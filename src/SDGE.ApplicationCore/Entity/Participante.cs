@@ -11,15 +11,15 @@ namespace SDGE.ApplicationCore.Entity
         {
 
         }
-
-        [Key]
-        public int id_participante { get; set; } 
-        public string nome { get; set; } 
-        public string ocupacao { get; set; } 
-        public string instituicao { get; set; } 
-        public string email { get; set; } 
-        public string telefone { get; set; } 
-        public string titulo_academico { get; set; } 
+        
+        public int ParticipanteId { get; set; } 
+        public string Nome { get; set; } 
+        public string Ocupacao { get; set; } 
+        public string Instituicao { get; set; } 
+        public string Email { get; set; } 
+        public string Telefone { get; set; } 
+        public string TituloAcademico { get; set; } 
+        public ICollection<Submissao>  Submissoes { get; set; }
              
     }
 }
