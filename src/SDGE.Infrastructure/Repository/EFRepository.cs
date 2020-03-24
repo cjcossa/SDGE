@@ -18,13 +18,13 @@ namespace SDGE.Infrastructure.Repository
         {
             _dbContext = dbContext;
         }
-        public void Actualizar(TEntity entity)
+        public virtual void Actualizar(TEntity entity)
         {
             _dbContext.Entry(entity).State = EntityState.Modified;
             _dbContext.SaveChanges();
         }
 
-        public TEntity Adicionar(TEntity entity)
+        public virtual TEntity Adicionar(TEntity entity)
         {
             _dbContext.Set<TEntity>().Add(entity);
             _dbContext.SaveChanges();
@@ -36,7 +36,7 @@ namespace SDGE.Infrastructure.Repository
             return _dbContext.Set<TEntity>().Where(predicado).AsEnumerable();
         }
 
-        public TEntity ObterPorId(int id)
+        public virtual TEntity ObterPorId(int id)
         {
             return _dbContext.Set<TEntity>().Find(id);
         }
