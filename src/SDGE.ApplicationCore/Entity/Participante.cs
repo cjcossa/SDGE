@@ -20,6 +20,8 @@ namespace SDGE.ApplicationCore.Entity
         public string Telefone { get; set; } 
         public string TituloAcademico { get; set; } 
         public ICollection<Submissao>  Submissoes { get; set; }
-             
+        public ICollection<Inscricao> Inscricoes { get; set; }
+        public ICollection<Alerta> Alertas { get; set; }
+
     }
 }

@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SDGE.Infrastructure.Data;
 
 namespace SDGE.Infrastructure.Migrations
 {
     [DbContext(typeof(ParticipanteContext))]
-    partial class ParticipanteContextModelSnapshot : ModelSnapshot
+    [Migration("20200324060350_Inicio")]
+    partial class Inicio
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -323,13 +325,13 @@ namespace SDGE.Infrastructure.Migrations
                     b.HasOne("SDGE.ApplicationCore.Entity.Comissao", "Comissao")
                         .WithMany("Alertas")
                         .HasForeignKey("ComissaoId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("SDGE.ApplicationCore.Entity.Participante", "Participante")
                         .WithMany("Alertas")
                         .HasForeignKey("ParticipanteId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
@@ -338,7 +340,7 @@ namespace SDGE.Infrastructure.Migrations
                     b.HasOne("SDGE.ApplicationCore.Entity.Evento", "Evento")
                         .WithMany("Comissoes")
                         .HasForeignKey("EventoId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
@@ -347,7 +349,7 @@ namespace SDGE.Infrastructure.Migrations
                     b.HasOne("SDGE.ApplicationCore.Entity.Submissao", "Submissao")
                         .WithOne("Correcao")
                         .HasForeignKey("SDGE.ApplicationCore.Entity.Correcao", "SubmissaoId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
@@ -356,13 +358,13 @@ namespace SDGE.Infrastructure.Migrations
                     b.HasOne("SDGE.ApplicationCore.Entity.Evento", "Evento")
                         .WithMany("Inscricoes")
                         .HasForeignKey("EventoId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("SDGE.ApplicationCore.Entity.Participante", "Participante")
                         .WithMany("Inscricoes")
                         .HasForeignKey("ParticipanteId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
@@ -371,7 +373,7 @@ namespace SDGE.Infrastructure.Migrations
                     b.HasOne("SDGE.ApplicationCore.Entity.Comissao", "Comissao")
                         .WithMany("Membros")
                         .HasForeignKey("ComissaoId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
@@ -380,13 +382,13 @@ namespace SDGE.Infrastructure.Migrations
                     b.HasOne("SDGE.ApplicationCore.Entity.Membro", "Membro")
                         .WithMany("MembroTipos")
                         .HasForeignKey("MembroId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("SDGE.ApplicationCore.Entity.Tipo", "Tipo")
                         .WithMany("MembroTipos")
                         .HasForeignKey("TipoId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
@@ -395,19 +397,19 @@ namespace SDGE.Infrastructure.Migrations
                     b.HasOne("SDGE.ApplicationCore.Entity.Evento", "Evento")
                         .WithMany("Submissoes")
                         .HasForeignKey("EventoId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("SDGE.ApplicationCore.Entity.Participante", "Participante")
                         .WithMany("Submissoes")
                         .HasForeignKey("ParticipanteId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("SDGE.ApplicationCore.Entity.Tipo", "Tipo")
                         .WithMany("Submissoes")
                         .HasForeignKey("TipoId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 #pragma warning restore 612, 618

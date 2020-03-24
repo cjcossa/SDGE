@@ -13,12 +13,17 @@ namespace SDGE.ApplicationCore.Entity
         }
         public int SubmissaoId { get; set; }
         public string Titulo { get; set; }
-        public string Tipo { get; set; }
         public string Descricao { get; set; }
         public string Ficheiro { get; set; }
         public string Status { get; set; }
+        public int TipoId { get; set; }
         public int ParticipanteId { get; set; }
+        public int EventoId { get; set; }
         public Participante Participante { get; set; }
+        public Correcao Correcao { get; set; }
+        public Evento Evento { get; set; }
+        public Tipo Tipo { get; set; }
+        //public Alerta Alerta { get; set; }
 
     }
 }

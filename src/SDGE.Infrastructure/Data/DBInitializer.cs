@@ -37,25 +37,39 @@ namespace SDGE.Infrastructure.Data
                 }
             };
             context.AddRange(participantes);
+            var tipos = new Tipo[]
+            {
+                new Tipo
+                {
+                    Titulo = "Resumo",
+                    Ficheiro = "Regras"
+                },
+                new Tipo
+                {
+                    Titulo = "Artigo",
+                    Ficheiro = "Regras"
+                }
+            };
+            context.AddRange(tipos);
             var submissoes = new Submissao[]
             {
                 new Submissao
                 {
                     Titulo ="Conferencia",
-                    Tipo = "Resumo",
                     Ficheiro = "Resumo.doc",
                     Status = "Activo",
                     Descricao = "Descriacao da conferencia",
-                    Participante = participantes[0]
+                    Participante = participantes[0],
+                    Tipo = tipos[0]
                 },
                 new Submissao
                 {
                     Titulo ="Conferencia",
-                    Tipo = "Artigo",
                     Ficheiro = "Artigo.doc",
                     Status = "Activo",
                     Descricao = "Descriacao da conferencia",
-                    Participante = participantes[1]
+                    Participante = participantes[1],
+                    Tipo = tipos[1]
                 }
             };
             context.AddRange(submissoes);

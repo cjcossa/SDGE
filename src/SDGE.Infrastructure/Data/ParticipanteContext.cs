@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using SDGE.ApplicationCore.Entity;
 using System.Text;
+using SDGE.Infrastructure.EntityConfig;
 
 namespace SDGE.Infrastructure.Data
 {
@@ -20,49 +21,26 @@ namespace SDGE.Infrastructure.Data
         {
             modelBuilder.Entity<Participante>().ToTable("Participante");
             modelBuilder.Entity<Submissao>().ToTable("Submissao");
+            modelBuilder.Entity<Evento>().ToTable("Evento");
+            modelBuilder.Entity<Tipo>().ToTable("Tipo");
+            modelBuilder.Entity<Membro>().ToTable("Membro");
+            modelBuilder.Entity<Inscricao>().ToTable("Inscricao");
+            modelBuilder.Entity<Correcao>().ToTable("Correcao");
+            modelBuilder.Entity<Comissao>().ToTable("Comissao");
+            modelBuilder.Entity<Alerta>().ToTable("Alerta");
+            modelBuilder.Entity<MembroTipo>().ToTable("MembroTipo");
 
-            #region Participante
+            modelBuilder.ApplyConfiguration(new ParticipanteMap());
+            modelBuilder.ApplyConfiguration(new SubmissaoMap());
+            modelBuilder.ApplyConfiguration(new EventoMap());
+            modelBuilder.ApplyConfiguration(new TipoMap());
+            modelBuilder.ApplyConfiguration(new MembroMap());
+            modelBuilder.ApplyConfiguration(new InscricaoMap());
+            modelBuilder.ApplyConfiguration(new CorrecaoMap());
+            modelBuilder.ApplyConfiguration(new ComissaoMap());
+            modelBuilder.ApplyConfiguration(new AlertaMap());
+            modelBuilder.ApplyConfiguration(new MembroTipoMap());
 
-            modelBuilder.Entity<Participante>().Property(e => e.Nome)
-                .HasColumnType("varchar(100)")
-                .IsRequired();
-            modelBuilder.Entity<Participante>().Property(e => e.Ocupacao)
-                .HasColumnType("varchar(100)")
-                .IsRequired();
-            modelBuilder.Entity<Participante>().Property(e => e.Instituicao)
-                .HasColumnType("varchar(100)")
-                .IsRequired();
-            modelBuilder.Entity<Participante>().Property(e => e.Email)
-                .HasColumnType("varchar(100)")
-                .IsRequired();
-            modelBuilder.Entity<Participante>().Property(e => e.Telefone)
-                .HasColumnType("varchar(100)")
-                .IsRequired();
-            modelBuilder.Entity<Participante>().Property(e => e.TituloAcademico)
-                .HasColumnType("varchar(100)")
-                .IsRequired();
-
-            #endregion
-
-            #region Submissao
-
-            modelBuilder.Entity<Submissao>().Property(e => e.Titulo)
-                .HasColumnType("varchar(250)")
-                .IsRequired();
-            modelBuilder.Entity<Submissao>().Property(e => e.Tipo)
-                .HasColumnType("varchar(100)")
-                .IsRequired();
-            modelBuilder.Entity<Submissao>().Property(e => e.Ficheiro)
-                .HasColumnType("varchar(250)")
-                .IsRequired();
-            modelBuilder.Entity<Submissao>().Property(e => e.Status)
-                .HasColumnType("varchar(50)")
-                .IsRequired();
-            modelBuilder.Entity<Submissao>().Property(e => e.Descricao)
-                .HasColumnType("varchar(500)")
-                .IsRequired();
-
-            #endregion
         }
     }
 }
