@@ -7,6 +7,6 @@ namespace SDGE.ApplicationCore.Interfaces.Repository
 {
     public interface ICorrecaoRepository : IRepository<Correcao>
     {
-
+        public IEnumerable<Correcao> ObterJoinPorId(int id);
     }
 }

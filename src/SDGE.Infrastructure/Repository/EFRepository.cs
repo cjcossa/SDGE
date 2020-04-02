@@ -41,7 +41,7 @@ namespace SDGE.Infrastructure.Repository
             return _dbContext.Set<TEntity>().Find(id);
         }
 
-        public IEnumerable<TEntity> ObterTodos()
+        public virtual IEnumerable<TEntity> ObterTodos()
         {
             return _dbContext.Set<TEntity>().AsEnumerable();
         }

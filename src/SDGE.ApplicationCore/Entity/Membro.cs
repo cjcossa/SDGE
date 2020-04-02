@@ -15,8 +15,7 @@ namespace SDGE.ApplicationCore.Entity
         public string Nome { get; set; }
         public string Email { get; set; }
         public string Telefone { get; set; }
-        public int ComissaoId { get; set; }
-        public Comissao Comissao { get; set; }
-        public ICollection<MembroTipo> MembroTipos { get; set; }
+        public ICollection<MembroEvento> MembroEventos { get; set; }
+        public ICollection<Correcao> Correcoes { get; set; }
     }
 }

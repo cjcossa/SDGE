@@ -26,9 +26,6 @@ namespace SDGE.Infrastructure.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("ComissaoId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Messagem")
                         .IsRequired()
                         .HasColumnType("varchar(250)");
@@ -42,36 +39,9 @@ namespace SDGE.Infrastructure.Migrations
 
                     b.HasKey("AlertaId");
 
-                    b.HasIndex("ComissaoId");
-
                     b.HasIndex("ParticipanteId");
 
                     b.ToTable("Alerta");
-                });
-
-            modelBuilder.Entity("SDGE.ApplicationCore.Entity.Comissao", b =>
-                {
-                    b.Property<int>("ComissaoId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("varchar(100)");
-
-                    b.Property<int>("EventoId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Nome")
-                        .IsRequired()
-                        .HasColumnType("varchar(100)");
-
-                    b.HasKey("ComissaoId");
-
-                    b.HasIndex("EventoId");
-
-                    b.ToTable("Comissao");
                 });
 
             modelBuilder.Entity("SDGE.ApplicationCore.Entity.Correcao", b =>
@@ -85,6 +55,9 @@ namespace SDGE.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(250)");
 
+                    b.Property<int>("MembroId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Observacoes")
                         .IsRequired()
                         .HasColumnType("varchar(1000)");
@@ -93,6 +66,8 @@ namespace SDGE.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("CorrecaoId");
+
+                    b.HasIndex("MembroId");
 
                     b.HasIndex("SubmissaoId")
                         .IsUnique();
@@ -121,6 +96,10 @@ namespace SDGE.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(1000)");
 
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("varchar(300)");
+
                     b.Property<string>("Lema")
                         .IsRequired()
                         .HasColumnType("varchar(500)");
@@ -138,9 +117,9 @@ namespace SDGE.Infrastructure.Migrations
                     b.ToTable("Evento");
                 });
 
-            modelBuilder.Entity("SDGE.ApplicationCore.Entity.Inscricao", b =>
+            modelBuilder.Entity("SDGE.ApplicationCore.Entity.EventoParticipante", b =>
                 {
-                    b.Property<int>("InscricaoId")
+                    b.Property<int>("EventoParticipanteId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
@@ -159,13 +138,13 @@ namespace SDGE.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(50)");
 
-                    b.HasKey("InscricaoId");
+                    b.HasKey("EventoParticipanteId");
 
                     b.HasIndex("EventoId");
 
                     b.HasIndex("ParticipanteId");
 
-                    b.ToTable("Inscricao");
+                    b.ToTable("EventoParticipante");
                 });
 
             modelBuilder.Entity("SDGE.ApplicationCore.Entity.Membro", b =>
@@ -174,9 +153,6 @@ namespace SDGE.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("ComissaoId")
-                        .HasColumnType("int");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -192,31 +168,32 @@ namespace SDGE.Infrastructure.Migrations
 
                     b.HasKey("MembroId");
 
-                    b.HasIndex("ComissaoId");
-
                     b.ToTable("Membro");
                 });
 
-            modelBuilder.Entity("SDGE.ApplicationCore.Entity.MembroTipo", b =>
+            modelBuilder.Entity("SDGE.ApplicationCore.Entity.MembroEvento", b =>
                 {
-                    b.Property<int>("MembroTipoId")
+                    b.Property<int>("MembroEventoId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<string>("Comissao")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("EventoId")
+                        .HasColumnType("int");
+
                     b.Property<int>("MembroId")
                         .HasColumnType("int");
 
-                    b.Property<int>("TipoId")
-                        .HasColumnType("int");
+                    b.HasKey("MembroEventoId");
 
-                    b.HasKey("MembroTipoId");
+                    b.HasIndex("EventoId");
 
                     b.HasIndex("MembroId");
 
-                    b.HasIndex("TipoId");
-
-                    b.ToTable("MembroTipo");
+                    b.ToTable("MembroEvento");
                 });
 
             modelBuilder.Entity("SDGE.ApplicationCore.Entity.Participante", b =>
@@ -320,12 +297,6 @@ namespace SDGE.Infrastructure.Migrations
 
             modelBuilder.Entity("SDGE.ApplicationCore.Entity.Alerta", b =>
                 {
-                    b.HasOne("SDGE.ApplicationCore.Entity.Comissao", "Comissao")
-                        .WithMany("Alertas")
-                        .HasForeignKey("ComissaoId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("SDGE.ApplicationCore.Entity.Participante", "Participante")
                         .WithMany("Alertas")
                         .HasForeignKey("ParticipanteId")
@@ -333,17 +304,14 @@ namespace SDGE.Infrastructure.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("SDGE.ApplicationCore.Entity.Comissao", b =>
-                {
-                    b.HasOne("SDGE.ApplicationCore.Entity.Evento", "Evento")
-                        .WithMany("Comissoes")
-                        .HasForeignKey("EventoId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("SDGE.ApplicationCore.Entity.Correcao", b =>
                 {
+                    b.HasOne("SDGE.ApplicationCore.Entity.Membro", "Membro")
+                        .WithMany("Correcoes")
+                        .HasForeignKey("MembroId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("SDGE.ApplicationCore.Entity.Submissao", "Submissao")
                         .WithOne("Correcao")
                         .HasForeignKey("SDGE.ApplicationCore.Entity.Correcao", "SubmissaoId")
@@ -351,41 +319,32 @@ namespace SDGE.Infrastructure.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("SDGE.ApplicationCore.Entity.Inscricao", b =>
+            modelBuilder.Entity("SDGE.ApplicationCore.Entity.EventoParticipante", b =>
                 {
                     b.HasOne("SDGE.ApplicationCore.Entity.Evento", "Evento")
-                        .WithMany("Inscricoes")
+                        .WithMany("EventoParticipantes")
                         .HasForeignKey("EventoId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("SDGE.ApplicationCore.Entity.Participante", "Participante")
-                        .WithMany("Inscricoes")
+                        .WithMany("EventoParticipantes")
                         .HasForeignKey("ParticipanteId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("SDGE.ApplicationCore.Entity.Membro", b =>
+            modelBuilder.Entity("SDGE.ApplicationCore.Entity.MembroEvento", b =>
                 {
-                    b.HasOne("SDGE.ApplicationCore.Entity.Comissao", "Comissao")
-                        .WithMany("Membros")
-                        .HasForeignKey("ComissaoId")
+                    b.HasOne("SDGE.ApplicationCore.Entity.Evento", "Evento")
+                        .WithMany("MembroEventos")
+                        .HasForeignKey("EventoId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-                });
 
-            modelBuilder.Entity("SDGE.ApplicationCore.Entity.MembroTipo", b =>
-                {
                     b.HasOne("SDGE.ApplicationCore.Entity.Membro", "Membro")
-                        .WithMany("MembroTipos")
+                        .WithMany("MembroEventos")
                         .HasForeignKey("MembroId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("SDGE.ApplicationCore.Entity.Tipo", "Tipo")
-                        .WithMany("MembroTipos")
-                        .HasForeignKey("TipoId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });

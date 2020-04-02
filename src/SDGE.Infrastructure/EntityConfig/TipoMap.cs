@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SDGE.ApplicationCore.Entity;
 using System;
 using System.Collections.Generic;
@@ -8,7 +9,7 @@ namespace SDGE.Infrastructure.EntityConfig
 {
     public class TipoMap : IEntityTypeConfiguration<Tipo>
     {
-        public void Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder<Tipo> builder)
+        public void Configure(EntityTypeBuilder<Tipo> builder)
         {
             builder.HasKey(p => p.TipoId);
 

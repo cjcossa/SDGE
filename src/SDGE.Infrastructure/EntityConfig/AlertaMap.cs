@@ -19,13 +19,6 @@ namespace SDGE.Infrastructure.EntityConfig
                   .HasPrincipalKey(s => s.ParticipanteId)
                   .OnDelete(DeleteBehavior.Restrict);
 
-            //com Comissao
-            builder.HasOne(s => s.Comissao)
-                  .WithMany(s => s.Alertas)
-                  .HasForeignKey(s => s.ComissaoId)
-                  .HasPrincipalKey(s => s.ComissaoId)
-                  .OnDelete(DeleteBehavior.Restrict);
-
             builder.Property(a => a.Messagem)
                .HasColumnType("varchar(250)")
                .IsRequired();

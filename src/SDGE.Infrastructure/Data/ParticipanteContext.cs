@@ -11,11 +11,18 @@ namespace SDGE.Infrastructure.Data
     {
         public ParticipanteContext(DbContextOptions<ParticipanteContext> options) : base(options)
         {
-
+            Database.EnsureCreated();
         }
         
         public DbSet<Participante> Participantes { get; set; }
+        public DbSet<Evento> Eventos { get; set; }
+        public DbSet<Tipo> Tipos { get; set; }
+        public DbSet<Membro> Membros { get; set; }
+        public DbSet<EventoParticipante> EventoParticipantes { get; set; }
         public DbSet<Submissao> Submissoes { get; set; }
+        public DbSet<Correcao> Correcoes { get; set; }
+        public DbSet<MembroEvento> MembroEventos { get; set; }
+        public DbSet<Alerta> Alertas { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -24,22 +31,20 @@ namespace SDGE.Infrastructure.Data
             modelBuilder.Entity<Evento>().ToTable("Evento");
             modelBuilder.Entity<Tipo>().ToTable("Tipo");
             modelBuilder.Entity<Membro>().ToTable("Membro");
-            modelBuilder.Entity<Inscricao>().ToTable("Inscricao");
+            modelBuilder.Entity<EventoParticipante>().ToTable("EventoParticipante");
             modelBuilder.Entity<Correcao>().ToTable("Correcao");
-            modelBuilder.Entity<Comissao>().ToTable("Comissao");
+            modelBuilder.Entity<MembroEvento>().ToTable("MembroEvento");
             modelBuilder.Entity<Alerta>().ToTable("Alerta");
-            modelBuilder.Entity<MembroTipo>().ToTable("MembroTipo");
 
             modelBuilder.ApplyConfiguration(new ParticipanteMap());
             modelBuilder.ApplyConfiguration(new SubmissaoMap());
             modelBuilder.ApplyConfiguration(new EventoMap());
             modelBuilder.ApplyConfiguration(new TipoMap());
             modelBuilder.ApplyConfiguration(new MembroMap());
-            modelBuilder.ApplyConfiguration(new InscricaoMap());
             modelBuilder.ApplyConfiguration(new CorrecaoMap());
-            modelBuilder.ApplyConfiguration(new ComissaoMap());
+            modelBuilder.ApplyConfiguration(new EventoParticipanteMap());
             modelBuilder.ApplyConfiguration(new AlertaMap());
-            modelBuilder.ApplyConfiguration(new MembroTipoMap());
+            modelBuilder.ApplyConfiguration(new MembroEventoMap());
 
         }
     }

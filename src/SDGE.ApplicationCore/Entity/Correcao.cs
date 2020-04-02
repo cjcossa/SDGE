@@ -16,5 +16,7 @@ namespace SDGE.ApplicationCore.Entity
         public string Observacoes { get; set; }
         public int SubmissaoId { get; set; }
         public Submissao Submissao { get; set; }
+        public int MembroId { get; set; }
+        public Membro Membro { get; set; }
     }
 }

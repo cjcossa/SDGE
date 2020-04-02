@@ -15,9 +15,9 @@ namespace SDGE.UI.Web
     {
         public static void Main(string[] args)
         {
-            //CreateHostBuilder(args).Build().Run();
+            CreateHostBuilder(args).Build().Run();
 
-            var host = CreateHostBuilder(args).Build();
+            /*var host = CreateHostBuilder(args).Build();
 
             using (var scope = host.Services.CreateScope())
             {
@@ -33,7 +33,7 @@ namespace SDGE.UI.Web
                     logger.LogError(ex, "Erro no metdo seeding do contexto");
                 }
             }
-            host.Run();
+            host.Run();*/
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>

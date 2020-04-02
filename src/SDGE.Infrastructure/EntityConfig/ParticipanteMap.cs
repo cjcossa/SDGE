@@ -20,13 +20,6 @@ namespace SDGE.Infrastructure.EntityConfig
                 .HasPrincipalKey(p => p.ParticipanteId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            //com Inscricao
-            builder.HasMany(p => p.Inscricoes)
-                .WithOne(p => p.Participante)
-                .HasForeignKey(p => p.ParticipanteId)
-                .HasPrincipalKey(p => p.ParticipanteId)
-                .OnDelete(DeleteBehavior.Restrict);
-
             //com Alerta
             builder.HasMany(p => p.Alertas)
                 .WithOne(p => p.Participante)

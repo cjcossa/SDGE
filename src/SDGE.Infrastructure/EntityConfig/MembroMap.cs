@@ -11,12 +11,12 @@ namespace SDGE.Infrastructure.EntityConfig
     {
         public void Configure(EntityTypeBuilder<Membro> builder)
         {
-            //com Comissao
-            builder.HasOne(s => s.Comissao)
-                  .WithMany(s => s.Membros)
-                  .HasForeignKey(s => s.ComissaoId)
-                  .HasPrincipalKey(s => s.ComissaoId)
-                  .OnDelete(DeleteBehavior.Restrict);
+            //com scorrecao
+            builder.HasMany(p => p.Correcoes)
+                .WithOne(p => p.Membro)
+                .HasForeignKey(p => p.MembroId)
+                .HasPrincipalKey(p => p.MembroId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.Property(m => m.Nome)
               .HasColumnType("varchar(100)")

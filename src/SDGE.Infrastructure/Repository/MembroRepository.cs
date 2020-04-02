@@ -15,9 +15,15 @@ namespace SDGE.Infrastructure.Repository
         {
 
         }
-        public Membro ObterPorTipo(int membroId)
+
+        public IEnumerable<Membro> ObterPorComissao(string comissao)
         {
-            return Buscar(m => m.MembroTipos.Any(t => t.MembroId == membroId))
+            return Buscar(m => m.MembroEventos.Any(m => m.Comissao == comissao)).AsEnumerable();
+        }
+
+        public  Membro ObterPorEvento(int membroId)
+        {
+            return Buscar(m => m.MembroEventos.Any(t => t.MembroId == membroId))
                  .FirstOrDefault();
         }
     }

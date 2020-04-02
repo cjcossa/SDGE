@@ -20,20 +20,6 @@ namespace SDGE.Infrastructure.EntityConfig
                 .HasPrincipalKey(p => p.EventoId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            //com Inscricao
-            builder.HasMany(p => p.Inscricoes)
-                .WithOne(p => p.Evento)
-                .HasForeignKey(p => p.EventoId)
-                .HasPrincipalKey(p => p.EventoId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            //com Comissao
-            builder.HasMany(p => p.Comissoes)
-                .WithOne(p => p.Evento)
-                .HasForeignKey(p => p.EventoId)
-                .HasPrincipalKey(p => p.EventoId)
-                .OnDelete(DeleteBehavior.Restrict);
-
             builder.Property(e => e.Titulo)
                 .HasColumnType("varchar(500)")
                 .IsRequired();
@@ -43,6 +29,10 @@ namespace SDGE.Infrastructure.EntityConfig
                .IsRequired();
 
             builder.Property(e => e.Local)
+               .HasColumnType("varchar(300)")
+               .IsRequired();
+
+            builder.Property(e => e.Email)
                .HasColumnType("varchar(300)")
                .IsRequired();
 

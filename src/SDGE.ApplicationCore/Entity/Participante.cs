@@ -18,9 +18,10 @@ namespace SDGE.ApplicationCore.Entity
         public string Instituicao { get; set; } 
         public string Email { get; set; } 
         public string Telefone { get; set; } 
-        public string TituloAcademico { get; set; } 
+        public string TituloAcademico { get; set; }
+        public ICollection<EventoParticipante> EventoParticipantes { get; set; }
         public ICollection<Submissao>  Submissoes { get; set; }
-        public ICollection<Inscricao> Inscricoes { get; set; }
+
         public ICollection<Alerta> Alertas { get; set; }
 
     }

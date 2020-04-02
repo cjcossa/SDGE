@@ -16,4 +16,8 @@
     <ProjectReference Include="..\SDGE.ApplicationCore\SDGE.ApplicationCore.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Migrations\" />
+  </ItemGroup>
+
 </Project>

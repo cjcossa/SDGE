@@ -14,6 +14,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SDGE.Infrastructure.Data;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
+using SDGE.Infrastructure.Repository;
+using SDGE.ApplicationCore.Interfaces.Services;
+using SDGE.ApplicationCore.Interfaces.Repository;
 
 namespace SDGE.UI.Web
 {
@@ -43,6 +46,19 @@ namespace SDGE.UI.Web
 
             services.AddControllersWithViews();
             services.AddRazorPages();
+
+            // services.AddSingleton(typeof(IRepository<>), typeof(EFRepository<>));
+            // services.AddSingleton<IParticipanteRepository, ParticipanteRepository>();
+            services.AddScoped(typeof(IRepository<>), typeof(EFRepository<>));
+            services.AddScoped<IParticipanteRepository, ParticipanteRepository>();
+            services.AddScoped<IEventoRepository, EventoRepository>();
+            services.AddScoped<IEventoParticipanteRepository, EventoParticipanteRepository>();
+            services.AddScoped<IMembroRepository, MembroRepository>();
+            services.AddScoped<ISubmissaoRepository, SubmissaoRepository>();
+            services.AddScoped<ITipoRepository, TipoRepository>();
+            services.AddScoped<ICorrecaoRepository, CorrecaoRepository>();
+            services.AddScoped<IMembroEventoRepository, MembroEventoRepository>();
+            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

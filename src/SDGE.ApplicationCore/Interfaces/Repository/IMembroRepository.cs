@@ -7,6 +7,7 @@ namespace SDGE.ApplicationCore.Interfaces.Repository
 {
     public interface IMembroRepository : IRepository<Membro>
     {
-        Membro ObterPorTipo(int membroId);
+        Membro ObterPorEvento(int membroId);
+        public IEnumerable<Membro> ObterPorComissao(string comissao);
     }
 }

@@ -18,7 +18,5 @@ namespace SDGE.ApplicationCore.Entity
         public Participante Participante { get; set; }
        // public int SubmissaoId { get; set; }
         //public Submissao Submissao { get; set; }
-        public int ComissaoId { get; set; }
-        public Comissao Comissao { get; set; }
     }
 }

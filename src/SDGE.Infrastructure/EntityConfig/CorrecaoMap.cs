@@ -11,6 +11,13 @@ namespace SDGE.Infrastructure.EntityConfig
     {
         public void Configure(EntityTypeBuilder<Correcao> builder)
         {
+            //com membro
+            builder.HasOne(s => s.Membro)
+                  .WithMany(s => s.Correcoes)
+                  .HasForeignKey(s => s.MembroId)
+                  .HasPrincipalKey(s => s.MembroId)
+                  .OnDelete(DeleteBehavior.Restrict);
+
             builder.Property(c => c.Ficheiro)
              .HasColumnType("varchar(250)")
              .IsRequired();

@@ -1,0 +1,53 @@
+﻿@model IEnumerable<SDGE.ApplicationCore.Entity.Correcao>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Ficheiro)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Observacoes)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Submissao)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Membro)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Ficheiro)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Observacoes)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Submissao.Titulo)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Membro.Nome)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.CorrecaoId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.CorrecaoId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.CorrecaoId">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
