@@ -15,7 +15,7 @@ namespace SDGE.Infrastructure.Data
                 return;
             }
 
-            var participantes = new Participante[]
+            /*var participantes = new Participante[]
             {
                 new Participante
                 {
@@ -73,7 +73,7 @@ namespace SDGE.Infrastructure.Data
                 }
             };
             context.AddRange(submissoes);
-            context.SaveChanges();
+            context.SaveChanges();*/
         }
     }
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using SDGE.ApplicationCore.Entity;
 using SDGE.ApplicationCore.Interfaces.Repository;
 
@@ -34,9 +35,18 @@ namespace SDGE.UI.Web.Controllers
         // GET: Evento/Create
         public ActionResult Create()
         {
+            ViewBag.Categoria = Categoria();
             return View(new Evento());
         }
 
+        private List<SelectListItem> Categoria()
+        {
+            return new List<SelectListItem>(){
+                new SelectListItem(){Value="Conferência",Text="Conferência"},
+                new SelectListItem(){Value="Seminário",Text="Seminário"},
+                new SelectListItem(){Value="Workshop",Text="Workshop"}
+            };
+        }
         // POST: Evento/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -57,6 +67,7 @@ namespace SDGE.UI.Web.Controllers
         // GET: Evento/Edit/5
         public ActionResult Edit(int id)
         {
+            ViewBag.Categoria = Categoria();
             return View(_eventoRepository.ObterPorId(id));
         }
 

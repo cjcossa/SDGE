@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -16,14 +18,16 @@ namespace SDGE.UI.Web.Controllers
         private readonly IParticipanteRepository _participanteRepository;
         private readonly IEventoRepository _eventoRepository;
         private readonly ITipoRepository _tipoRepository;
+       // private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
-      
-        public SubmissaoController(ISubmissaoRepository submissaoRepository, IParticipanteRepository participanteRepository, IEventoRepository eventoRepository, ITipoRepository tipoRepository)
+        public SubmissaoController(ISubmissaoRepository submissaoRepository, IParticipanteRepository participanteRepository, IEventoRepository eventoRepository, ITipoRepository tipoRepository, IWebHostEnvironment webHostEnvironment)
         {
             _submissaoRepository = submissaoRepository;
             _participanteRepository = participanteRepository;
             _eventoRepository = eventoRepository;
             _tipoRepository = tipoRepository;
+            _webHostEnvironment = webHostEnvironment;
         }
         // GET: Submissao
         public ActionResult Index()
@@ -40,11 +44,9 @@ namespace SDGE.UI.Web.Controllers
         // GET: Submissao/Create
         public ActionResult Create()
         {
-            ViewBag.ParticipanteId = ObterParticipantes();
-            ViewBag.EventoId = ObterEventos();
-            ViewBag.TipoId = ObterTipos();
-        
-            return View(new Submissao());
+
+            PreencherCombobox();
+            return View(new SubmeterFicheiro());
         }
         private SelectList ObterParticipantes(string id = null)
         {
@@ -58,28 +60,52 @@ namespace SDGE.UI.Web.Controllers
         {
             return new SelectList(_tipoRepository.ObterTodos(), "TipoId", "Titulo", id);
         }
+        private void PreencherCombobox()
+        {
+            ViewBag.ParticipanteId = ObterParticipantes();
+            ViewBag.EventoId = ObterEventos();
+            ViewBag.TipoId = ObterTipos();
+        }
 
 
         // POST: Submissao/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(Submissao collection)
+        public ActionResult Create(SubmeterFicheiro collection)
         {
             try
             {
                 // TODO: Add insert logic here
+
                 if (ModelState.IsValid)
                 {
-                    _submissaoRepository.Adicionar(collection);
+                    string filePath = null;
+                    if (collection.File != null)
+                    {
+                        string uplodasFolder = Path.Combine(_webHostEnvironment.WebRootPath, "Ficheiros");
+                        string fileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(collection.File.FileName);
+                        filePath = Path.Combine(uplodasFolder, fileName);
+                        collection.File.CopyTo(new FileStream(filePath, FileMode.Create));
+                    }
+                    Submissao submissao = new Submissao {
+                        Titulo = collection.Titulo,
+                        Descricao = collection.Descricao,
+                        Ficheiro = filePath,
+                        Status = collection.Status,
+                        TipoId = collection.TipoId,
+                        ParticipanteId = collection.ParticipanteId,
+                        EventoId = collection.EventoId                   
+                    };
+
+                    _submissaoRepository.Adicionar(submissao);
                     return RedirectToAction(nameof(Index));
                 }
-                ViewBag.ParticipanteId = ObterParticipantes(collection.ParticipanteId.ToString());
-                ViewBag.EventoId = ObterEventos(collection.EventoId.ToString());
-                ViewBag.TipoId = ObterTipos(collection.TipoId.ToString());
+                PreencherCombobox();
                 return View(collection);
             }
             catch
             {
+                PreencherCombobox();
                 return View();
             }
             

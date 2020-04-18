@@ -12,9 +12,11 @@ namespace SDGE.ApplicationCore.Entity
         }
 
         public int UtilizadorId { get; set; }
-        public string Titulo { get; set; }
-        public string Ficheiro { get; set; }
-        public ICollection<Submissao> Submissoes { get; set; }
+        public string Email { get; set; }
+        public string Password { get; set; }
+        public int PermissaoId { get; set; }
+        public Permissao Permissao { get; set; }
+
 
     }
 }

@@ -10,7 +10,7 @@ using SDGE.Infrastructure.Data;
 namespace SDGE.Infrastructure.Migrations
 {
     [DbContext(typeof(ParticipanteContext))]
-    [Migration("20200328185552_DB")]
+    [Migration("20200418163105_DB")]
     partial class DB
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

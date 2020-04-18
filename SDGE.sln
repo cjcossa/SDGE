@@ -9,11 +9,16 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2 - Domain", "2 - Domain", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3 - Infrastructure", "3 - Infrastructure", "{D2C984A7-AD94-412E-A679-61712AD3F49B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SDGE.ApplicationCore", "src\SDGE.ApplicationCore\SDGE.ApplicationCore.csproj", "{B529F795-C116-4E6B-8B69-4D434C09C8AF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SDGE.ApplicationCore", "src\SDGE.ApplicationCore\SDGE.ApplicationCore.csproj", "{B529F795-C116-4E6B-8B69-4D434C09C8AF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SDGE.Infrastructure", "src\SDGE.Infrastructure\SDGE.Infrastructure.csproj", "{165213B5-6A49-466D-B7FB-8BF48658D631}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SDGE.Infrastructure", "src\SDGE.Infrastructure\SDGE.Infrastructure.csproj", "{165213B5-6A49-466D-B7FB-8BF48658D631}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SDGE.UI.Web", "src\SDGE.UI.Web\SDGE.UI.Web.csproj", "{EC6C636B-4132-4AAF-A9BC-BE10B489074D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SDGE.UI.Web", "src\SDGE.UI.Web\SDGE.UI.Web.csproj", "{EC6C636B-4132-4AAF-A9BC-BE10B489074D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{1F4A0210-A728-4B6C-B9FA-B4CDDDCEAAAA}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

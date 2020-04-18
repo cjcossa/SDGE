@@ -38,11 +38,19 @@ namespace SDGE.UI.Web.Controllers
         // GET: MembroEvento/Create
         public ActionResult Create()
         {
+            ViewBag.Comissao = Comissao();
             ViewBag.EventoId = ObterEventos();
             ViewBag.MembroId = ObterMembros();
             return View(new MembroEvento());
         }
-        
+        private List<SelectListItem> Comissao()
+        {
+            return new List<SelectListItem>(){
+                new SelectListItem(){Value="Comissão Organizadora",Text="Comissão Organizadora"},
+                new SelectListItem(){Value="Comissão Científica",Text="Comissão Científica"}
+            };
+        }
+
         public SelectList ObterEventos(string id = null)
         {
             return new SelectList(_eventoRepository.ObterTodos(), "EventoId", "Titulo", id);
@@ -79,6 +87,7 @@ namespace SDGE.UI.Web.Controllers
         // GET: MembroEvento/Edit/5
         public ActionResult Edit(int id)
         {
+            ViewBag.Comissao = Comissao();
             ViewBag.EventoId = ObterEventos();
             ViewBag.MembroId = ObterMembros();
             return View(_membroEventoRepository.ObterPorId(id));
