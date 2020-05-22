@@ -128,7 +128,7 @@ namespace SDGE.UI.Web
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Submissao}/{action=Index}/{id?}");
+                    pattern: "{controller=Evento}/{action=Index}/{id?}");
                 endpoints.MapRazorPages();
             });
         }

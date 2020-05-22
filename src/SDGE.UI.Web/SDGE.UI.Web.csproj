@@ -29,7 +29,9 @@
 
 
   <ItemGroup>
-    <Folder Include="wwwroot\Ficheiros\" />
+    <Folder Include="wwwroot\Correcoes\" />
+    <Folder Include="wwwroot\Comprovativos\" />
+    <Folder Include="wwwroot\Submissoes\" />
   </ItemGroup>
 
 </Project>

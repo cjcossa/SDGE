@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.StaticFiles;
+using MimeKit;
 using SDGE.ApplicationCore.Entity;
 using SDGE.ApplicationCore.Interfaces.Repository;
 
@@ -18,7 +20,6 @@ namespace SDGE.UI.Web.Controllers
         private readonly IParticipanteRepository _participanteRepository;
         private readonly IEventoRepository _eventoRepository;
         private readonly ITipoRepository _tipoRepository;
-       // private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IWebHostEnvironment _webHostEnvironment;
 
         public SubmissaoController(ISubmissaoRepository submissaoRepository, IParticipanteRepository participanteRepository, IEventoRepository eventoRepository, ITipoRepository tipoRepository, IWebHostEnvironment webHostEnvironment)
@@ -48,26 +49,7 @@ namespace SDGE.UI.Web.Controllers
             PreencherCombobox();
             return View(new SubmeterFicheiro());
         }
-        private SelectList ObterParticipantes(string id = null)
-        {
-            return new SelectList(_participanteRepository.ObterTodos(), "ParticipanteId", "Nome", id);
-        }
-        private SelectList ObterEventos(string id = null)
-        {
-            return new SelectList(_eventoRepository.ObterTodos(), "EventoId", "Titulo", id);
-        }
-        private SelectList ObterTipos(string id = null)
-        {
-            return new SelectList(_tipoRepository.ObterTodos(), "TipoId", "Titulo", id);
-        }
-        private void PreencherCombobox()
-        {
-            ViewBag.ParticipanteId = ObterParticipantes();
-            ViewBag.EventoId = ObterEventos();
-            ViewBag.TipoId = ObterTipos();
-        }
-
-
+       
         // POST: Submissao/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -79,26 +61,23 @@ namespace SDGE.UI.Web.Controllers
 
                 if (ModelState.IsValid)
                 {
-                    string filePath = null;
-                    if (collection.File != null)
+                    if(collection.File != null)
                     {
-                        string uplodasFolder = Path.Combine(_webHostEnvironment.WebRootPath, "Ficheiros");
-                        string fileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(collection.File.FileName);
-                        filePath = Path.Combine(uplodasFolder, fileName);
-                        collection.File.CopyTo(new FileStream(filePath, FileMode.Create));
-                    }
-                    Submissao submissao = new Submissao {
-                        Titulo = collection.Titulo,
-                        Descricao = collection.Descricao,
-                        Ficheiro = filePath,
-                        Status = collection.Status,
-                        TipoId = collection.TipoId,
-                        ParticipanteId = collection.ParticipanteId,
-                        EventoId = collection.EventoId                   
-                    };
+                        var fileName = UploadFile(collection);
+                        Submissao submissao = new Submissao
+                        {
+                            Titulo = collection.Titulo,
+                            Descricao = collection.Descricao,
+                            Ficheiro = fileName,
+                            Status = collection.Status,
+                            TipoId = collection.TipoId,
+                            ParticipanteId = collection.ParticipanteId,
+                            EventoId = collection.EventoId
+                        };
 
-                    _submissaoRepository.Adicionar(submissao);
-                    return RedirectToAction(nameof(Index));
+                        _submissaoRepository.Adicionar(submissao);
+                        return RedirectToAction(nameof(Index));
+                    }
                 }
                 PreencherCombobox();
                 return View(collection);
@@ -117,30 +96,37 @@ namespace SDGE.UI.Web.Controllers
             ViewBag.ParticipanteId = ObterParticipantes();
             ViewBag.EventoId = ObterEventos();
             ViewBag.TipoId = ObterTipos();
-            return View(_submissaoRepository.ObterPorId(id));
+            ViewBag.Ficheiro =_submissaoRepository.ObterPorId(id).Ficheiro;
+            
+            return View(Submeter(id));
         }
-
+       
         // POST: Submissao/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, Submissao collection)
+        public ActionResult Edit(int id, SubmeterFicheiro submeterFicheiro)
         {
+            
             try
             {
                 // TODO: Add update logic here
                 if (ModelState.IsValid)
                 {
-                    _submissaoRepository.Actualizar(collection);
+                    if (submeterFicheiro.File != null)
+                    {
+                        var fileName = UploadFile(submeterFicheiro);
+                        submeterFicheiro.Ficheiro = fileName;
+                    }
+                    _submissaoRepository.Actualizar(Submissao(submeterFicheiro));
                     return RedirectToAction(nameof(Index));
                 }
-                ViewBag.ParticipanteId = ObterParticipantes(collection.ParticipanteId.ToString());
-                ViewBag.EventoId = ObterEventos(collection.EventoId.ToString());
-                ViewBag.TipoId = ObterTipos(collection.TipoId.ToString());
-                return View(collection);
+                PreencherCombobox();
+                return View(submeterFicheiro);
             }
             catch
             {
-                return View();
+                PreencherCombobox();
+                return View(submeterFicheiro);
             }
         }
 
@@ -158,6 +144,8 @@ namespace SDGE.UI.Web.Controllers
             try
             {
                 // TODO: Add delete logic here
+
+                //DeleteFile(collection.Ficheiro);
                 _submissaoRepository.Remover(collection);
                 return RedirectToAction(nameof(Index));
             }
@@ -166,6 +154,88 @@ namespace SDGE.UI.Web.Controllers
                 return View();
             }
 
+        }
+      
+        public ActionResult Download(int id)
+        {
+            var uploads = Path.Combine(_webHostEnvironment.WebRootPath, "Submissoes");
+             var filePath = Path.Combine(uploads, _submissaoRepository.ObterPorId(id).Ficheiro);
+             if (!System.IO.File.Exists(filePath))
+                 return NotFound();
+
+             return PhysicalFile(filePath, MimeTypes.GetMimeType(filePath), Path.GetFileName(filePath));
+        }
+
+        private void DeleteFile(string fileName)
+        {
+            var filePath = Path.Combine(_webHostEnvironment.WebRootPath, "Submissoes", fileName);
+            if (System.IO.File.Exists(filePath))
+            {
+                System.IO.File.Delete(filePath);
+            }
+        }
+        private SubmeterFicheiro Submeter(int id)
+        {
+            Submissao submissao = _submissaoRepository.ObterPorId(id);
+
+            return new SubmeterFicheiro
+            {
+                SubmissaoId = submissao.SubmissaoId,
+                Titulo = submissao.Titulo,
+                Descricao = submissao.Descricao,
+                Status = submissao.Status,
+                TipoId = submissao.TipoId,
+                ParticipanteId = submissao.ParticipanteId,
+                EventoId = submissao.EventoId,
+                Ficheiro = submissao.Ficheiro
+            };
+        }
+        private Submissao Submissao(SubmeterFicheiro submeterFicheiro)
+        {
+            return new Submissao
+            {
+                SubmissaoId = submeterFicheiro.SubmissaoId,
+                Titulo = submeterFicheiro.Titulo,
+                Descricao = submeterFicheiro.Descricao,
+                Ficheiro = submeterFicheiro.Ficheiro,
+                Status = submeterFicheiro.Status,
+                TipoId = submeterFicheiro.TipoId,
+                ParticipanteId = submeterFicheiro.ParticipanteId,
+                EventoId = submeterFicheiro.EventoId
+            };
+        }
+
+        private string UploadFile(SubmeterFicheiro submeterFicheiro)
+        {
+            if (submeterFicheiro.File != null)
+            {
+                var uplodasFolder = Path.Combine(_webHostEnvironment.WebRootPath, "Submissoes");
+                var fileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(submeterFicheiro.File.FileName);
+                var filePath = Path.Combine(uplodasFolder, fileName);
+                submeterFicheiro.File.CopyTo(new FileStream(filePath, FileMode.Create));
+
+                return fileName;
+            }
+            return null;
+        }
+        private SelectList ObterParticipantes(string id = null)
+        {
+            return new SelectList(_participanteRepository.ObterTodos(), "ParticipanteId", "Nome", id);
+        }
+        private SelectList ObterEventos(string id = null)
+        {
+            return new SelectList(_eventoRepository.ObterTodos(), "EventoId", "Titulo", id);
+        }
+        private SelectList ObterTipos(string id = null)
+        {
+            return new SelectList(_tipoRepository.ObterTodos(), "TipoId", "Titulo", id);
+        }
+
+        private void PreencherCombobox()
+        {
+            ViewBag.ParticipanteId = ObterParticipantes();
+            ViewBag.EventoId = ObterEventos();
+            ViewBag.TipoId = ObterTipos();
         }
     }
 }

@@ -45,7 +45,8 @@
             <td>
                 <a asp-action="Edit" asp-route-id="@item.CorrecaoId">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.CorrecaoId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.CorrecaoId">Delete</a>
+                <a asp-action="Delete" asp-route-id="@item.CorrecaoId">Delete</a> |
+                <a><input type="button" value="Download" class="btn btn-outline-success" onclick="location.href='@Url.Action("Download", "Correcao", new { id = item.CorrecaoId })'" /></a>
             </td>
         </tr>
 }

@@ -45,7 +45,8 @@
             <td>
                 <a asp-action="Edit" asp-route-id="@item.EventoParticipanteId">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.EventoParticipanteId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.EventoParticipanteId">Delete</a>
+                <a asp-action="Delete" asp-route-id="@item.EventoParticipanteId">Delete</a> |
+                <a><input type="button" value="Download" class="btn btn-outline-success" onclick="location.href='@Url.Action("Download", "EventoParticipante", new { id = item.EventoParticipanteId })'" /></a>
             </td>
         </tr>
 }

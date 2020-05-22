@@ -29,6 +29,7 @@ namespace SDGE.ApplicationCore.Entity
     }
     public class SubmeterFicheiro
     {
+        public int SubmissaoId { get; set; }
         public string Titulo { get; set; }
         public string Descricao { get; set; }
         public string Status { get; set; }
@@ -40,6 +41,7 @@ namespace SDGE.ApplicationCore.Entity
         public Evento Evento { get; set; }
         public Tipo Tipo { get; set; }
         public IFormFile File { get; set; }
+        public string Ficheiro { get; set; }
     }
 }
  

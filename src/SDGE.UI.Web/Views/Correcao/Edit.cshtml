@@ -1,4 +1,4 @@
-﻿@model SDGE.ApplicationCore.Entity.Correcao
+﻿@model SDGE.ApplicationCore.Entity.SubmeterCorrecao
 
 @{
     ViewData["Title"] = "Edit";
@@ -10,13 +10,16 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Edit">
+        <form method="post" enctype="multipart/form-data" asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="CorrecaoId" />
+            <input type="hidden" asp-for="Ficheiro" />
             <div class="form-group">
-                <label asp-for="Ficheiro" class="control-label"></label>
-                <input asp-for="Ficheiro" class="form-control" />
-                <span asp-validation-for="Ficheiro" class="text-danger"></span>
+                <label asp-for="File" class="control-label"></label>
+                <div class="custom-file">
+                    <input asp-for="File" class="form-control custom-file-input" />
+                    <label class="custom-file-label">@ViewBag.Ficheiro</label>
+                </div>
             </div>
             <div class="form-group">
                 <label asp-for="Observacoes" class="control-label"></label>
@@ -45,5 +48,13 @@
 </div>
 
 @section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('.custom-file-input').on("change", function () {
+                var fileName = $(this).val().split("\\").pop();
+                $(this).next(".custom-file-label").html(fileName);
+            });
+        });
+    </script>
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }

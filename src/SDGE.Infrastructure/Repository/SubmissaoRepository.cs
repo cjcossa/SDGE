@@ -21,5 +21,6 @@ namespace SDGE.Infrastructure.Repository
         {
             return _dbContext.Set<Submissao>().Include(x => x.Participante).Include(x => x.Evento).Include(x => x.Tipo).AsEnumerable();
         }
+        
     }
 }
