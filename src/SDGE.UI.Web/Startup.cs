@@ -17,7 +17,7 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 using SDGE.Infrastructure.Repository;
 using SDGE.ApplicationCore.Interfaces.Services;
 using SDGE.ApplicationCore.Interfaces.Repository;
-using EmailService;
+
 
 namespace SDGE.UI.Web
 {
@@ -37,8 +37,9 @@ namespace SDGE.UI.Web
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
            
-            services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+            //services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+            services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true).AddRoles<IdentityRole>()
+               .AddEntityFrameworkStores<ApplicationDbContext>();
 
             services.AddDbContext<ParticipanteContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
@@ -60,12 +61,6 @@ namespace SDGE.UI.Web
             services.AddScoped<ICorrecaoRepository, CorrecaoRepository>();
             services.AddScoped<IMembroEventoRepository, MembroEventoRepository>();
             
-            var emailConfig = Configuration
-               .GetSection("EmailConfiguration")
-               .Get<EmailConfiguration>();
-            services.AddSingleton(emailConfig);
-            services.AddScoped<IEmailSender, EmailSender>();
-
             services.Configure<IdentityOptions>(options =>
             {
                 // Password settings.
@@ -73,8 +68,8 @@ namespace SDGE.UI.Web
                 options.Password.RequireLowercase = false;
                 options.Password.RequireNonAlphanumeric = false;
                 options.Password.RequireUppercase = false;
-                options.Password.RequiredLength = 6;
-                options.Password.RequiredUniqueChars = 1;
+                options.Password.RequiredLength = 1;
+                options.Password.RequiredUniqueChars = 0;
 
 
                 // Lockout settings.

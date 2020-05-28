@@ -1,0 +1,16 @@
+﻿
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<div class="text-center">
+    <p>
+        <a><input type="button" value="Membro" class="btn btn-outline-success" onclick="location.href='@Url.Action("CreateMembro", "Register", new { email = ViewBag.Email, returnUrl = ViewBag.Url })'" /></a>
+    </p>
+    <p>
+        <a><input type="button" value="Participante" class="btn btn-outline-success" onclick="location.href='@Url.Action("CreateParticipante", "Register", new { email = ViewBag.Email, returnUrl = ViewBag.Url })'" /></a>
+    </p>
+</div>
+
