@@ -73,20 +73,14 @@ namespace SDGE.UI.Web.Controllers
                 if (result.Email != null)
                 {
                     IdentityUser identityUser = await _userManager.FindByEmailAsync(result.Email);
-
                     if(identityUser != null)
                     {
-                        identityUser = await _userManager.FindByIdAsync(identityUser.Id);
-                        if (identityUser != null)
-                        {
-                            identityResult = await _userManager.AddToRoleAsync(identityUser, "Membro");
-                           
-                            if (!identityResult.Succeeded)
-                               return View(identityResult.Errors);
-                        }
+                        identityResult = await _userManager.AddToRoleAsync(identityUser, "Membro");
+                        if (!identityResult.Succeeded)
+                        return View(identityResult.Errors);                       
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Index", "Evento");
             }
             catch
             {

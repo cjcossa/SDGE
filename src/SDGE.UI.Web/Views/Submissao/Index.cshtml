@@ -4,69 +4,83 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
-
 <p>
     <a asp-action="Create">Create New</a>
 </p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Titulo)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Descricao)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Ficheiro)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Status)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Participante)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Evento)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Tipo)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Titulo)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Descricao)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Ficheiro)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Status)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Participante.Nome)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Evento.Titulo)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Tipo.Titulo)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.SubmissaoId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.SubmissaoId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.SubmissaoId">Delete</a>
-                <a><input type="button" value="Download" class="btn btn-outline-success" onclick="location.href='@Url.Action("Download", "Submissao", new { id = item.SubmissaoId })'" /></a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header card-header-primary">
+                <h4 class="card-title ">Submissões</h4>
+                <p class="card-category"> Here is a subtitle for this table</p>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead class=" text-primary">
+                            <tr>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Titulo)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Descricao)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Ficheiro)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Status)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Participante)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Evento)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Tipo)
+                                </th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Titulo)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Descricao)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Ficheiro)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Status)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Participante.Nome)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Evento.Titulo)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Tipo.Titulo)
+                                    </td>
+                                    <td>
+                                        <a asp-action="Edit" asp-route-id="@item.SubmissaoId">Edit</a> |
+                                        <a asp-action="Details" asp-route-id="@item.SubmissaoId">Details</a> |
+                                        <a asp-action="Delete" asp-route-id="@item.SubmissaoId">Delete</a>
+                                        <a><input type="button" value="Download" class="btn btn-outline-success" onclick="location.href='@Url.Action("Download", "Submissao", new { id = item.SubmissaoId })'" /></a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

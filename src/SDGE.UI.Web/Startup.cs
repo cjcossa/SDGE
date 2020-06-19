@@ -17,7 +17,7 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 using SDGE.Infrastructure.Repository;
 using SDGE.ApplicationCore.Interfaces.Services;
 using SDGE.ApplicationCore.Interfaces.Repository;
-
+using Microsoft.AspNetCore.Mvc;
 
 namespace SDGE.UI.Web
 {
@@ -38,7 +38,7 @@ namespace SDGE.UI.Web
                     Configuration.GetConnectionString("DefaultConnection")));
            
             //services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-            services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true).AddRoles<IdentityRole>()
+            services.AddDefaultIdentity<IdentityUser>().AddRoles<IdentityRole>()
                .AddEntityFrameworkStores<ApplicationDbContext>();
 
             services.AddDbContext<ParticipanteContext>(options =>
@@ -48,6 +48,9 @@ namespace SDGE.UI.Web
 
             services.AddControllersWithViews();
             services.AddRazorPages();
+           // services.AddMvc(option => option.EnableEndpointRouting = false);
+
+
 
             // services.AddSingleton(typeof(IRepository<>), typeof(EFRepository<>));
             // services.AddSingleton<IParticipanteRepository, ParticipanteRepository>();
@@ -81,7 +84,7 @@ namespace SDGE.UI.Web
                 options.User.AllowedUserNameCharacters =
                 "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
                 options.User.RequireUniqueEmail = true;
-                options.SignIn.RequireConfirmedEmail = true;
+                options.SignIn.RequireConfirmedEmail = false;
             });
 
             services.ConfigureApplicationCookie(options =>
@@ -120,12 +123,19 @@ namespace SDGE.UI.Web
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
+             {
+                 endpoints.MapControllerRoute(
+                     name: "default",
+                     pattern: "{controller=Evento}/{action=Index}/{id?}");
+                 endpoints.MapRazorPages();
+             });
+            /*app.UseMvc(routes =>
             {
-                endpoints.MapControllerRoute(
+                routes.MapRoute(
                     name: "default",
-                    pattern: "{controller=Evento}/{action=Index}/{id?}");
-                endpoints.MapRazorPages();
-            });
+                    template: "{controller=Submissao}/{action=Index}/{id?}");
+            });*/
+            
         }
     }
 }

@@ -37,9 +37,15 @@ namespace SDGE.Infrastructure.EntityConfig
                .IsRequired();
 
             builder.Property(e => e.Descricao)
-               .HasColumnType("varchar(1000)")
+               .HasColumnType("text")
                .IsRequired();
 
+            builder.Property(e => e.DataFim)
+               .HasColumnType("varchar(50)")
+               .IsRequired(); 
+            builder.Property(e => e.DataInicio)
+               .HasColumnType("varchar(50)")
+               .IsRequired();
             builder.Property(e => e.Categoria)
                .HasColumnType("varchar(100)")
                .IsRequired();

@@ -4,74 +4,80 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
 
 <p>
     <a asp-action="Create">Create New</a>
 </p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Titulo)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Lema)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Email)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DataInico)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DataFim)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Local)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Descricao)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Categoria)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Titulo)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Lema)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Email)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DataInico)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DataFim)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Local)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Descricao)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Categoria)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.EventoId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.EventoId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.EventoId">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header card-header-primary">
+                <h4 class="card-title ">Eventos</h4>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table" id="dtMaterialDesignExample">
+                        <thead class=" text-primary">
+                            <tr>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Titulo)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.DataInicio)
+                                </th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Titulo)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.DataInicio)
+                                    </td>
+                                    <td class="td-actions text-right">
+                                        <button type="button" onclick="location.href='@Url.Action("Edit", "Evento", new { id = item.EventoId })'" rel="tooltip" title="Editar" class="btn btn-primary btn-link btn-sm">
+                                            <i class="material-icons">edit</i>
+                                        </button>
+                                        <button type="button" onclick="location.href='@Url.Action("Details", "Evento", new { id = item.EventoId })'" rel="tooltip" title="Detalhes" class="btn btn-success btn-link btn-sm">
+                                            <i class="material-icons">details</i>
+                                        </button>
+                                        <button type="button" onclick="location.href='@Url.Action("Delete", "Evento", new { id = item.EventoId })'" rel="tooltip" title="Apagar" class="btn btn-danger btn-link btn-sm">
+                                            <i class="material-icons">delete_outline</i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    // Material Design example
+    $(document).ready(function () {
+        $('#dtMaterialDesignExample').DataTable();
+        /*$('#dtMaterialDesignExample_wrapper').find('label').each(function () {
+            $(this).parent().append($(this).children());
+        });
+        $('#dtMaterialDesignExample_wrapper .dataTables_filter').find('input').each(function () {
+            const $this = $(this);
+            $this.attr("", "Pesquisar...");
+            $this.removeClass('form-control-sm');
+        });
+        $('#dtMaterialDesignExample_wrapper .dataTables_length').addClass('d-flex flex-row');
+        $('#dtMaterialDesignExample_wrapper .dataTables_filter').addClass('md-form');
+        $('#dtMaterialDesignExample_wrapper select').removeClass(
+            'custom-select custom-select-sm form-control form-control-sm');
+        $('#dtMaterialDesignExample_wrapper select').addClass('mdb-select');
+        $('#dtMaterialDesignExample_wrapper .mdb-select').materialSelect();
+        $('#dtMaterialDesignExample_wrapper .dataTables_filter').find('label').remove();*/
+    });
+</script>

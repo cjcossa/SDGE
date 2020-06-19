@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -21,6 +23,7 @@ namespace SDGE.UI.Web.Controllers
         }
 
         // GET: Evento
+        
         public ActionResult Index()
         {
             return View(_eventoRepository.ObterTodos());
@@ -33,6 +36,7 @@ namespace SDGE.UI.Web.Controllers
         }
 
         // GET: Evento/Create
+        //[Authorize(Roles = "Membro")]
         public ActionResult Create()
         {
             ViewBag.Categoria = Categoria();
@@ -42,6 +46,7 @@ namespace SDGE.UI.Web.Controllers
         private List<SelectListItem> Categoria()
         {
             return new List<SelectListItem>(){
+                new SelectListItem(){Value="",Text="Seleccione a Categoria"},
                 new SelectListItem(){Value="Conferência",Text="Conferência"},
                 new SelectListItem(){Value="Seminário",Text="Seminário"},
                 new SelectListItem(){Value="Workshop",Text="Workshop"}
@@ -65,6 +70,7 @@ namespace SDGE.UI.Web.Controllers
         }
 
         // GET: Evento/Edit/5
+       // [Authorize(Roles = "Membro")]
         public ActionResult Edit(int id)
         {
             ViewBag.Categoria = Categoria();
@@ -89,6 +95,7 @@ namespace SDGE.UI.Web.Controllers
         }
 
         // GET: Evento/Delete/5
+        //[Authorize(Roles = "Membro")]
         public ActionResult Delete(int id)
         {
             return View(_eventoRepository.ObterPorId(id));

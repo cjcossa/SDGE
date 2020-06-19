@@ -16,10 +16,10 @@ namespace SDGE.Infrastructure.Migrations
                     Titulo = table.Column<string>(type: "varchar(500)", nullable: false),
                     Lema = table.Column<string>(type: "varchar(500)", nullable: false),
                     Email = table.Column<string>(type: "varchar(300)", nullable: false),
-                    DataInico = table.Column<DateTime>(nullable: false),
-                    DataFim = table.Column<DateTime>(nullable: false),
+                    DataInico = table.Column<string>(type: "varchar(50)", nullable: false),
+                    DataFim = table.Column<string>(type: "varchar(50)", nullable: false),
                     Local = table.Column<string>(type: "varchar(300)", nullable: false),
-                    Descricao = table.Column<string>(type: "varchar(1000)", nullable: false),
+                    Descricao = table.Column<string>(type: "text", nullable: false),
                     Categoria = table.Column<string>(type: "varchar(100)", nullable: false)
                 },
                 constraints: table =>

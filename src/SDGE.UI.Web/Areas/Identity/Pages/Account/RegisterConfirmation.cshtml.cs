@@ -45,6 +45,7 @@ namespace SDGE.UI.Web.Areas.Identity.Pages.Account
             DisplayConfirmAccountLink = true;
             if (DisplayConfirmAccountLink)
             {
+                //return RedirectToAction("Index", "Register", new { email = user, returnUrl = returnUrl });
                 var userId = await _userManager.GetUserIdAsync(user);
                 var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                 code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));

@@ -3,61 +3,110 @@
 @{
     ViewData["Title"] = "Edit";
 }
+    <div class="row">
+        <div class="col-md-1"></div>
+        <div class="col-md-10">
+            <div class="card">
+                <div class="card-header card-header-primary">
+                    <h4 class="card-title">Editar Evento</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Edit">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <input type="hidden" asp-for="EventoId" />
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label asp-for="Titulo" class="bmd-label-floating"></label>
+                                    <input asp-for="Titulo" class="form-control" />
+                                    <span asp-validation-for="Titulo" class="text-danger"></span>
+                                </div>
+                            </div>
 
-<h1>Edit</h1>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label asp-for="Lema" class="bmd-label-floating"></label>
+                                    <input asp-for="Lema" class="form-control" />
+                                    <span asp-validation-for="Lema" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
 
-<h4>Evento</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="EventoId" />
-            <div class="form-group">
-                <label asp-for="Titulo" class="control-label"></label>
-                <input asp-for="Titulo" class="form-control" />
-                <span asp-validation-for="Titulo" class="text-danger"></span>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="DataInicio" class="bmd-label-floating"></label>
+                                    <input name="datainicio" asp-for="DataInicio" id="datainicio" class="form-control" />
+                                    <span asp-validation-for="DataInicio" class="text-danger"></span>
+                                    <script>
+                                        var today = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
+                                        $('#datainicio').datepicker({
+                                            showOtherMonths: true,
+                                            minDate: today,
+                                            maxDate: function () {
+                                                return $('#datafim').val();
+                                            }
+                                        });
+                                    </script>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="DataFim" class="bmd-label-floating"></label>
+                                    <input name="datafim" asp-for="DataFim" id="datafim" class="form-control" />
+                                    <span asp-validation-for="DataFim" class="text-danger"></span>
+                                    <script>
+                                        $('#datafim').datepicker({
+                                            showOtherMonths: true,
+                                            minDate: function () {
+                                                return $('#datainicio').val();
+                                            }
+                                        });
+                                    </script>
+                                </div>
+                            </div>
+                            <div class="col-md-5">
+                                <div class="form-group">
+                                    <select asp-for="Categoria" class="selectpicker" data-style="btn-primary" asp-items="(List<SelectListItem>)ViewBag.Categoria"></select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="Local" class="bmd-label-floating"></label>
+                                    <input asp-for="Local" class="form-control" />
+                                    <span asp-validation-for="Local" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="Email" class="bmd-label-floating"></label>
+                                    <input asp-for="Email" class="form-control" />
+                                    <span asp-validation-for="Email" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <div class="form-group">
+                                        <label asp-for="Descricao" class="bmd-label-floating"></label>
+                                        <textarea asp-for="Descricao" class="form-control" rows="5"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary pull-right">Save</button>
+                        <div class="clearfix"></div>
+                    </form>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="Lema" class="control-label"></label>
-                <input asp-for="Lema" class="form-control" />
-                <span asp-validation-for="Lema" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Email" class="control-label"></label>
-                <input asp-for="Email" class="form-control" />
-                <span asp-validation-for="Email" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="DataInico" class="control-label"></label>
-                <input asp-for="DataInico" class="form-control" />
-                <span asp-validation-for="DataInico" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="DataFim" class="control-label"></label>
-                <input asp-for="DataFim" class="form-control" />
-                <span asp-validation-for="DataFim" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Local" class="control-label"></label>
-                <input asp-for="Local" class="form-control" />
-                <span asp-validation-for="Local" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Descricao" class="control-label"></label>
-                <input asp-for="Descricao" class="form-control" />
-                <span asp-validation-for="Descricao" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Categoria" class="control-label"></label>
-                <select asp-for="Categoria" class="form-control" asp-items="(List<SelectListItem>)ViewBag.Categoria"></select>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+        </div>
     </div>
-</div>
+
 
 <div>
     <a asp-action="Index">Back to List</a>

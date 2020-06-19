@@ -71,25 +71,19 @@ namespace SDGE.UI.Web.Controllers
             try
             {
                 // TODO: Add insert logic here
-                
+
                 var result = _participanteRepository.Adicionar(collection);
                 if (result.Email != null)
                 {
                     IdentityUser identityUser = await _userManager.FindByEmailAsync(result.Email);
-
                     if (identityUser != null)
                     {
-                        identityUser = await _userManager.FindByIdAsync(identityUser.Id);
-                        if (identityUser != null)
-                        {
-                           IdentityResult identityResult = await _userManager.AddToRoleAsync(identityUser, "Participante");
-
-                            if (!identityResult.Succeeded)
-                                return View(identityResult.Errors);
-                        }
+                        IdentityResult identityResult = await _userManager.AddToRoleAsync(identityUser, "Participante");
+                        if (!identityResult.Succeeded)
+                            return View(identityResult.Errors);
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Index", "Evento");
             }
             catch
             {

@@ -93,8 +93,8 @@ namespace SDGE.UI.Web.Areas.Identity.Pages.Account
 
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {
-                        //return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
-                        return RedirectToAction("Index", "Register", new { email = Input.Email, returnUrl = returnUrl });
+                        return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
+                        //return RedirectToAction("Index", "Register", new { email = Input.Email, returnUrl = returnUrl });
                         /*IdentityResult identityResult = await _userManager.AddToRoleAsync(user, "Admin");
                         if(identityResult.Succeeded)
                         {
@@ -103,8 +103,9 @@ namespace SDGE.UI.Web.Areas.Identity.Pages.Account
                     }
                     else
                     {
-                        await _signInManager.SignInAsync(user, isPersistent: false);
-                        return LocalRedirect(returnUrl);
+                        return RedirectToAction("Index", "Register", new { email = Input.Email, returnUrl = returnUrl });
+                        //await _signInManager.SignInAsync(user, isPersistent: false);
+                        //return LocalRedirect(returnUrl);
                     }
                 }
                 foreach (var error in result.Errors)
