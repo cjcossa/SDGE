@@ -8,7 +8,7 @@ using System.Text;
 
 namespace SDGE.ApplicationCore.Services
 {
-    public class EventoService : IEventoRepository
+    public class EventoService : IEventoService
     {
 
         private readonly IEventoRepository _eventoRepository;

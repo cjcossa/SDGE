@@ -10,13 +10,14 @@ namespace SDGE.ApplicationCore.Entity
     {
         public Submissao()
         {
-
+            this.Removido = false;
         }
         public int SubmissaoId { get; set; }
         public string Titulo { get; set; }
         public string Descricao { get; set; }
         public string Ficheiro { get; set; }
         public string Status { get; set; }
+        public bool Removido { get; set; }
         public int TipoId { get; set; }
         public int ParticipanteId { get; set; }
         public int EventoId { get; set; }
@@ -24,7 +25,7 @@ namespace SDGE.ApplicationCore.Entity
         public Correcao Correcao { get; set; }
         public Evento Evento { get; set; }
         public Tipo Tipo { get; set; }
-        //public Alerta Alerta { get; set; }
+       
 
     }
     public class SubmeterFicheiro

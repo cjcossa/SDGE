@@ -9,5 +9,6 @@ namespace SDGE.ApplicationCore.Interfaces.Repository
     {
         Membro ObterPorEvento(int membroId);
         public IEnumerable<Membro> ObterPorComissao(string comissao);
+        public IEnumerable<Membro> ObterPorComissaoOrganizadora(int id);
     }
 }

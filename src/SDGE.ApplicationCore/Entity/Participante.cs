@@ -9,7 +9,7 @@ namespace SDGE.ApplicationCore.Entity
     {
         public Participante()
         {
-
+            this.Removido = false;
         }
         
         public int ParticipanteId { get; set; } 
@@ -19,6 +19,7 @@ namespace SDGE.ApplicationCore.Entity
         public string Email { get; set; } 
         public string Telefone { get; set; } 
         public string TituloAcademico { get; set; }
+        public bool Removido { get; set; }
         public ICollection<EventoParticipante> EventoParticipantes { get; set; }
         public ICollection<Submissao>  Submissoes { get; set; }
 

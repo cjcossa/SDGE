@@ -22,7 +22,12 @@ namespace SDGE.Infrastructure.Data
         public DbSet<Submissao> Submissoes { get; set; }
         public DbSet<Correcao> Correcoes { get; set; }
         public DbSet<MembroEvento> MembroEventos { get; set; }
+        public DbSet<DataImportante> DataImportantes { get; set; }
         public DbSet<Alerta> Alertas { get; set; }
+        public DbSet<ComissaoOrganizadora> ComissaoOrganizadoras { get; set; }
+        public DbSet<ComissaoCientifica> ComissaoCientificas { get; set; }
+        public DbSet<MembroCientifico> MembroCientificos { get; set; }
+        public DbSet<MembroOrganizador> MembroOrganizadors { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -35,6 +40,11 @@ namespace SDGE.Infrastructure.Data
             modelBuilder.Entity<Correcao>().ToTable("Correcao");
             modelBuilder.Entity<MembroEvento>().ToTable("MembroEvento");
             modelBuilder.Entity<Alerta>().ToTable("Alerta");
+            modelBuilder.Entity<ComissaoCientifica>().ToTable("ComissaoCientifica");
+            modelBuilder.Entity<ComissaoOrganizadora>().ToTable("ComissaoOrganizadora");
+            modelBuilder.Entity<MembroOrganizador>().ToTable("MembroOrganizador");
+            modelBuilder.Entity<MembroCientifico>().ToTable("MembroCientifico");
+            modelBuilder.Entity<DataImportante>().ToTable("DataImportante");
 
             modelBuilder.ApplyConfiguration(new ParticipanteMap());
             modelBuilder.ApplyConfiguration(new SubmissaoMap());
@@ -45,6 +55,11 @@ namespace SDGE.Infrastructure.Data
             modelBuilder.ApplyConfiguration(new EventoParticipanteMap());
             modelBuilder.ApplyConfiguration(new AlertaMap());
             modelBuilder.ApplyConfiguration(new MembroEventoMap());
+            modelBuilder.ApplyConfiguration(new MembroCientificoMap());
+            modelBuilder.ApplyConfiguration(new MembroOrganizadorMap());
+            modelBuilder.ApplyConfiguration(new ComissaoOrganizadoraMap());
+            modelBuilder.ApplyConfiguration(new ComissaoCientificaMap());
+            modelBuilder.ApplyConfiguration(new DataImportanteMap());
 
         }
     }

@@ -65,7 +65,6 @@ namespace SDGE.UI.Web.Controllers
                         var fileName = UploadFile(collection);
                         EventoParticipante eventoParticipante = new EventoParticipante { 
                            Comprovativo = fileName,
-                           Status = collection.Status,
                            EventoId = collection.EventoId,
                            ParticipanteId = collection.ParticipanteId
                         };
@@ -172,7 +171,6 @@ namespace SDGE.UI.Web.Controllers
             {
                 EventoParticipanteId = eventoParticipante.EventoParticipanteId,
                 Comprovativo = eventoParticipante.Comprovativo,
-                Status = eventoParticipante.Status,
                 EventoId = eventoParticipante.EventoId,
                 ParticipanteId = eventoParticipante.ParticipanteId
             };
@@ -183,7 +181,6 @@ namespace SDGE.UI.Web.Controllers
             {
                 EventoParticipanteId = inscricao.EventoParticipanteId,
                 Comprovativo = inscricao.Comprovativo,
-                Status = inscricao.Status,
                 EventoId = inscricao.EventoId,
                 ParticipanteId = inscricao.ParticipanteId
             };

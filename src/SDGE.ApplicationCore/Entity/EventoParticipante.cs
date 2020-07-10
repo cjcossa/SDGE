@@ -9,12 +9,14 @@ namespace SDGE.ApplicationCore.Entity
     {
         public EventoParticipante()
         {
-
+            this.Removido = false;
+            this.Confirmado = false;
         }
 
         public int EventoParticipanteId { get; set; }
         public string Comprovativo { get; set; }
-        public string Status { get; set; }
+        public bool Confirmado { get; set; }
+        public bool Removido { get; set; }
         public int EventoId { get; set; }
         public Evento Evento { get; set; }
         public int ParticipanteId { get; set; }

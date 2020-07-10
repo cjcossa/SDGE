@@ -8,7 +8,7 @@ using System.Text;
 
 namespace SDGE.ApplicationCore.Services
 {
-    public class AlertaService : IAlertaRepository
+    public class AlertaService : IAlertaService
     {
 
         private readonly IAlertaRepository _alertaRepository;

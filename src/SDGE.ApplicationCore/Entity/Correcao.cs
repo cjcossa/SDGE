@@ -9,12 +9,13 @@ namespace SDGE.ApplicationCore.Entity
     {
         public Correcao()
         {
-
+            this.Removido = false;
         }
 
         public int CorrecaoId { get; set; }
         public string Ficheiro { get; set; }
         public string Observacoes { get; set; }
+        public bool Removido { get; set; }
         public int SubmissaoId { get; set; }
         public Submissao Submissao { get; set; }
         public int MembroId { get; set; }

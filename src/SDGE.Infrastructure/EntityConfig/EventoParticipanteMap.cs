@@ -29,9 +29,6 @@ namespace SDGE.Infrastructure.EntityConfig
            .HasColumnType("varchar(250)")
            .IsRequired();
 
-            builder.Property(i => i.Status)
-               .HasColumnType("varchar(50)")
-               .IsRequired();
         }
     }
 }

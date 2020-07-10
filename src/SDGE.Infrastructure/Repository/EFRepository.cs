@@ -50,6 +50,8 @@ namespace SDGE.Infrastructure.Repository
         {
             _dbContext.Set<TEntity>().Remove(entity);
             _dbContext.SaveChanges();
+           // _dbContext.Entry(entity).State = EntityState.Modified;
+            //_dbContext.SaveChanges();
         }
     }
 }

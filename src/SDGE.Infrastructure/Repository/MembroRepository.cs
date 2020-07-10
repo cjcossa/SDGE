@@ -21,10 +21,20 @@ namespace SDGE.Infrastructure.Repository
             return Buscar(m => m.MembroEventos.Any(m => m.Comissao == comissao)).AsEnumerable();
         }
 
+        public IEnumerable<Membro> ObterPorComissaoOrganizadora(int id)
+        {
+            return Buscar(m => m.MembroOrganizadors.Any(m => m.ComissaoOrganizadoraId == id)).AsEnumerable();
+        }
+
         public  Membro ObterPorEvento(int membroId)
         {
             return Buscar(m => m.MembroEventos.Any(t => t.MembroId == membroId))
                  .FirstOrDefault();
+        }
+        override
+        public IEnumerable<Membro> ObterTodos()
+        {
+            return Buscar(m => m.Removido == false).AsEnumerable();
         }
     }
 }

@@ -1,0 +1,25 @@
+﻿@model SDGE.ApplicationCore.Entity.MembroOrganizador
+<!--Modal: modalConfirmDelete-->
+<div class="modal fade" id="modalConfirmDelete" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-notify modal-danger" role="document">
+        <!--Content-->
+        <div class="modal-content">
+            <!--Header-->
+            <div class="mx-4 pt-3 mb-1">
+                <p class="heading">Remover @Html.DisplayFor(model => model.Membro.Nome) da comissão?</p>
+            </div>
+
+            <!--Footer-->
+            <div class="mx-3 pt-3 mb-1 text-right">
+                <form asp-action="RemoverMembro">
+                    <input type="hidden" asp-for="MembroOrganizadorId" />
+                    <button class="btn  btn-danger btn-sm waves-effect" data-dismiss="modal">Cancelar</button>
+                    <input type="submit" value="Remover" class="btn btn-outline-danger btn-sm" />
+                </form>
+            </div>
+        </div>
+        <!--/.Content-->
+    </div>
+</div>
+<!--Modal: modalConfirmDelete-->

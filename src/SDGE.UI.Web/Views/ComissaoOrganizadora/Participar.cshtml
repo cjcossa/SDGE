@@ -1,0 +1,37 @@
+﻿@model SDGE.UI.Web.Models.ComissaoOrganizadoraViewModel
+
+@{
+    ViewData["Title"] = "Participar";
+}
+
+<div class="row">
+    <div class="col-md-2"></div>
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header card-header-primary">
+                <h4 class="card-title">Participar na comissão organizadora</h4>
+                <p class="card-category">Comissão responsável pelo controlo total do sistema.</p>
+            </div>
+            <div class="card-body">
+                <form asp-action="Participar">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="form-group">
+                        <label asp-for="Codigo" class="bmd-label-floating"></label>
+                        <input asp-for="Codigo" class="form-control" autocomplete="off" />
+                        <span asp-validation-for="Codigo" class="text-danger"></span>
+                    </div>
+                    <div class="form-group text-right">
+                        <a asp-action="index">
+                            <input type="button" value="Voltar" class="btn btn-primary btn-sm waves-effect" />
+                        </a>
+                        <input type="submit" value="Participar" class="btn btn-outline-primary btn-sm" />
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
