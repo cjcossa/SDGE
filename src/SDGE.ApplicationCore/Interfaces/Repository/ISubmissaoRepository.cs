@@ -7,6 +7,8 @@ namespace SDGE.ApplicationCore.Interfaces.Repository
 {
     public interface ISubmissaoRepository : IRepository<Submissao>
     {
-
+        public IEnumerable<Submissao> ObterPorParticipante(int id);
+        public IEnumerable<Submissao> ObterPorEvento(int id);
+        public Submissao ObterPorSubmissao(int id);
     }
 }

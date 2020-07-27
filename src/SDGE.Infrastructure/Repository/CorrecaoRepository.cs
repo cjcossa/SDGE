@@ -16,6 +16,7 @@ namespace SDGE.Infrastructure.Repository
         {
 
         }
+        private bool state = false;
         public override IEnumerable<Correcao> ObterTodos()
         {
             return _dbContext.Set<Correcao>().Include(c => c.Submissao).Include(c => c.Membro);
@@ -23,6 +24,25 @@ namespace SDGE.Infrastructure.Repository
         public IEnumerable<Correcao> ObterJoinPorId(int id)
         {
             return ObterTodos().Where(c => c.CorrecaoId == id);
+        }
+
+        public IEnumerable<Correcao> ObterPorSubmissao(int id)
+        {
+            return _dbContext.Set<Correcao>().Include(c => c.Submissao).Include(c => c.Membro)
+                .Where(c => c.SubmissaoId == id && c.Removido == state && c.Submissao.Removido == state && c.Membro.Removido == state)
+                .AsEnumerable();
+        }
+
+        public Correcao ObterPorCorrecao(int id)
+        {
+            return _dbContext.Set<Correcao>().Include(c => c.Submissao).Include(c => c.Membro)
+               .Where(c => c.CorrecaoId == id && c.Removido == state && c.Submissao.Removido == state && c.Membro.Removido == state)
+               .FirstOrDefault();
+        }
+        public override void Remover(Correcao entity)
+        {
+            entity.Removido = !entity.Removido;
+            base.Actualizar(entity);
         }
     }
 }

@@ -11,6 +11,7 @@ namespace SDGE.ApplicationCore.Interfaces.Repository
         public string GenerateCode();
         public bool VerificarCodigo(string codigo);
         public IEnumerable<ComissaoOrganizadora> ObterPorMembro(int membroId);
+        public IEnumerable<ComissaoOrganizadora> ObterEventos(int membroId);
        
     }
 }

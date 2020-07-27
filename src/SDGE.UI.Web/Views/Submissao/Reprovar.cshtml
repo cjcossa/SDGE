@@ -1,0 +1,46 @@
+﻿@model SDGE.UI.Web.Models.ReprovarViewModel
+
+<div class="row">
+    <div class="col-md-2"></div>
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header card-header-primary">
+                <h4 class="card-title">Reprovar Submissão</h4>
+                <p class="card-category">@Html.DisplayFor(modelitem => Model.Titulo)</p>
+            </div>
+            <div class="card-body">
+                <form asp-action="Reprovar">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input type="hidden" asp-for="SubmissaoId" />
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <div class="form-group">
+                                    <div class="form-group">
+                                        <label asp-for="Observacoes" class="bmd-label-floating"></label>
+                                        <textarea asp-for="Observacoes" class="form-control" rows="5"></textarea>
+                                        <span asp-validation-for="Observacoes" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group text-right">
+                                <button type="button" onclick="location.href='@Url.Action("Index", new { id = Model.EventoId })'" class="btn  btn-danger btn-sm waves-effect">
+                                    <i class="material-icons">close</i>
+                                    Cancelar
+                                </button>
+                                <button type="submit" class="btn btn-outline-success btn-sm">
+                                    <i class="material-icons">done</i>
+                                    Reprovar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

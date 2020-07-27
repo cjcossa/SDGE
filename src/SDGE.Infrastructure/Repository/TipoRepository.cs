@@ -15,5 +15,10 @@ namespace SDGE.Infrastructure.Repository
         {
 
         }
+        private bool state = false;
+        public override IEnumerable<Tipo> ObterTodos()
+        {
+            return base.ObterTodos().Where(t => t.Removido == state);
+        }
     }
 }

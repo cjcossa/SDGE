@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using MimeKit;
 using SDGE.ApplicationCore.Entity;
 using SDGE.ApplicationCore.Interfaces.Repository;
+using SDGE.UI.Web.Models;
 
 namespace SDGE.UI.Web.Controllers
 {
@@ -20,18 +21,38 @@ namespace SDGE.UI.Web.Controllers
         private readonly IEventoRepository _eventoRepository;
         private readonly IParticipanteRepository _participanteRepository;
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly IComissaoOrganizadoraRepository _comissaoOrganizadoraRepository;
+        private readonly IDataImportanteRepository _dataImportanteRepository;
+        private int sessionId = 1;
+        private int sessionAdminId = 2;
 
-        public EventoParticipanteController(IEventoParticipanteRepository eventoParticipanteRepository, IEventoRepository eventoRepository, IParticipanteRepository participanteRepository, IWebHostEnvironment webHostEnvironment)
+        public EventoParticipanteController(IEventoParticipanteRepository eventoParticipanteRepository, 
+            IEventoRepository eventoRepository,
+            IParticipanteRepository participanteRepository, 
+            IWebHostEnvironment webHostEnvironment,
+            IComissaoOrganizadoraRepository comissaoOrganizadoraRepository,
+            IDataImportanteRepository dataImportanteRepository)
         {
             _eventoParticipanteRepository = eventoParticipanteRepository;
             _eventoRepository = eventoRepository;
             _participanteRepository = participanteRepository;
             _webHostEnvironment = webHostEnvironment;
+            _comissaoOrganizadoraRepository = comissaoOrganizadoraRepository;
+            _dataImportanteRepository = dataImportanteRepository;
         }
         // GET: MembroEvento
-        public ActionResult Index()
+        public ActionResult Index(int id, string msg = null, string type = null)
         {
-            return View(_eventoParticipanteRepository.ObterTodos());
+            ViewBag.Alert = msg;
+            ViewBag.Type = type;
+            return View(_eventoParticipanteRepository.ObterPorEvento(id));
+        }
+
+        public ActionResult Listar(string msg = null)
+        {
+            ViewBag.Alert = msg;
+            //ViewBag.Prazo = _dataImportanteRepository.VerificarPrazoFinalidade("Inscrições", data.EventoId);
+            return View(_eventoParticipanteRepository.ObterPorParticipante(sessionId));
         }
 
         // GET: MembroEvento/Details/5
@@ -44,86 +65,131 @@ namespace SDGE.UI.Web.Controllers
         public ActionResult Create()
         {
             ViewBag.EventoId = ObterEventos();
-            ViewBag.ParticipanteId = ObterParticipantes();
-            return View(new Inscricao());
+
+          //  ViewBag.ParticipanteId = ObterParticipantes();
+            return View(new InscricaoViewModel());
         }
         
        
         // POST: MembroEvento/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(Inscricao collection)
+        public ActionResult Create(InscricaoViewModel collection)
         {
             try
             {
                 // TODO: Add insert logic here
-                
+                if (_eventoParticipanteRepository.VerificarEvento(collection.EventoId, sessionId))
+                {
+                    ModelState.AddModelError("EventoId", $"O participante ja esta inscrito no evento.");
+                }
                 if (ModelState.IsValid)
                 {
+                    
                     if (collection.File != null)
                     {
                         var fileName = UploadFile(collection);
-                        EventoParticipante eventoParticipante = new EventoParticipante { 
-                           Comprovativo = fileName,
-                           EventoId = collection.EventoId,
-                           ParticipanteId = collection.ParticipanteId
-                        };
-                        _eventoParticipanteRepository.Adicionar(eventoParticipante);
-                        return RedirectToAction(nameof(Index));
+                        
+                        if (_eventoParticipanteRepository.VerificarEvento(collection.EventoId, sessionId, true))
+                        {
+                            var _result = _eventoParticipanteRepository.ObterPorEventoParticipante(collection.EventoId, sessionId, true);
+                            _result.Comprovativo = fileName;
+                            _result.Removido = false;
+                            _result.Confirmado = false;
+                            _eventoParticipanteRepository.Actualizar(_result);
+                        }
+                        else
+                        {
+                            EventoParticipante eventoParticipante = new EventoParticipante
+                            {
+                                Comprovativo = fileName,
+                                EventoId = collection.EventoId,
+                                ParticipanteId = sessionId
+                            };
+                            _eventoParticipanteRepository.Adicionar(eventoParticipante);
+                        }
+                       
+                        return RedirectToAction("Listar", new { msg = "Inscrição criada." });
                     }
                         
                 }
-                ViewBag.EventoId = ObterEventos(collection.EventoId.ToString());
-                ViewBag.ParticipanteId = ObterParticipantes(collection.ParticipanteId.ToString());
+                ViewBag.EventoId = ObterEventos();
                 return View(collection);
             }
             catch
             {
-                return View();
+                ViewBag.EventoId = ObterEventos();
+                return View(collection);
             }
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Confirmar(string [] confirmar, string cnf)
+        {
+            int eventoId = 0;
+            if(confirmar != null)
+            {
+                foreach (var epId in confirmar)
+                {
+                    int id = int.Parse(epId);
+                    var result = _eventoParticipanteRepository.ObterPorId(id);
+                    eventoId = result.EventoId;
+                    if (cnf != null)
+                        result.Confirmado = true;
+                    else
+                        result.Confirmado = false;
+
+                    _eventoParticipanteRepository.Actualizar(result);
+                }
+            }
+            if(cnf != null)
+                return RedirectToAction("Index", new {id = eventoId , msg = "Inscrição confirmada.", type = "success" });
+
+            return RedirectToAction("Index", new {id = eventoId , msg = "Inscrição cancelada.", type = "danger" });
+        }
+        
         // GET: MembroEvento/Edit/5
         public ActionResult Edit(int id)
         {
-            ViewBag.EventoId = ObterEventos();
-            ViewBag.ParticipanteId = ObterParticipantes();
+            ViewBag.EventoId = ObterEventos(id.ToString());
+           // ViewBag.ParticipanteId = ObterParticipantes();
             ViewBag.Ficheiro = _eventoParticipanteRepository.ObterPorId(id).Comprovativo;
+            
             return View(Inscricao(id));
         }
 
         // POST: MembroEvento/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, Inscricao inscricao)
+        public ActionResult Edit(int id, InscricaoViewModel inscricao)
         {
             try
             {
                 // TODO: Add update logic here
-                if (ModelState.IsValid)
-                {
+                
                     if (inscricao.File != null)
                     {
                         var fileName = UploadFile(inscricao);
                         inscricao.Comprovativo = fileName;
                     }
-                    _eventoParticipanteRepository.Actualizar(Inscricao(inscricao));
-                    return RedirectToAction(nameof(Index));
-                }
-                ViewBag.EventoId = ObterEventos(inscricao.EventoId.ToString());
-                ViewBag.ParticipanteId = ObterParticipantes(inscricao.ParticipanteId.ToString());
-                return View(inscricao);
+                    
+                        _eventoParticipanteRepository.Actualizar(Inscricao(inscricao));
+                    //}
+                     return RedirectToAction("Listar", new { msg = "Inscrição actualizada." });
+                
             }
             catch
             {
-                return View();
+                ViewBag.EventoId = ObterEventos(inscricao.EventoParticipanteId.ToString());
+                return View(inscricao);
             }
         }
 
         // GET: MembroEvento/Delete/5
         public ActionResult Delete(int id)
         {
-            return View(_eventoParticipanteRepository.ObterPorId(id));
+            return PartialView("_Remover", _eventoParticipanteRepository.ObterPorEventoParticipante(id,sessionId));
         }
 
         // POST: MembroEvento/Delete/5
@@ -134,7 +200,8 @@ namespace SDGE.UI.Web.Controllers
             try
             {
                 // TODO: Add delete logic here
-                _eventoParticipanteRepository.Remover(collection);
+                var result = _eventoParticipanteRepository.ObterPorId(collection.EventoParticipanteId);
+                _eventoParticipanteRepository.Remover(result);
                 return RedirectToAction(nameof(Index));
             }
             catch
@@ -142,7 +209,7 @@ namespace SDGE.UI.Web.Controllers
                 return View();
             }
         }
-        private string UploadFile(Inscricao inscricao)
+        private string UploadFile(InscricaoViewModel inscricao)
         {
             if (inscricao.File != null)
             {
@@ -155,19 +222,48 @@ namespace SDGE.UI.Web.Controllers
             }
             return null;
         }
-        public SelectList ObterEventos(string id = null)
+        public List<SelectListItem> ObterEventos(string id = null)
         {
-            return new SelectList(_eventoRepository.ObterTodos(), "EventoId", "Titulo", id);
+            List<SelectListItem> items = new List<SelectListItem>();
+            var result = _eventoRepository.ObterTodos();
+            bool state = true;
+
+            foreach (var item in result)
+            {
+                if (!_eventoParticipanteRepository.VerificarEvento(item.EventoId, sessionId))
+                {
+                    if(_dataImportanteRepository.VerificarPrazoFinalidade("Inscrições", item.EventoId))
+                    {
+                        items.Add(new SelectListItem() { Value = item.EventoId.ToString(), Text = item.Titulo });
+                        state = false;
+                    }
+                }
+            }
+
+            if (id != null)
+            {
+                var data = _eventoParticipanteRepository.ObterPorId(int.Parse(id));
+               
+                if (_dataImportanteRepository.VerificarPrazoFinalidade("Inscrições", data.EventoId))
+                {
+                    items.Add(new SelectListItem() { Value = data.EventoId.ToString(), Text = data.Evento.Titulo });
+                }
+            }
+           
+            if (state && id == null)
+                items.Add(new SelectListItem() { Value = "", Text = "Não existe nenhum evento" });
+            return items;
         }
+        
         public SelectList ObterParticipantes(string id = null)
         {
             return new SelectList(_participanteRepository.ObterTodos(), "ParticipanteId", "Nome", id);
         }
-        private Inscricao Inscricao(int id)
+        private InscricaoViewModel Inscricao(int id)
         {
             EventoParticipante eventoParticipante = _eventoParticipanteRepository.ObterPorId(id);
 
-            return new Inscricao
+            return new InscricaoViewModel
             {
                 EventoParticipanteId = eventoParticipante.EventoParticipanteId,
                 Comprovativo = eventoParticipante.Comprovativo,
@@ -175,14 +271,15 @@ namespace SDGE.UI.Web.Controllers
                 ParticipanteId = eventoParticipante.ParticipanteId
             };
         }
-        private EventoParticipante Inscricao(Inscricao inscricao)
+        private EventoParticipante Inscricao(InscricaoViewModel inscricao)
         {
+            //EventoParticipante eventoParticipante = _eventoParticipanteRepository.ObterPorId(inscricao.EventoParticipanteId);
             return new EventoParticipante
             {
                 EventoParticipanteId = inscricao.EventoParticipanteId,
                 Comprovativo = inscricao.Comprovativo,
                 EventoId = inscricao.EventoId,
-                ParticipanteId = inscricao.ParticipanteId
+                ParticipanteId = sessionId,
             };
         }
         public ActionResult Download(int id)
@@ -194,6 +291,17 @@ namespace SDGE.UI.Web.Controllers
                 return NotFound();
 
             return PhysicalFile(filePath, MimeTypes.GetMimeType(filePath), Path.GetFileName(filePath));
+        }
+
+        [AcceptVerbs("GET", "POST")]
+        public IActionResult VerificarEvento(int eventoId)
+        {
+            //int id = 1;
+            if (_eventoParticipanteRepository.VerificarEvento(eventoId, sessionId))
+            {
+                return Json($"O participante já esta inscrito no evento.");
+            }
+            return Json(true);
         }
     }
 }

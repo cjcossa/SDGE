@@ -17,7 +17,7 @@ namespace SDGE.UI.Web.Controllers
         private readonly IComissaoOrganizadoraRepository _comissaoOrganizadoraRepository;
         private readonly IMembroRepository _membroRepository;
         private readonly IMembroOrganizadorRepository _membroOrganizadorRepository;
-        private int id = 1;
+        private int id = 2;
         public ComissaoOrganizadoraController(IComissaoOrganizadoraRepository comissaoOrganizadoraRepository, 
             IMembroRepository membroRepository, 
             IMembroOrganizadorRepository membroOrganizadorRepository)
@@ -219,17 +219,18 @@ namespace SDGE.UI.Web.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult RemoverMembro(int id, MembroOrganizador organizador)
         {
+            var result = new MembroOrganizador();
             try
             {
                 // TODO: Add delete logic here
                 // organizadora.Removido = true;
-                var result = _membroOrganizadorRepository.ObterPorId(organizador.MembroOrganizadorId);
+                result = _membroOrganizadorRepository.ObterPorId(organizador.MembroOrganizadorId);
                 _membroOrganizadorRepository.Actualizar(result);
                 return RedirectToAction("Listar", new { id = result.ComissaoOrganizadoraId, msg = "Membro removido"});
             }
             catch
             {
-                return View(organizador);
+                return PartialView("_RemoverMembro", result);
             }
         }
 

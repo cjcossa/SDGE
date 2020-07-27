@@ -1,0 +1,27 @@
+﻿@model SDGE.ApplicationCore.Entity.EventoParticipante
+
+<div class="modal fade" id="modalConfirmDelete" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-md modal-notify modal-danger" role="document">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card modal-content">
+                        <div class="card-header card-header-danger">
+                            <h4 class="card-title ">Remover Inscrição </h4>
+                            <p class="card-category ">Evento: @Html.DisplayFor(model => model.Evento.Titulo)?</p>
+                        </div>
+                        <div class="card-body">
+                            <form asp-action="Delete">
+                                <input type="hidden" asp-for="EventoParticipanteId" />
+                                <div class="form-group text-right">
+                                    <button class="btn  btn-danger btn-sm waves-effect" data-dismiss="modal">Cancelar</button>
+                                    <input type="submit" value="Remover" class="btn btn-outline-danger btn-sm" />
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </div>
+</div>
+

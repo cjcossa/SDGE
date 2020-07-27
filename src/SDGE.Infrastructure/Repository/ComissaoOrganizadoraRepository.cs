@@ -19,7 +19,7 @@ namespace SDGE.Infrastructure.Repository
         private bool state = false;
         public ComissaoOrganizadora ObterPorCodigo(string codigo)
         {
-            return _dbContext.Set<ComissaoOrganizadora>().Where(c => c.Codigo == codigo).FirstOrDefault();
+            return _dbContext.Set<ComissaoOrganizadora>().Where(c => c.Codigo == codigo && c.Removido == state).FirstOrDefault();
         }
         
         public IEnumerable<ComissaoOrganizadora> ObterPorMembro(int membroId)
@@ -65,6 +65,11 @@ namespace SDGE.Infrastructure.Repository
 
             return true;
         }
-       
+
+        public IEnumerable<ComissaoOrganizadora> ObterEventos(int membroId)
+        {
+            return _dbContext.Set<ComissaoOrganizadora>().Include(c => c.MembroOrganizadors.Any(m => m.Removido == state && m.MembroId == membroId)).Include(m => m.Eventos.Any(e => e.Removido == state))
+                .AsEnumerable();
+        }
     }
 }

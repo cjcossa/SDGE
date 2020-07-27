@@ -15,7 +15,7 @@ namespace SDGE.UI.Web.Models
         [Required(ErrorMessage = "Introduza o código")]
         [StringLength(10, ErrorMessage = "O códido deve ter 10 caracteres", MinimumLength = 10)]
         [Remote(action: "VerifyCode", controller: "ComissaoOrganizadora")]
-        [Display(Name = "Código")]
+        [Display(Name = "Código da comissão organizadora")]
         public string Codigo { get; set; }
     }
 }

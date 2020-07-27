@@ -46,7 +46,7 @@ namespace SDGE.Infrastructure.Repository
             return _dbContext.Set<TEntity>().AsEnumerable();
         }
 
-        public void Remover(TEntity entity)
+        public virtual void Remover(TEntity entity)
         {
             _dbContext.Set<TEntity>().Remove(entity);
             _dbContext.SaveChanges();

@@ -15,5 +15,10 @@ namespace SDGE.Infrastructure.Repository
         {
 
         }
+        private bool state = false;
+        public override Participante ObterPorId(int id)
+        {
+            return _dbContext.Set<Participante>().Where(c => c.ParticipanteId == id && c.Removido == state).FirstOrDefault();
+        }
     }
 }

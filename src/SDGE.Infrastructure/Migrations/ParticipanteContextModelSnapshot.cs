@@ -25,6 +25,15 @@ namespace SDGE.Infrastructure.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<int>("ComissaoCientificaId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ComissaoOrganizadoraId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("Destino")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Messagem")
                         .IsRequired()
                         .HasColumnType("varchar(250)");
@@ -35,11 +44,14 @@ namespace SDGE.Infrastructure.Migrations
                     b.Property<bool>("Removido")
                         .HasColumnType("bit");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("varchar(50)");
+                    b.Property<bool>("Status")
+                        .HasColumnType("bit");
 
                     b.HasKey("AlertaId");
+
+                    b.HasIndex("ComissaoCientificaId");
+
+                    b.HasIndex("ComissaoOrganizadoraId");
 
                     b.HasIndex("ParticipanteId");
 
@@ -112,8 +124,7 @@ namespace SDGE.Infrastructure.Migrations
 
                     b.HasIndex("MembroId");
 
-                    b.HasIndex("SubmissaoId")
-                        .IsUnique();
+                    b.HasIndex("SubmissaoId");
 
                     b.ToTable("Correcao");
                 });
@@ -391,6 +402,9 @@ namespace SDGE.Infrastructure.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<bool>("Confirmado")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Descricao")
                         .IsRequired()
                         .HasColumnType("varchar(1000)");
@@ -402,6 +416,9 @@ namespace SDGE.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(250)");
 
+                    b.Property<string>("Observacoes")
+                        .HasColumnType("varchar(1000)");
+
                     b.Property<int>("ParticipanteId")
                         .HasColumnType("int");
 
@@ -409,7 +426,6 @@ namespace SDGE.Infrastructure.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("Status")
-                        .IsRequired()
                         .HasColumnType("varchar(50)");
 
                     b.Property<int>("TipoId")
@@ -455,6 +471,18 @@ namespace SDGE.Infrastructure.Migrations
 
             modelBuilder.Entity("SDGE.ApplicationCore.Entity.Alerta", b =>
                 {
+                    b.HasOne("SDGE.ApplicationCore.Entity.ComissaoCientifica", "ComissaoCientifica")
+                        .WithMany("Alertas")
+                        .HasForeignKey("ComissaoCientificaId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SDGE.ApplicationCore.Entity.ComissaoOrganizadora", "ComissaoOrganizadora")
+                        .WithMany("Alertas")
+                        .HasForeignKey("ComissaoOrganizadoraId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("SDGE.ApplicationCore.Entity.Participante", "Participante")
                         .WithMany("Alertas")
                         .HasForeignKey("ParticipanteId")
@@ -471,8 +499,8 @@ namespace SDGE.Infrastructure.Migrations
                         .IsRequired();
 
                     b.HasOne("SDGE.ApplicationCore.Entity.Submissao", "Submissao")
-                        .WithOne("Correcao")
-                        .HasForeignKey("SDGE.ApplicationCore.Entity.Correcao", "SubmissaoId")
+                        .WithMany("Correcoes")
+                        .HasForeignKey("SubmissaoId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });

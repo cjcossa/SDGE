@@ -11,18 +11,21 @@ namespace SDGE.ApplicationCore.Entity
         public Submissao()
         {
             this.Removido = false;
+            this.Confirmado = false;
         }
         public int SubmissaoId { get; set; }
         public string Titulo { get; set; }
         public string Descricao { get; set; }
         public string Ficheiro { get; set; }
+        public string Observacoes { get; set; }
+        public bool Confirmado { get; set; }
         public string Status { get; set; }
         public bool Removido { get; set; }
         public int TipoId { get; set; }
         public int ParticipanteId { get; set; }
         public int EventoId { get; set; }
         public Participante Participante { get; set; }
-        public Correcao Correcao { get; set; }
+        public ICollection<Correcao> Correcoes { get; set; }
         public Evento Evento { get; set; }
         public Tipo Tipo { get; set; }
        

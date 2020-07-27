@@ -7,6 +7,6 @@ namespace SDGE.ApplicationCore.Interfaces.Repository
 {
     public interface IAlertaRepository : IRepository<Alerta>
     {
-
+        public IEnumerable<Alerta> ObterPorParticipante(int id);
     }
 }

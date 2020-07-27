@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using SDGE.Infrastructure.Data;
+using SDGE.UI.Web.Data;
 
 namespace SDGE.UI.Web
 {
@@ -15,17 +16,19 @@ namespace SDGE.UI.Web
     {
         public static void Main(string[] args)
         {
-            CreateHostBuilder(args).Build().Run();
+            //CreateHostBuilder(args).Build().Run();
 
-            /*var host = CreateHostBuilder(args).Build();
+            var host = CreateHostBuilder(args).Build();
 
             using (var scope = host.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
                 try
                 {
-                    var context = services.GetRequiredService<ParticipanteContext>();
-                    DBInitializer.Initialize(context);
+                    var context = services.GetRequiredService<ApplicationDbContext>();
+                    var context2 = services.GetRequiredService<ParticipanteContext>();
+                    Seed.Initialize(context);
+                    DBInitializer.Initialize(context2);
                 }
                 catch(Exception ex)
                 {
@@ -33,7 +36,7 @@ namespace SDGE.UI.Web
                     logger.LogError(ex, "Erro no metdo seeding do contexto");
                 }
             }
-            host.Run();*/
+            host.Run();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>

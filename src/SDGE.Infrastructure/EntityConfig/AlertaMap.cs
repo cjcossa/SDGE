@@ -19,13 +19,24 @@ namespace SDGE.Infrastructure.EntityConfig
                   .HasPrincipalKey(s => s.ParticipanteId)
                   .OnDelete(DeleteBehavior.Restrict);
 
+            //com comissao cientifica
+            builder.HasOne(s => s.ComissaoCientifica)
+                  .WithMany(s => s.Alertas)
+                  .HasForeignKey(s => s.ComissaoCientificaId)
+                  .HasPrincipalKey(s => s.ComissaoCientificaId)
+                  .OnDelete(DeleteBehavior.Restrict);
+
+            //com comissao  organizadora
+            builder.HasOne(s => s.ComissaoOrganizadora)
+                  .WithMany(s => s.Alertas)
+                  .HasForeignKey(s => s.ComissaoOrganizadoraId)
+                  .HasPrincipalKey(s => s.ComissaoOrganizadoraId)
+                  .OnDelete(DeleteBehavior.Restrict);
             builder.Property(a => a.Messagem)
                .HasColumnType("varchar(250)")
                .IsRequired();
 
-            builder.Property(a => a.Status)
-               .HasColumnType("varchar(50)")
-               .IsRequired();
+          
         }
     }
 }

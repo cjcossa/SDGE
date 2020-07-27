@@ -15,5 +15,6 @@ namespace SDGE.ApplicationCore.Entity
         public bool Removido { get; set; }
         public ICollection<MembroCientifico> MembroCientificos { get; set; }
         public ICollection<Evento> Eventos { get; set; }
+        public ICollection<Alerta> Alertas { get; set; }
     }
 }

@@ -68,6 +68,7 @@ namespace SDGE.UI.Web
             services.AddScoped<IComissaoOrganizadoraRepository, ComissaoOrganizadoraRepository>();
             services.AddScoped<IMembroCientificoRepository, MembroCientificoRepository>();
             services.AddScoped<IMembroOrganizadorRepository, MembroOrganizadorRepository>();
+            services.AddScoped<IAlertaRepository, AlertaRepository>();
             
             services.Configure<IdentityOptions>(options =>
             {
@@ -131,7 +132,7 @@ namespace SDGE.UI.Web
              {
                  endpoints.MapControllerRoute(
                      name: "default",
-                     pattern: "{controller=ComissaoOrganizadora}/{action=Index}/{id?}");
+                     pattern: "{controller=Evento}/{action=Eventos}/{id?}");
                  endpoints.MapRazorPages();
              });
             /*app.UseMvc(routes =>

@@ -1,12 +1,11 @@
-﻿@model SDGE.ApplicationCore.Entity.Evento
+﻿@model SDGE.UI.Web.Models.EventoViewModel
 
 @{
     ViewData["Title"] = "Create";
 }
 
 <div class="row">
-    <div class="col-md-1"></div>
-        <div class="col-md-8">
+        <div class="col-md-12">
             <div class="card">
                 <div class="card-header card-header-primary">
                     <h4 class="card-title">Criar Evento</h4>
@@ -22,7 +21,7 @@
                                     <span asp-validation-for="Titulo" class="text-danger"></span>
                                 </div>
                             </div>
-                            
+
                         </div>
                         <div class="row">
                             <div class="col-md-12">
@@ -35,57 +34,54 @@
                         </div>
 
                         <div class="row">
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <div class="form-group">
                                     <label asp-for="DataInicio" class="bmd-label-floating"></label>
-                                    <input name="datainicio" asp-for="DataInicio" id="datainicio" class="form-control" />
+                                    <input name="datainicio" asp-for="DataInicio" id="datainicio" class="form-control" autocomplete="off" />
                                     <span asp-validation-for="DataInicio" class="text-danger"></span>
-                                    <script>
-                                        var today = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
-                                        $('#datainicio').datepicker({
-                                            showOtherMonths: true,
-                                            minDate: today,
-                                            maxDate: function () {
-                                                return $('#datafim').val();
-                                            }
-                                        });
-                                    </script>
                                 </div>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <div class="form-group">
                                     <label asp-for="DataFim" class="bmd-label-floating"></label>
-                                    <input name="datafim" asp-for="DataFim" id="datafim" class="form-control" />
+                                    <input name="datafim" asp-for="DataFim" id="datafim" class="form-control" autocomplete="off" />
                                     <span asp-validation-for="DataFim" class="text-danger"></span>
-                                    <script>
-                                        $('#datafim').datepicker({
-                                            showOtherMonths: true,
-                                            minDate: function () {
-                                                return $('#datainicio').val();
-                                            }
-                                        });
-                                    </script>
                                 </div>
                             </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <select asp-for="Categoria" class="selectpicker" data-style="btn-primary" asp-items="(List<SelectListItem>)ViewBag.Categoria"></select>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-3">
                                 <div class="form-group">
                                     <label asp-for="Local" class="bmd-label-floating"></label>
                                     <input asp-for="Local" class="form-control" />
                                     <span asp-validation-for="Local" class="text-danger"></span>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <select asp-for="Categoria" class="selectpicker" data-style="btn-outline-primary" data-width="100%" asp-items="(List<SelectListItem>)ViewBag.Categoria"></select>
+                                    <span asp-validation-for="Categoria" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
                                 <div class="form-group">
                                     <label asp-for="Email" class="bmd-label-floating"></label>
                                     <input asp-for="Email" class="form-control" />
                                     <span asp-validation-for="Email" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="CodigoOrganizadora" class="bmd-label-floating"></label>
+                                    <input asp-for="CodigoOrganizadora" class="form-control" />
+                                    <span asp-validation-for="CodigoOrganizadora" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label asp-for="CodigoCientifica" class="bmd-label-floating"></label>
+                                    <input asp-for="CodigoCientifica" class="form-control" />
+                                    <span asp-validation-for="CodigoCientifica" class="text-danger"></span>
                                 </div>
                             </div>
                         </div>
@@ -95,21 +91,40 @@
                                     <div class="form-group">
                                         <label asp-for="Descricao" class="bmd-label-floating"></label>
                                         <textarea asp-for="Descricao" class="form-control" rows="5"></textarea>
+                                        <span asp-validation-for="Descricao" class="text-danger"></span>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-primary pull-right">Create</button>
+                        <div class="form-group text-right">
+                            <a asp-action="index">
+                                <input type="button" value="Cancelar" class="btn btn-primary btn-sm waves-effect" />
+                            </a>
+                            
+                            <button type="submit" class="btn btn-outline-primary btn-sm">Guardar</button>
+                        </div>
                         <div class="clearfix"></div>
                     </form>
                 </div>
             </div>
         </div>
     </div>
-
-    <div>
-        <a asp-action="Index">Back to List</a>
-    </div>
+<script>
+var today = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
+$('#datainicio').datepicker({
+    showOtherMonths: true,
+    minDate: today,
+    maxDate: function () {
+        return $('#datafim').val();
+    }
+});
+$('#datafim').datepicker({
+    showOtherMonths: true,
+    minDate: function () {
+        return $('#datainicio').val();
+    }
+});
+</script>
 
     @section Scripts {
         @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

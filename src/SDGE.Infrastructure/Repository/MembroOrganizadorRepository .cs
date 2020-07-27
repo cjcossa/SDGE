@@ -22,13 +22,15 @@ namespace SDGE.Infrastructure.Repository
         public IEnumerable<MembroOrganizador> ObterPorComissao(int id)
         {
             return _dbContext.Set<MembroOrganizador>().Include(c => c.ComissaoOrganizadora).Include(m => m.Membro)
-                .Where(c => c.ComissaoOrganizadoraId == id && c.Removido == state).AsEnumerable();
+                .Where(c => c.ComissaoOrganizadoraId == id && c.Removido == state &&
+                 c.ComissaoOrganizadora.Removido == state && c.Membro.Removido == state).AsEnumerable();
         }
 
         public bool VerificarMembro(int membroId, int comissaoId, bool state)
         {
             var result = _dbContext.Set<MembroOrganizador>().Include(c => c.ComissaoOrganizadora).Include(m => m.Membro)
-                .Where(c => c.ComissaoOrganizadoraId == comissaoId && c.MembroId == membroId && c.Removido == state).FirstOrDefault();
+                .Where(c => c.ComissaoOrganizadoraId == comissaoId && c.MembroId == membroId && c.Removido == state &&
+                 c.ComissaoOrganizadora.Removido == state && c.Membro.Removido == state).FirstOrDefault();
             if (result == null)
                 return false;
             
@@ -38,13 +40,21 @@ namespace SDGE.Infrastructure.Repository
         public MembroOrganizador ObterPorMembroComissao(int membroId, int comissaoId, bool state)
         {
            return _dbContext.Set<MembroOrganizador>().Include(c => c.ComissaoOrganizadora).Include(m => m.Membro)
-                .Where(c => c.ComissaoOrganizadora.ComissaoOrganizadoraId == comissaoId && c.Membro.MembroId == membroId && c.Removido == state).FirstOrDefault();
+                .Where(c => c.ComissaoOrganizadora.ComissaoOrganizadoraId == comissaoId && c.Membro.MembroId == membroId && c.Removido == state &&
+                 c.ComissaoOrganizadora.Removido == state && c.Membro.Removido == state).FirstOrDefault();
         }
 
         public override void Actualizar(MembroOrganizador entity)
         {
             entity.Removido = !entity.Removido;
             base.Actualizar(entity);
+        }
+
+        public IEnumerable<MembroOrganizador> ObterPorMembro(int id)
+        {
+            return _dbContext.Set<MembroOrganizador>().Include(c => c.ComissaoOrganizadora).Include(m => m.ComissaoOrganizadora.Eventos)
+               .Where(c => c.MembroId == id && c.Removido == state &&
+                c.ComissaoOrganizadora.Removido == state).AsEnumerable();
         }
     }
 }

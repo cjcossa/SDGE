@@ -10,6 +10,7 @@ namespace SDGE.ApplicationCore.Interfaces.Repository
     {
         public bool VerificarMembro(int membroId, int comissaoId, bool state);
         public IEnumerable<MembroOrganizador> ObterPorComissao(int id);
+        public IEnumerable<MembroOrganizador> ObterPorMembro(int id);
         public MembroOrganizador ObterPorMembroComissao(int membroId, int comissaoId, bool state);
 
     }

@@ -1,0 +1,26 @@
+﻿@model SDGE.ApplicationCore.Entity.DataImportante
+
+<div class="modal fade" id="modalConfirmDelete" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-md modal-notify modal-danger" role="document">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card modal-content">
+                        <div class="card-header card-header-danger">
+                            <h4 class="card-title ">Remover a Configuração @Html.DisplayFor(model => model.Finalidade)?</h4>
+                        </div>
+                        <div class="card-body">
+                            <form asp-action="Delete">
+                                <input type="hidden" asp-for="DataImportanteId" />
+                                <div class="form-group text-right">
+                                    <button type="button" class="btn  btn-danger btn-sm waves-effect" data-dismiss="modal">Cancelar</button>
+                                    <input type="submit" value="Remover" class="btn btn-outline-danger btn-sm" />
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </div>
+</div>
+

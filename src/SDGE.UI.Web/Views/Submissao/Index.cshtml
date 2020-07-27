@@ -2,85 +2,160 @@
 
 @{
     ViewData["Title"] = "Index";
+    bool state = false;
 }
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
+<div id="modalView" class="col-md-12"></div>
+
 <div class="row">
     <div class="col-md-12">
-        <div class="card">
-            <div class="card-header card-header-primary">
-                <h4 class="card-title ">Submissões</h4>
-                <p class="card-category"> Here is a subtitle for this table</p>
+        @if (ViewBag.Alert != null)
+        {
+            <div class="alert alert-success">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <i class="material-icons">close</i>
+                </button>
+                <span>
+                    <b> Sucesso - </b> @ViewBag.Alert
+                </span>
             </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table">
-                        <thead class=" text-primary">
-                            <tr>
-                                <th>
-                                    @Html.DisplayNameFor(model => model.Titulo)
-                                </th>
-                                <th>
-                                    @Html.DisplayNameFor(model => model.Descricao)
-                                </th>
-                                <th>
-                                    @Html.DisplayNameFor(model => model.Ficheiro)
-                                </th>
-                                <th>
-                                    @Html.DisplayNameFor(model => model.Status)
-                                </th>
-                                <th>
-                                    @Html.DisplayNameFor(model => model.Participante)
-                                </th>
-                                <th>
-                                    @Html.DisplayNameFor(model => model.Evento)
-                                </th>
-                                <th>
-                                    @Html.DisplayNameFor(model => model.Tipo)
-                                </th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var item in Model)
-                            {
+        }
+        <form asp-action="Aprovar">
+            <div class="card">
+                <div class="card-header card-header-primary">
+                    <h4 class="card-title ">Lista de Submissões</h4>
+                    @foreach (var item in Model)
+                    {
+                        if (item.SubmissaoId.ToString() != null)
+                        {
+                            state = true;
+                            <p class="card-category ">Evento: @Html.DisplayFor(modelItem => item.Evento.Titulo)</p>break;
+                        }
+                    }
+                    
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table" id="dtMaterialDesignExample">
+                            <thead class=" text-primary">
                                 <tr>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => item.Titulo)
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => item.Descricao)
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => item.Ficheiro)
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => item.Status)
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => item.Participante.Nome)
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => item.Evento.Titulo)
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => item.Tipo.Titulo)
-                                    </td>
-                                    <td>
-                                        <a asp-action="Edit" asp-route-id="@item.SubmissaoId">Edit</a> |
-                                        <a asp-action="Details" asp-route-id="@item.SubmissaoId">Details</a> |
-                                        <a asp-action="Delete" asp-route-id="@item.SubmissaoId">Delete</a>
-                                        <a><input type="button" value="Download" class="btn btn-outline-success" onclick="location.href='@Url.Action("Download", "Submissao", new { id = item.SubmissaoId })'" /></a>
-                                    </td>
+                                    <th></th>
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.Titulo)
+                                    </th>
+
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.Confirmado)
+                                    </th>
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.Status)
+                                    </th>
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.Participante)
+                                    </th>
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.Tipo)
+                                    </th>
+
+                                    <th></th>
                                 </tr>
-                            }
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <label class="form-check-label">
+                                                    <input class="form-check-input" type="checkbox" name="aprovar[]" value="@item.SubmissaoId.ToString()">
+                                                    <span class="form-check-sign">
+                                                        <span class="check"></span>
+                                                    </span>
+                                                </label>
+                                            </div>
+                                            <input type="hidden" asp-for="@item.SubmissaoId" />
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.Titulo)
+                                        </td>
+
+
+                                        <td>
+                                            @if (item.Confirmado == false)
+                                            {
+                                                <button class="btn btn-danger btn-sm" disabled>Não</button>
+                                            }
+                                            else
+                                            {
+                                                <button class="btn btn-success btn-sm" disabled>Sim</button>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (item.Status == null)
+                                            {
+                                                <button class="btn btn-info btn-sm" disabled>Em Andamento</button>
+                                            }
+                                            else
+                                            {
+                                                if (item.Status.Equals("Aprovado"))
+                                                {
+                                                    <button class="btn btn-success btn-sm" disabled>Aprovado</button>
+                                                }
+                                                else if (item.Status.Equals("Reprovado"))
+                                                {
+                                                    <button class="btn btn-danger btn-sm" disabled>Reprovado</button>
+                                                }
+                                                else
+                                                {
+                                                    <button class="btn btn-primary btn-sm" disabled>Aprovado com Revissão</button>
+                                                }
+                                            }
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.Participante.Nome)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.Tipo.Titulo)
+                                        </td>
+
+                                        <td class="td-actions text-right">
+                                            <button type="button" onclick="location.href='@Url.Action("Download", new { id = item.SubmissaoId })'" rel="tooltip" title="Baixar" class="btn btn-success btn-link btn-sm">
+                                                <i class="material-icons">archive</i>
+                                            </button>
+                                            <button type="button" data-toggle="ajax-modal" data-target="#modalConfirmDelete" data-url="@Url.Action($"Details/{item.SubmissaoId}")" rel="tooltip" title="Detalhes" class="btn btn-info btn-link btn-lg">
+                                                <i class="material-icons">details</i>
+                                            </button>
+                                            @if (item.Status == null || item.Status.Equals("Aprovado com Revisão"))
+                                            {
+                                                <button type="button" onclick="location.href='@Url.Action("Create", "Correcao", new { id = item.SubmissaoId })'" rel="tooltip" title="Avaliar" class="btn btn-success btn-link btn-sm">
+                                                    <i class="material-icons">done</i>
+                                                </button>
+                                            }
+                                            <button type="button" onclick="location.href='@Url.Action("Index", "Correcao", new { id = item.SubmissaoId })'" rel="tooltip" title="Avaliações" class="btn btn-success btn-link btn-sm">
+                                                <i class="material-icons">view_list</i>
+                                            </button>
+                                            @if (item.Status == null || !item.Status.Equals("Reprovado"))
+                                            {
+                                                <button type="button" onclick="location.href='@Url.Action("Reprovar", new { id = item.SubmissaoId })'" rel="tooltip" title="Reprovar" class="btn btn-danger btn-link btn-sm">
+                                                    <i class="material-icons">clear</i>
+                                                </button>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
-        </div>
+            <div class="form-group text-right">
+                @if (state)
+                {
+                    <input type="submit" value="Aprovar com revisão" class="btn btn-outline-primary btn-sm" name="revisao" />
+                    <input type="submit" value="Aprovar" class="btn btn-outline-success btn-sm" name="aprovado" />
+                }
+            </div>
+        </form>
     </div>
 </div>
 

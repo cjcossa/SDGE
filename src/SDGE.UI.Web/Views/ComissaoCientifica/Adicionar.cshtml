@@ -1,0 +1,31 @@
+﻿@model SDGE.UI.Web.Models.MembroCientificoViewModel
+
+@{
+    ViewData["Title"] = "Adicionar";
+}
+
+<div class="row">
+    <div class="col-md-2"></div>
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header card-header-primary">
+                <h4 class="card-title">Adicionar membros na comissão científica</h4>
+                <p class="card-category">Comissão responsável por avaliar as submissões.</p>
+            </div>
+            <div class="card-body">
+                <form asp-action="Adicionar">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input type="hidden" asp-for="ComissaoCientificaId" />
+                    <div class="form-group">
+                        <select asp-for="Membros" class="form-control selectpicker" asp-items="ViewBag.MembroId" multiple title="SELECCIONE O(S) MEMBRO(S)" data-width="100%" data-style="btn-outline-info" data-live-search="true" data-selected-text-format="count > 1"></select>
+                        <span asp-validation-for="Membros" class="text-danger"></span>
+                    </div>
+                    <div class="form-group text-right">
+                        <button asp-action="Index" class="btn btn-primary btn-sm waves-effect">Voltar</button>
+                        <input type="submit" value="Adicionar" class="btn btn-outline-primary btn-sm" />
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

@@ -6,7 +6,12 @@
 
 $(document).ready(function () {
     $('#dtMaterialDesignExample').DataTable();
+    $('.custom-file-input').on("change", function () {
+        var fileName = $(this).val().split("\\").pop();
+        $(this).next(".custom-file-label").html(fileName);
+    });
 });
+
 
 /*$(document).ready(function () {
 

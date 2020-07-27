@@ -15,6 +15,7 @@ namespace SDGE.ApplicationCore.Entity
         public bool Removido { get; set; }
         public ICollection<MembroOrganizador> MembroOrganizadors { get; set; }
         public ICollection<Evento> Eventos { get; set; }
+        public ICollection<Alerta> Alertas { get; set; }
     }
 
 }

@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.StaticFiles;
 using SDGE.ApplicationCore.Entity;
 using SDGE.ApplicationCore.Interfaces.Repository;
+using SDGE.UI.Web.Models;
 
 namespace SDGE.UI.Web.Controllers
 {
@@ -20,7 +21,7 @@ namespace SDGE.UI.Web.Controllers
         private readonly ISubmissaoRepository _submissaoRepository;
         private readonly IMembroRepository _membroRepository;
         private readonly IWebHostEnvironment _webHostEnvironment;
-
+        private int id = 1;
         public CorrecaoController(ICorrecaoRepository correcaoRepository, ISubmissaoRepository submissaoRepository, IMembroRepository membroRepository, IWebHostEnvironment webHostEnvironment)
         {
             _correcaoRepository = correcaoRepository;
@@ -29,28 +30,32 @@ namespace SDGE.UI.Web.Controllers
             _webHostEnvironment = webHostEnvironment;
         }
         // GET: MembroEvento
-        public ActionResult Index()
+        public ActionResult Index(int id, string msg = null)
         {
-            return View(_correcaoRepository.ObterTodos());
+            ViewBag.Alert = msg;
+            return View(_correcaoRepository.ObterPorSubmissao(id));
         }
 
         // GET: MembroEvento/Details/5
         public ActionResult Details(int id)
         {
-            return View(_correcaoRepository.ObterJoinPorId(id));
+            return PartialView("_Details", _correcaoRepository.ObterPorCorrecao(id));
         }
 
         // GET: MembroEvento/Create
-        public ActionResult Create()
+        public ActionResult Create(int id)
         {
-            PreencherCombobox();
-            return View(new SubmeterCorrecao());
+            CorrecaoViewModel correcao = new CorrecaoViewModel();
+            var result = _submissaoRepository.ObterPorId(id);
+            correcao.SubmissaoId = id;
+            correcao.Titulo = result.Titulo;
+            return View(correcao);
         }
         
         // POST: MembroEvento/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(SubmeterCorrecao collection)
+        public ActionResult Create(CorrecaoViewModel collection)
         {
             try
             {
@@ -66,11 +71,11 @@ namespace SDGE.UI.Web.Controllers
                             Ficheiro = fileName,
                             Observacoes = collection.Observacoes,
                             SubmissaoId = collection.SubmissaoId,
-                            MembroId = collection.MembroId
+                            MembroId = id
                         };
 
                         _correcaoRepository.Adicionar(correcao);
-                        return RedirectToAction(nameof(Index));
+                        return RedirectToAction("Index", new { id = collection.SubmissaoId, msg = "Avaliação efectuada." });
                     }
                     
                 }
@@ -96,27 +101,26 @@ namespace SDGE.UI.Web.Controllers
         // POST: MembroEvento/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, SubmeterCorrecao submeterCorrecao)
+        public ActionResult Edit(int id, CorrecaoViewModel submeterCorrecao)
         {
             try
             {
                 // TODO: Add update logic here
-                if (ModelState.IsValid)
-                {
+                
                     if (submeterCorrecao.File != null)
                     {
                         var fileName = UploadFile(submeterCorrecao);
                         submeterCorrecao.Ficheiro = fileName;
                     }
                     _correcaoRepository.Actualizar(Submeter(submeterCorrecao));
-                    return RedirectToAction(nameof(Index));
-                }
-                PreencherCombobox();
-                return View(submeterCorrecao);
+                    return RedirectToAction("Index", new { id = submeterCorrecao.SubmissaoId, msg = "Avaliação alterada." });
+
+                //PreencherCombobox();
+                //return View(submeterCorrecao);
             }
             catch
             {
-                PreencherCombobox();
+                //PreencherCombobox();
                 return View(submeterCorrecao);
             }
         }
@@ -124,7 +128,7 @@ namespace SDGE.UI.Web.Controllers
         // GET: MembroEvento/Delete/5
         public ActionResult Delete(int id)
         {
-            return View(_correcaoRepository.ObterPorId(id));
+            return PartialView("_Delete", _correcaoRepository.ObterPorId(id));
         }
 
         // POST: MembroEvento/Delete/5
@@ -135,8 +139,10 @@ namespace SDGE.UI.Web.Controllers
             try
             {
                 // TODO: Add delete logic here
-                _correcaoRepository.Remover(collection);
-                return RedirectToAction(nameof(Index));
+              
+                var result = _correcaoRepository.ObterPorId(id);
+                _correcaoRepository.Remover(result);
+                return RedirectToAction("Index", new { id = collection.SubmissaoId, msg = "Avaliação removida." });
             }
             catch
             {
@@ -174,7 +180,7 @@ namespace SDGE.UI.Web.Controllers
             }
             return contentType;
         }
-        private string UploadFile(SubmeterCorrecao submeterCorrecao)
+        private string UploadFile(CorrecaoViewModel submeterCorrecao)
         {
             if (submeterCorrecao.File != null)
             {
@@ -204,17 +210,18 @@ namespace SDGE.UI.Web.Controllers
         }
         private object Submeter(int id)
         {
-            Correcao correcao = _correcaoRepository.ObterPorId(id);
-            return new SubmeterCorrecao
+            Correcao correcao = _correcaoRepository.ObterPorCorrecao(id);
+            return new CorrecaoViewModel
             {
                 CorrecaoId = correcao.CorrecaoId,
                 Ficheiro = correcao.Ficheiro,
                 Observacoes = correcao.Observacoes,
                 SubmissaoId = correcao.SubmissaoId,
-                MembroId = correcao.MembroId
+                MembroId = correcao.MembroId,
+                Titulo = correcao.Submissao.Titulo
             };
         }
-        private Correcao Submeter(SubmeterCorrecao submeterCorrecao)
+        private Correcao Submeter(CorrecaoViewModel submeterCorrecao)
         {
             return new Correcao
             {
@@ -222,7 +229,7 @@ namespace SDGE.UI.Web.Controllers
                 Ficheiro = submeterCorrecao.Ficheiro,
                 Observacoes = submeterCorrecao.Observacoes,
                 SubmissaoId = submeterCorrecao.SubmissaoId,
-                MembroId = submeterCorrecao.MembroId
+                MembroId = id
             };
         }
 

@@ -1,0 +1,93 @@
+﻿@model IEnumerable<SDGE.ApplicationCore.Entity.DataImportante>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+
+<div id="modalView" class="col-md-12"></div>
+
+<div class="row">
+    <div class="col-md-12">
+        @if (ViewBag.Alert != null)
+        {
+            <div class="alert alert-success">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <i class="material-icons">close</i>
+                </button>
+                <span>
+                    <b> Sucesso - </b> @ViewBag.Alert
+                </span>
+            </div>
+        }
+        @foreach (var item in Model)
+        {
+           <button onclick="location.href='@Url.Action("Create", new { id = item.EventoId})'" class="btn btn-outline-primary btn-sm">
+               <i class="material-icons">add</i>
+               Adicionar
+            </button>
+            break;
+        }
+        
+        <div class="card">
+            <div class="card-header card-header-primary">
+                <h4 class="card-title ">Configurações</h4>
+                @foreach (var item in Model)
+                {
+                    if (item.DataImportanteId.ToString() != null)
+                    {
+                        <p class="card-category ">Evento: @Html.DisplayFor(modelItem => item.Evento.Titulo)</p>break;
+                    }
+                }
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table" id="dtMaterialDesignExample">
+                        <thead class=" text-primary">
+                            <tr>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Finalidade)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.DataInicio)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.DataFim)
+                                </th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Finalidade)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.DataInicio)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.DataFim)
+                                    </td>
+                                    <td class="td-actions text-right">
+
+                                        <button type="button" onclick="location.href='@Url.Action("Edit", new { id = item.DataImportanteId })'" rel="tooltip" title="Editar" class="btn btn-primary btn-link btn-sm">
+                                            <i class="material-icons">edit</i>
+                                        </button>
+                                        <button type="button" data-toggle="ajax-modal" data-target="#modalConfirmDelete" data-url="@Url.Action($"Details/{item.DataImportanteId}")" rel="tooltip" title="Detalhes" class="btn btn-info btn-link btn-lg">
+                                            <i class="material-icons">details</i>
+                                        </button>
+                                        <button type="button" data-toggle="ajax-modal" data-target="#modalConfirmDelete" data-url="@Url.Action($"Delete/{item.DataImportanteId}")" rel="tooltip" title="Remover" class="btn btn-danger btn-link btn-lg">
+                                            <i class="material-icons">remove</i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

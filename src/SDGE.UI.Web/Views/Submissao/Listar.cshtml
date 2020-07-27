@@ -1,0 +1,132 @@
+﻿@model IEnumerable<SDGE.ApplicationCore.Entity.Submissao>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+
+<div id="modalView" class="col-md-12"></div>
+<div class="row">
+    <div class="col-md-12">
+        @if (ViewBag.Alert != null)
+        {
+            <div class="alert alert-success">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <i class="material-icons">close</i>
+                </button>
+                <span>
+                    <b> Sucesso - </b> @ViewBag.Alert
+                </span>
+            </div>
+        }
+        <button onclick="location.href='@Url.Action("Create")'" class="btn btn-outline-primary btn-sm">Nova Submissão</button>
+        <div class="card">
+            <div class="card-header card-header-primary">
+                <h4 class="card-title ">Submissões</h4>
+            </div>
+
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table" id="dtMaterialDesignExample">
+                        <thead class=" text-primary">
+                            <tr>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Titulo)
+                                </th>
+
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Confirmado)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Status)
+                                </th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Titulo)
+                                    </td>
+
+                                    <td>
+                                        @if (item.Confirmado == false)
+                                        {
+                                            <button class="btn btn-danger btn-sm" disabled>Não</button>
+                                        }
+                                        else
+                                        {
+                                            <button class="btn btn-success btn-sm" disabled>Sim</button>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (item.Status == null)
+                                        {
+                                            <button class="btn btn-info btn-sm" disabled>Em Andamento</button>
+                                        }
+                                        else
+                                        {
+                                            if (item.Status.Equals("Aprovado"))
+                                            {
+                                                <button class="btn btn-success btn-sm" disabled>Aprovado</button>
+                                            }
+                                            else if (item.Status.Equals("Reprovado"))
+                                            {
+                                                <button class="btn btn-danger btn-sm" disabled>Reprovado</button>
+                                            }
+                                            else
+                                            {
+                                                <button class="btn btn-primary btn-sm" disabled>Aprovado com Revisão</button>
+                                            }
+                                        }
+
+                                    </td>
+                                    
+                                    <td class="td-actions text-right">
+                                        <button type="button" onclick="location.href='@Url.Action("Download", new { id = item.SubmissaoId })'" rel="tooltip" title="Baixar" class="btn btn-success btn-link btn-sm">
+                                            <i class="material-icons">archive</i>
+                                        </button>
+
+                                        @if (item.Status != null && item.Status.Equals("Aprovado"))
+                                        {
+                                            if (item.Confirmado)
+                                            {
+                                                <a asp-action="Confirmar" asp-route-id="@item.SubmissaoId" rel="tooltip" title="Cancelar" class="btn btn-danger btn-link btn-sm">
+                                                    <i class="material-icons">close</i>
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                <a asp-action="Confirmar" asp-route-id="@item.SubmissaoId" rel="tooltip" title="Confirmar" class="btn btn-success btn-link btn-sm">
+                                                    <i class="material-icons">done</i>
+                                                </a>
+                                            }
+                                        }
+                                        @if (item.Confirmado == false && (item.Status == null || item.Status.Equals("Aprovado com Revisão")))
+                                        {
+                                            <a asp-action="Edit" asp-route-id="@item.SubmissaoId" rel="tooltip" title="Editar" class="btn btn-primary btn-link btn-sm">
+                                                <i class="material-icons">edit</i>
+                                            </a>
+                                        }
+                                        <button type="button" data-toggle="ajax-modal" data-target="#modalConfirmDelete" data-url="@Url.Action($"Details/{item.SubmissaoId}")" rel="tooltip" title="Detalhes" class="btn btn-info btn-link btn-lg">
+                                            <i class="material-icons">details</i>
+                                        </button>
+                                        <button type="button" onclick="location.href='@Url.Action("Index", "Correcao", new { id = item.SubmissaoId })'" rel="tooltip" title="Avaliações" class="btn btn-success btn-link btn-sm">
+                                            <i class="material-icons">view_list</i>
+                                        </button>
+                                        <button type="button" data-toggle="ajax-modal" data-target="#modalConfirmDelete" data-url="@Url.Action($"Delete/{item.SubmissaoId}")" rel="tooltip" title="Remover" class="btn btn-danger btn-link btn-lg">
+                                            <i class="material-icons">remove</i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

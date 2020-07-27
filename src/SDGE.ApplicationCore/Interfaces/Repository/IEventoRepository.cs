@@ -7,6 +7,12 @@ namespace SDGE.ApplicationCore.Interfaces.Repository
 {
     public interface IEventoRepository : IRepository<Evento>
     {
+        public bool VerificarTitulo(string titulo);
+        public bool VerificarEmail(string email);
+        public Evento ObterPorEmail(string email);
+        public Evento ObterPorTitulo(string titulo);
+        public IEnumerable<Evento> ObterEventos(int membroId);
+        public Evento ObterPorEvento(int id);
 
     }
 }
