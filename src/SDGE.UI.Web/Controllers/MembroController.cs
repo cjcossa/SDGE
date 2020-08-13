@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SDGE.ApplicationCore.Entity;
 using SDGE.ApplicationCore.Interfaces.Repository;
+using SDGE.UI.Web.Models;
 
 namespace SDGE.UI.Web.Controllers
 {
@@ -14,11 +15,15 @@ namespace SDGE.UI.Web.Controllers
     {
         private readonly IMembroRepository _membroRepository;
         private readonly UserManager<IdentityUser> _userManager;
+        private readonly SignInManager<IdentityUser> _signInManager;
        
-        public MembroController(IMembroRepository membroRepository, UserManager<IdentityUser> userManager)
+        public MembroController(IMembroRepository membroRepository, 
+            UserManager<IdentityUser> userManager,
+            SignInManager<IdentityUser> signInManager)
         {
             _membroRepository = membroRepository;
             _userManager = userManager;
+            _signInManager = signInManager;
         }
         // GET: Membro
         public ActionResult Index()
@@ -55,7 +60,7 @@ namespace SDGE.UI.Web.Controllers
             {
                 return NotFound($"Unable to load user with ID '{userId}'.");
             }
-            Membro membro = new Membro();
+            MembroViewModel membro = new MembroViewModel();
             membro.Email = email;
             return View(membro);
         }
@@ -63,7 +68,7 @@ namespace SDGE.UI.Web.Controllers
         // POST: Membro/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create(Membro collection)
+        public async Task<ActionResult> Create(MembroViewModel collection)
         {
             IdentityResult identityResult;
             try
@@ -71,7 +76,7 @@ namespace SDGE.UI.Web.Controllers
                 // TODO: Add insert logic here
                 if(ModelState.IsValid)
                 {
-                    var result = _membroRepository.Adicionar(collection);
+                    var result = _membroRepository.Adicionar(Membro(collection));
                     if (result != null)
                     {
                         IdentityUser identityUser = await _userManager.FindByEmailAsync(collection.Email);
@@ -80,7 +85,12 @@ namespace SDGE.UI.Web.Controllers
                             
                             identityResult = await _userManager.AddToRoleAsync(identityUser, "Membro");
                             if (identityResult.Succeeded)
+                            {
+                                await _signInManager.SignOutAsync();
+                                HttpContext.Session.Remove("_UserEmail");
                                 return RedirectToAction("Eventos", "Evento");
+                            }
+                                
                         }
                         
                     }
@@ -139,6 +149,24 @@ namespace SDGE.UI.Web.Controllers
             {
                 return View();
             }
+        }
+        private Membro Membro(MembroViewModel model)
+        {
+            return new Membro
+            {
+                Nome = model.Nome,
+                Email = model.Email,
+                Telefone = model.Telefone
+            };
+        }
+        private MembroViewModel Membro(Membro model)
+        {
+            return new MembroViewModel
+            {
+                Nome = model.Nome,
+                Email = model.Email,
+                Telefone = model.Telefone
+            };
         }
     }
 }

@@ -15,7 +15,7 @@ namespace SDGE.Infrastructure.Repository
         {
 
         }
-
+        private bool state = false;
         public IEnumerable<Membro> ObterPorComissao(string comissao)
         {
             return Buscar(m => m.MembroEventos.Any(m => m.Comissao == comissao)).AsEnumerable();
@@ -23,7 +23,13 @@ namespace SDGE.Infrastructure.Repository
 
         public IEnumerable<Membro> ObterPorComissaoOrganizadora(int id)
         {
-            return Buscar(m => m.MembroOrganizadors.Any(m => m.ComissaoOrganizadoraId == id)).AsEnumerable();
+            return Buscar(m => m.MembroOrganizadors.Any(m => m.ComissaoOrganizadoraId == id && m.Removido == state) && m.Removido == state).AsEnumerable();
+        }
+
+        public Membro ObterPorEmail(string email)
+        {
+            return Buscar(m => m.Email.Equals(email) && m.Removido == state)
+                 .FirstOrDefault();
         }
 
         public  Membro ObterPorEvento(int membroId)
@@ -34,7 +40,7 @@ namespace SDGE.Infrastructure.Repository
         override
         public IEnumerable<Membro> ObterTodos()
         {
-            return Buscar(m => m.Removido == false).AsEnumerable();
+            return Buscar(m => m.Removido == state).AsEnumerable();
         }
     }
 }

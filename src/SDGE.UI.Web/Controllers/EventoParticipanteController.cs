@@ -23,15 +23,17 @@ namespace SDGE.UI.Web.Controllers
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IComissaoOrganizadoraRepository _comissaoOrganizadoraRepository;
         private readonly IDataImportanteRepository _dataImportanteRepository;
-        private int sessionId = 1;
-        private int sessionAdminId = 2;
-
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IAlertaRepository _alertaRepository;
+       
         public EventoParticipanteController(IEventoParticipanteRepository eventoParticipanteRepository, 
             IEventoRepository eventoRepository,
             IParticipanteRepository participanteRepository, 
             IWebHostEnvironment webHostEnvironment,
             IComissaoOrganizadoraRepository comissaoOrganizadoraRepository,
-            IDataImportanteRepository dataImportanteRepository)
+            IDataImportanteRepository dataImportanteRepository,
+            IHttpContextAccessor httpContextAccessor,
+            IAlertaRepository alertaRepository)
         {
             _eventoParticipanteRepository = eventoParticipanteRepository;
             _eventoRepository = eventoRepository;
@@ -39,6 +41,8 @@ namespace SDGE.UI.Web.Controllers
             _webHostEnvironment = webHostEnvironment;
             _comissaoOrganizadoraRepository = comissaoOrganizadoraRepository;
             _dataImportanteRepository = dataImportanteRepository;
+            _httpContextAccessor = httpContextAccessor;
+            _alertaRepository = alertaRepository;
         }
         // GET: MembroEvento
         public ActionResult Index(int id, string msg = null, string type = null)
@@ -52,7 +56,7 @@ namespace SDGE.UI.Web.Controllers
         {
             ViewBag.Alert = msg;
             //ViewBag.Prazo = _dataImportanteRepository.VerificarPrazoFinalidade("Inscrições", data.EventoId);
-            return View(_eventoParticipanteRepository.ObterPorParticipante(sessionId));
+            return View(_eventoParticipanteRepository.ObterPorParticipante(SessionId()));
         }
 
         // GET: MembroEvento/Details/5
@@ -79,7 +83,7 @@ namespace SDGE.UI.Web.Controllers
             try
             {
                 // TODO: Add insert logic here
-                if (_eventoParticipanteRepository.VerificarEvento(collection.EventoId, sessionId))
+                if (_eventoParticipanteRepository.VerificarEvento(collection.EventoId, SessionId()))
                 {
                     ModelState.AddModelError("EventoId", $"O participante ja esta inscrito no evento.");
                 }
@@ -90,9 +94,9 @@ namespace SDGE.UI.Web.Controllers
                     {
                         var fileName = UploadFile(collection);
                         
-                        if (_eventoParticipanteRepository.VerificarEvento(collection.EventoId, sessionId, true))
+                        if (_eventoParticipanteRepository.VerificarEvento(collection.EventoId, SessionId(), true))
                         {
-                            var _result = _eventoParticipanteRepository.ObterPorEventoParticipante(collection.EventoId, sessionId, true);
+                            var _result = _eventoParticipanteRepository.ObterPorEventoParticipante(collection.EventoId, SessionId(), true);
                             _result.Comprovativo = fileName;
                             _result.Removido = false;
                             _result.Confirmado = false;
@@ -104,7 +108,7 @@ namespace SDGE.UI.Web.Controllers
                             {
                                 Comprovativo = fileName,
                                 EventoId = collection.EventoId,
-                                ParticipanteId = sessionId
+                                ParticipanteId = SessionId()
                             };
                             _eventoParticipanteRepository.Adicionar(eventoParticipante);
                         }
@@ -141,6 +145,7 @@ namespace SDGE.UI.Web.Controllers
                         result.Confirmado = false;
 
                     _eventoParticipanteRepository.Actualizar(result);
+                    _alertaRepository.Adicionar(Alerta(result, "Resultado de inscrição disponível para o evento: ", true));
                 }
             }
             if(cnf != null)
@@ -189,7 +194,7 @@ namespace SDGE.UI.Web.Controllers
         // GET: MembroEvento/Delete/5
         public ActionResult Delete(int id)
         {
-            return PartialView("_Remover", _eventoParticipanteRepository.ObterPorEventoParticipante(id,sessionId));
+            return PartialView("_Remover", _eventoParticipanteRepository.ObterPorEventoParticipante(id, SessionId()));
         }
 
         // POST: MembroEvento/Delete/5
@@ -230,7 +235,7 @@ namespace SDGE.UI.Web.Controllers
 
             foreach (var item in result)
             {
-                if (!_eventoParticipanteRepository.VerificarEvento(item.EventoId, sessionId))
+                if (!_eventoParticipanteRepository.VerificarEvento(item.EventoId, SessionId()))
                 {
                     if(_dataImportanteRepository.VerificarPrazoFinalidade("Inscrições", item.EventoId))
                     {
@@ -279,7 +284,7 @@ namespace SDGE.UI.Web.Controllers
                 EventoParticipanteId = inscricao.EventoParticipanteId,
                 Comprovativo = inscricao.Comprovativo,
                 EventoId = inscricao.EventoId,
-                ParticipanteId = sessionId,
+                ParticipanteId = SessionId(),
             };
         }
         public ActionResult Download(int id)
@@ -297,11 +302,29 @@ namespace SDGE.UI.Web.Controllers
         public IActionResult VerificarEvento(int eventoId)
         {
             //int id = 1;
-            if (_eventoParticipanteRepository.VerificarEvento(eventoId, sessionId))
+            if (_eventoParticipanteRepository.VerificarEvento(eventoId, SessionId()))
             {
                 return Json($"O participante já esta inscrito no evento.");
             }
             return Json(true);
+        }
+        private int SessionId()
+        {
+            return int.Parse(_httpContextAccessor.HttpContext.Session.GetString("_Participante"));
+        }
+        public Alerta Alerta(EventoParticipante eventoParticipante, string msg, bool destino = false)
+        {
+            var result = _eventoRepository.ObterPorId(eventoParticipante.EventoId);
+            Alerta alerta = new Alerta
+            {
+                Messagem = msg + result.Titulo,
+                ParticipanteId = eventoParticipante.ParticipanteId,
+                ComissaoCientificaId = result.ComissaoCientificaId,
+                ComissaoOrganizadoraId = result.ComissaoOrganizadoraId,
+                Destino = destino
+
+            };
+            return alerta;
         }
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -32,6 +33,18 @@ namespace SDGE.UI.Web.Areas.Identity.Pages.Account
             _logger.LogInformation("User logged out.");
             if (returnUrl != null)
             {
+               
+               
+                if(HttpContext.Session.GetString("_Membro") != null)
+                {
+                    HttpContext.Session.Remove("_Membro");
+                    HttpContext.Session.Remove("_UserEmail");
+                }
+                if (HttpContext.Session.GetString("_Participante") != null)
+                {
+                    HttpContext.Session.Remove("_Participante");
+                    HttpContext.Session.Remove("_UserEmail");
+                }
                 return LocalRedirect(returnUrl);
             }
             else

@@ -3,14 +3,32 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
-
+<br />
+<br />
+<br />
 <div class="text-center">
-    <p>
-        <a><input type="button" value="Membro" class="btn btn-outline-success" onclick="location.href='@Url.Action("CreateMembro", "Register", new { email = ViewBag.Email, returnUrl = ViewBag.Url })'" /></a>
-    </p>
-    <p>
-        <a><input type="button" value="Participante" class="btn btn-outline-success" onclick="location.href='@Url.Action("CreateParticipante", "Register", new { email = ViewBag.Email, returnUrl = ViewBag.Url })'" /></a>
-    </p>
+    <div class="row">
+        <div class="col-md-2"></div>
+        <div class="col-md-8">
+            <div class="card card-chart">
+                <div class="card-header card-header-primary">
+                    <h4 class="card-title">Registe-se</h4>
+                    <p class="card-category">Clique no botão Candidato ou Membro.</p>
+                </div>
+                <div class="card-body">
+                    <form>
+                        <button type="button" class="btn btn-outline-success btn-sm" onclick="location.href='@Url.Action("CreateParticipante", "Register", new { email = ViewBag.Email, returnUrl = ViewBag.Url })'">
+                            <i class="material-icons">person</i>
+                            Candidato
+                        </button>
+                        <button type="button" class="btn btn-outline-success btn-sm" onclick="location.href='@Url.Action("CreateMembro", "Register", new { email = ViewBag.Email, returnUrl = ViewBag.Url })'">
+                            <i class="material-icons">person</i>
+                            Membro
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 

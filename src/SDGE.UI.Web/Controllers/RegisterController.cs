@@ -63,8 +63,10 @@ namespace SDGE.UI.Web.Controllers
             }
             var userId = await _userManager.GetUserIdAsync(user);
             var code = await _userManager.GenerateConcurrencyStampAsync(user);
+           
             code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
             return RedirectToAction("Create", "Participante", new { email = email, userId = userId, code = code });
+            
         }
     }
 }

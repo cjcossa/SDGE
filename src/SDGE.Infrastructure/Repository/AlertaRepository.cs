@@ -19,9 +19,24 @@ namespace SDGE.Infrastructure.Repository
         private bool state = false;
         public IEnumerable<Alerta> ObterPorParticipante(int id)
         {
-            return _dbContext.Set<Alerta>().Include(a => a.ComissaoCientifica).Include(a => a.ComissaoOrganizadora).Include(a => a.Participante)
-                  .Where(a => a.Destino == state && a.ParticipanteId == id)
+            return _dbContext.Set<Alerta>().Include(a => a.Participante).Include(a => a.ComissaoOrganizadora)
+                  .Where(a => a.Destino == !state && a.ParticipanteId == id && a.Removido == state)
                   .AsEnumerable();
+
+        }
+
+        public IEnumerable<Alerta> ObterPorOrganizador(int id)
+        {
+            return _dbContext.Set<Alerta>().Include(a => a.ComissaoOrganizadora).Include(a => a.ComissaoOrganizadora.MembroOrganizadors).Include(a => a.Participante)
+                 .Where(a => a.Destino == state && a.ComissaoOrganizadora.MembroOrganizadors.Any(a => a.MembroId == id) && a.Removido == state)
+                 .AsEnumerable();
+        }
+
+        public IEnumerable<Alerta> ObterPorCientifico(int id)
+        {
+            return _dbContext.Set<Alerta>().Include(a => a.ComissaoCientifica).Include(a => a.ComissaoCientifica.MembroCientificos).Include(a => a.Participante)
+                .Where(a => a.Destino == state && a.ComissaoCientifica.MembroCientificos.Any(a => a.MembroId == id) && a.Removido == state)
+                .AsEnumerable();
         }
     }
 }

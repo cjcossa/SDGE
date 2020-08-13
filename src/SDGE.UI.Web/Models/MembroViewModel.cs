@@ -6,32 +6,21 @@ using System.Threading.Tasks;
 
 namespace SDGE.UI.Web.Models
 {
-    public class ParticipanteViewModel
+    public class MembroViewModel
     {
-        public int ParticipanteId { get; set; }
+        public int MembroId { get; set; }
 
         [Required(ErrorMessage = "Introduza o Nome")]
         [Display(Name = "Nome")]
         public string Nome { get; set; }
 
-        [Required(ErrorMessage = "Introduza a Ocupação")]
-        [Display(Name = "Ocupação")]
-        public string Ocupacao { get; set; }
-
-        [Required(ErrorMessage = "Introduza a Instituição")]
-        [Display(Name = "Instituição")]
-        public string Instituicao { get; set; }
-
         [Required(ErrorMessage = "Introduza o Email")]
+        [EmailAddress]
         [Display(Name = "Email")]
         public string Email { get; set; }
 
         [Required(ErrorMessage = "Introduza o Telefone")]
         [Display(Name = "Telefone")]
         public string Telefone { get; set; }
-
-        [Required(ErrorMessage = "Introduza o Título Academico")]
-        [Display(Name = "Título Academico")]
-        public string TituloAcademico { get; set; }
     }
 }

@@ -1,0 +1,68 @@
+﻿@using Microsoft.AspNetCore.Http;
+@inject IHttpContextAccessor HttpContextAccessor
+
+<div class="sidebar" data-color="purple" data-background-color="white" data-image="~/assets/img/sidebar-1.jpg">
+    <div class="logo">
+        <a href="" class="simple-text logo-normal">
+            SGDE UPM
+        </a>
+    </div>
+    <div class="sidebar-wrapper">
+        <ul class="nav">
+            @if (HttpContextAccessor.HttpContext.Session.GetString("_Membro") != null)
+            {
+                <li class="nav-item">
+                    <a class="nav-link" asp-area="" asp-controller="ComissaoOrganizadora" asp-action="index">
+                        <i class="material-icons">dashboard</i>
+                        <p>Comissao Organizadora</p>
+                    </a>
+                </li>
+                <li class="nav-item ">
+                    <a class="nav-link" asp-area="" asp-controller="ComissaoCientifica" asp-action="index">
+                        <i class="material-icons">person</i>
+                        <p>Comissao Cientifica</p>
+                    </a>
+                </li>
+                <li class="nav-item ">
+                    <a class="nav-link" asp-area="" asp-controller="Evento" asp-action="index">
+                        <i class="material-icons">content_paste</i>
+                        <p>Evento</p>
+                    </a>
+                </li>
+                <li class="nav-item ">
+                    <a class="nav-link" asp-area="" asp-controller="Evento" asp-action="Listar">
+                        <i class="material-icons">library_books</i>
+                        <p>Inscrições</p>
+                    </a>
+                </li>
+                <li class="nav-item ">
+                    <a class="nav-link" asp-area="" asp-controller="Evento" asp-action="ListarSub">
+                        <i class="material-icons">bubble_chart</i>
+                        <p>Submissões</p>
+                    </a>
+                </li>
+            }
+            else
+            {
+                <li class="nav-item ">
+                    <a class="nav-link" asp-area="" asp-controller="EventoParticipante" asp-action="Listar">
+                        <i class="material-icons">person</i>
+                        <p>Inscrições</p>
+                    </a>
+                </li>
+                <li class="nav-item ">
+                    <a class="nav-link" asp-area="" asp-controller="Submissao" asp-action="Listar">
+                        <i class="material-icons">person</i>
+                        <p>Submissões</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-area="" asp-controller="Participante" asp-action="Show">
+                        <i class="material-icons">dashboard</i>
+                        <p>Participante</p>
+                    </a>
+                </li>
+            }
+        </ul>
+    </div>
+</div>

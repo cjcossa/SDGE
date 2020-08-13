@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -21,13 +22,24 @@ namespace SDGE.UI.Web.Controllers
         private readonly ISubmissaoRepository _submissaoRepository;
         private readonly IMembroRepository _membroRepository;
         private readonly IWebHostEnvironment _webHostEnvironment;
-        private int id = 1;
-        public CorrecaoController(ICorrecaoRepository correcaoRepository, ISubmissaoRepository submissaoRepository, IMembroRepository membroRepository, IWebHostEnvironment webHostEnvironment)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IEventoRepository _eventoRepository;
+        private readonly IAlertaRepository _alertaRepository;
+        public CorrecaoController(ICorrecaoRepository correcaoRepository, 
+            ISubmissaoRepository submissaoRepository, 
+            IMembroRepository membroRepository, 
+            IWebHostEnvironment webHostEnvironment,
+            IHttpContextAccessor httpContextAccessor,
+            IEventoRepository eventoRepository,
+            IAlertaRepository alertaRepository)
         {
             _correcaoRepository = correcaoRepository;
             _submissaoRepository = submissaoRepository;
             _membroRepository = membroRepository;
             _webHostEnvironment = webHostEnvironment;
+            _httpContextAccessor = httpContextAccessor;
+            _eventoRepository = eventoRepository;
+            _alertaRepository = alertaRepository;
         }
         // GET: MembroEvento
         public ActionResult Index(int id, string msg = null)
@@ -43,6 +55,7 @@ namespace SDGE.UI.Web.Controllers
         }
 
         // GET: MembroEvento/Create
+        [Authorize(Roles = "Cientifico")]
         public ActionResult Create(int id)
         {
             CorrecaoViewModel correcao = new CorrecaoViewModel();
@@ -71,11 +84,18 @@ namespace SDGE.UI.Web.Controllers
                             Ficheiro = fileName,
                             Observacoes = collection.Observacoes,
                             SubmissaoId = collection.SubmissaoId,
-                            MembroId = id
+                            MembroId = SessionId()
                         };
 
+                       
+
                         _correcaoRepository.Adicionar(correcao);
-                        return RedirectToAction("Index", new { id = collection.SubmissaoId, msg = "Avaliação efectuada." });
+                        var result = _submissaoRepository.ObterPorId(collection.SubmissaoId);
+                        if(result != null)
+                        {
+                            _alertaRepository.Adicionar(Alerta(result, "Correção disponível para a submissão: " + result.Titulo, true));
+                            return RedirectToAction("Index", new { id = collection.SubmissaoId, msg = "Avaliação efectuada." });
+                        }
                     }
                     
                 }
@@ -90,6 +110,7 @@ namespace SDGE.UI.Web.Controllers
         }
 
         // GET: MembroEvento/Edit/5
+        [Authorize(Roles = "Cientifico")]
         public ActionResult Edit(int id)
         {
             ViewBag.SubmissaoId = ObterSubmissoes();
@@ -126,6 +147,7 @@ namespace SDGE.UI.Web.Controllers
         }
 
         // GET: MembroEvento/Delete/5
+        [Authorize(Roles = "Cientifico")]
         public ActionResult Delete(int id)
         {
             return PartialView("_Delete", _correcaoRepository.ObterPorId(id));
@@ -229,9 +251,27 @@ namespace SDGE.UI.Web.Controllers
                 Ficheiro = submeterCorrecao.Ficheiro,
                 Observacoes = submeterCorrecao.Observacoes,
                 SubmissaoId = submeterCorrecao.SubmissaoId,
-                MembroId = id
+                MembroId = SessionId()
             };
         }
 
+        private int SessionId()
+        {
+            return int.Parse(_httpContextAccessor.HttpContext.Session.GetString("_Membro"));
+        }
+        public Alerta Alerta(Submissao submissao, string msg, bool destino = false)
+        {
+            var result = _eventoRepository.ObterPorId(submissao.EventoId);
+            Alerta alerta = new Alerta
+            {
+                Messagem = msg,
+                ParticipanteId = submissao.ParticipanteId,
+                ComissaoCientificaId = result.ComissaoCientificaId,
+                ComissaoOrganizadoraId = result.ComissaoOrganizadoraId,
+                Destino = destino
+
+            };
+            return alerta;
+        }
     }
 }

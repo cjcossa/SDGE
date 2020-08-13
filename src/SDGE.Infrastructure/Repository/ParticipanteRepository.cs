@@ -20,5 +20,11 @@ namespace SDGE.Infrastructure.Repository
         {
             return _dbContext.Set<Participante>().Where(c => c.ParticipanteId == id && c.Removido == state).FirstOrDefault();
         }
+
+        public Participante ObterPorEmail(string email)
+        {
+            return Buscar(m => m.Email.Equals(email) && m.Removido == state)
+                .FirstOrDefault();
+        }
     }
 }

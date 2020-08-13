@@ -16,12 +16,18 @@ namespace SDGE.UI.Web.Controllers
     {
         private readonly IParticipanteRepository _participanteRepository;
         private readonly UserManager<IdentityUser> _userManager;
-        private int sessionId = 1; 
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly SignInManager<IdentityUser> _signInManager;
 
-        public ParticipanteController(IParticipanteRepository participanteRepository, UserManager<IdentityUser> userManager)
+        public ParticipanteController(IParticipanteRepository participanteRepository, 
+            UserManager<IdentityUser> userManager,
+            IHttpContextAccessor httpContextAccessor,
+            SignInManager<IdentityUser> signInManager)
         {
             _participanteRepository = participanteRepository;
             _userManager = userManager;
+            _httpContextAccessor = httpContextAccessor;
+            _signInManager = signInManager;
         }
 
         // GET: Participante
@@ -33,7 +39,7 @@ namespace SDGE.UI.Web.Controllers
 
         public ActionResult Show()
         {
-            return View(ParticipanteViewModel(_participanteRepository.ObterPorId(sessionId)));
+            return View(ParticipanteViewModel(_participanteRepository.ObterPorId(SessionId())));
         }
 
         // GET: Participante/Details/5
@@ -43,7 +49,7 @@ namespace SDGE.UI.Web.Controllers
         }
 
         // GET: Participante/Create
-       /* public async Task<ActionResult> Create(string email, string userId, string code)
+        public async Task<ActionResult> Create(string email, string userId, string code)
         {
             if (email == null)
             {
@@ -69,17 +75,12 @@ namespace SDGE.UI.Web.Controllers
             ParticipanteViewModel model = new ParticipanteViewModel();
             model.Email = email;
             return View(model);
-        }*/
-        
-        public ActionResult Create()
-        {
-            return View(new ParticipanteViewModel());
         }
-
+       
         // POST: Participante/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        /*public async Task<ActionResult> Create(ParticipanteViewModel collection)
+        public async Task<ActionResult> Create(ParticipanteViewModel collection)
         {
             try
             {
@@ -92,32 +93,16 @@ namespace SDGE.UI.Web.Controllers
                     if (identityUser != null)
                     {
                         IdentityResult identityResult = await _userManager.AddToRoleAsync(identityUser, "Participante");
-                        if (!identityResult.Succeeded)
-                            return View(identityResult.Errors);
+                        if (identityResult.Succeeded)
+                        {
+                            await _signInManager.SignOutAsync();
+                            HttpContext.Session.Remove("_UserEmail");
+                            return RedirectToAction("Eventos", "Evento");
+                        }
+                          
                     }
                 }
                 return RedirectToAction("Index");
-            }
-            catch
-            {
-                return View(collection);
-            }
-        }*/
-
-        public ActionResult Create(ParticipanteViewModel collection)
-        {
-            try
-            {
-                // TODO: Add insert logic here
-
-                if(ModelState.IsValid)
-                {
-                   
-                    _participanteRepository.Adicionar(Participante(collection));
-                    return RedirectToAction("Index", new { msg = "Dados gravados."});
-                }
-
-                return View(collection);
             }
             catch
             {
@@ -128,7 +113,7 @@ namespace SDGE.UI.Web.Controllers
         // GET: Participante/Edit/5
         public ActionResult Edit()
         {
-            return View(ParticipanteViewModel(_participanteRepository.ObterPorId(sessionId)));
+            return View(ParticipanteViewModel(_participanteRepository.ObterPorId(SessionId())));
         }
 
         // POST: Participante/Edit/5
@@ -199,6 +184,9 @@ namespace SDGE.UI.Web.Controllers
             };
             return model;
         }
-        //private IEnumerable<ParticipanteViewModel> ParticipanteViewModels()
+        private int SessionId()
+        {
+            return int.Parse(_httpContextAccessor.HttpContext.Session.GetString("_Participante"));
+        }
     }
 }

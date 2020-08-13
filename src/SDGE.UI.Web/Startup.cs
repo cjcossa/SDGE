@@ -43,14 +43,21 @@ namespace SDGE.UI.Web
 
             services.AddDbContext<ParticipanteContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-           // services.AddDbContext<ParticipanteContext>(options =>
-              //  options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"), b => b.MigrationsAssembly("SDGE.UI.Web")));
+            // services.AddDbContext<ParticipanteContext>(options =>
+            //  options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"), b => b.MigrationsAssembly("SDGE.UI.Web")));
 
+            services.AddDistributedMemoryCache();
+            services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromMinutes(120);// 2h timeout
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            });
+            
             services.AddControllersWithViews();
             services.AddRazorPages();
-           // services.AddMvc(option => option.EnableEndpointRouting = false);
-
-
+            // services.AddMvc(option => option.EnableEndpointRouting = false);
+           
 
             // services.AddSingleton(typeof(IRepository<>), typeof(EFRepository<>));
             // services.AddSingleton<IParticipanteRepository, ParticipanteRepository>();
@@ -124,9 +131,11 @@ namespace SDGE.UI.Web
             app.UseStaticFiles();
 
             app.UseRouting();
-
+           
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.UseSession();
 
             app.UseEndpoints(endpoints =>
              {

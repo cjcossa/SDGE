@@ -20,17 +20,19 @@ namespace SDGE.UI.Web.Controllers
         private readonly IComissaoCientificaRepository _comissaoCientificaRepository;
         private readonly IComissaoOrganizadoraRepository _comissaoOrganizadoraRepository;
         private readonly IMembroOrganizadorRepository _membroOrganizadorRepository;
-        private int id = 2;
-
+        private readonly IHttpContextAccessor _httpContextAccessor;
+       
         public EventoController(IEventoRepository eventoRepository,
             IComissaoOrganizadoraRepository comissaoOrganizadoraRepository,
             IComissaoCientificaRepository comissaoCientificaRepository,
-            IMembroOrganizadorRepository membroOrganizadorRepository)
+            IMembroOrganizadorRepository membroOrganizadorRepository,
+            IHttpContextAccessor httpContextAccessor)
         {
             _eventoRepository = eventoRepository;
             _comissaoCientificaRepository = comissaoCientificaRepository;
             _comissaoOrganizadoraRepository = comissaoOrganizadoraRepository;
             _membroOrganizadorRepository = membroOrganizadorRepository;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         // GET: Evento
@@ -38,7 +40,7 @@ namespace SDGE.UI.Web.Controllers
         public ActionResult Index(string msg = null)
         {
             ViewBag.Alert = msg;
-            return View(_eventoRepository.ObterEventos(id));
+            return View(_eventoRepository.ObterEventos(SessionId()));
         }
         public ActionResult Eventos()
         {
@@ -47,12 +49,12 @@ namespace SDGE.UI.Web.Controllers
         public ActionResult Listar(string msg = null)
         {
             ViewBag.Alert = msg;
-            return View(_eventoRepository.ObterEventos(id));
+            return View(_eventoRepository.ObterEventos(SessionId()));
         }
         public ActionResult ListarSub(string msg = null)
         {
             ViewBag.Alert = msg;
-            return View(_eventoRepository.ObterEventos(id));
+            return View(_eventoRepository.ObterEventos(SessionId()));
         }
 
         // GET: Evento/Details/5
@@ -188,7 +190,7 @@ namespace SDGE.UI.Web.Controllers
                 return Json($"O código {codigoorganizadora} não existe.");
             }
             int comissaoId = _comissaoOrganizadoraRepository.ObterPorCodigo(codigoorganizadora).ComissaoOrganizadoraId;
-            if (!_membroOrganizadorRepository.VerificarMembro(id, comissaoId, false))
+            if (!_membroOrganizadorRepository.VerificarMembro(SessionId(), comissaoId, false))
             {
                 return Json($"O membro não existe neste código {codigoorganizadora} da comissão organizadora.");
             }
@@ -224,7 +226,7 @@ namespace SDGE.UI.Web.Controllers
                 ModelState.AddModelError("CodigoOrganizadora", $"O código {collection.CodigoOrganizadora} não existe.");
             }
             int comissaoId = _comissaoOrganizadoraRepository.ObterPorCodigo(collection.CodigoOrganizadora).ComissaoOrganizadoraId;
-            if (!_membroOrganizadorRepository.VerificarMembro(id, comissaoId, false))
+            if (!_membroOrganizadorRepository.VerificarMembro(SessionId(), comissaoId, false))
             {
                 ModelState.AddModelError("CodigoOrganizadora", $"O membro não existe neste código {collection.CodigoOrganizadora} da comissão organizadora.");
             }
@@ -281,6 +283,10 @@ namespace SDGE.UI.Web.Controllers
                 new SelectListItem(){Value="Seminário",Text="Seminário"},
                 new SelectListItem(){Value="Workshop",Text="Workshop"}
             };
+        }
+        private int SessionId()
+        {
+            return int.Parse(_httpContextAccessor.HttpContext.Session.GetString("_Membro"));
         }
     }
 }

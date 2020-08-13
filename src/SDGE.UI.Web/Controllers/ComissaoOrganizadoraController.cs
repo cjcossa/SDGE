@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using SDGE.ApplicationCore.Entity;
@@ -17,21 +18,25 @@ namespace SDGE.UI.Web.Controllers
         private readonly IComissaoOrganizadoraRepository _comissaoOrganizadoraRepository;
         private readonly IMembroRepository _membroRepository;
         private readonly IMembroOrganizadorRepository _membroOrganizadorRepository;
-        private int id = 2;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly UserManager<IdentityUser> _userManager;
         public ComissaoOrganizadoraController(IComissaoOrganizadoraRepository comissaoOrganizadoraRepository, 
             IMembroRepository membroRepository, 
-            IMembroOrganizadorRepository membroOrganizadorRepository)
+            IMembroOrganizadorRepository membroOrganizadorRepository,
+            IHttpContextAccessor httpContextAccessor,
+            UserManager<IdentityUser> userManager)
         {
             _comissaoOrganizadoraRepository = comissaoOrganizadoraRepository;
             _membroRepository = membroRepository;
             _membroOrganizadorRepository = membroOrganizadorRepository;
-            //id = 2;
+            _httpContextAccessor = httpContextAccessor;
+            _userManager = userManager;
         }
         // GET: ComissaoOrganizadora
         public ActionResult Index(string msg = null)
         {
             ViewBag.Alert = msg;
-            return View(_comissaoOrganizadoraRepository.ObterPorMembro(id));
+            return View(_comissaoOrganizadoraRepository.ObterPorMembro(SessionId()));
         }
 
 
@@ -47,8 +52,9 @@ namespace SDGE.UI.Web.Controllers
         // POST: ComissaoOrganizadora/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Criar(ComissaoOrganizadoraViewModel comissao)
+        public async Task<ActionResult> Criar(ComissaoOrganizadoraViewModel comissao)
         {
+            IdentityResult identityResult;
             try
             {
                 // TODO: Add insert logic here
@@ -64,13 +70,18 @@ namespace SDGE.UI.Web.Controllers
                     {
                         MembroOrganizador membro = new MembroOrganizador
                         {
-                            MembroId = id,
+                            MembroId = SessionId(),
                             ComissaoOrganizadoraId = result.ComissaoOrganizadoraId
                         };
                         _membroOrganizadorRepository.Adicionar(membro);
+                        IdentityUser identityUser = await _userManager.FindByEmailAsync(_membroRepository.ObterPorId(SessionId()).Email);
+                        if(identityUser != null)
+                        {
+                            identityResult = await _userManager.AddToRoleAsync(identityUser, "Organizador");
+                            if(identityResult != null)
+                                return RedirectToAction("Index", new { msg = "Comissão criada." });
+                        }
                     }
-
-                    return RedirectToAction("Index", new { msg = "Comissão criada."});
                 }
                 return View(comissao);
 
@@ -102,7 +113,7 @@ namespace SDGE.UI.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Participar(ComissaoOrganizadoraViewModel comissao)
+        public async Task<ActionResult> Participar(ComissaoOrganizadoraViewModel comissao)
         {
            
             try
@@ -113,20 +124,27 @@ namespace SDGE.UI.Web.Controllers
                 {
                     MembroOrganizador membro = new MembroOrganizador
                     {
-                        MembroId = id,
+                        MembroId = SessionId(),
                         ComissaoOrganizadoraId = _comissaoOrganizadoraRepository.ObterPorCodigo(comissao.Codigo).ComissaoOrganizadoraId
                     };
 
-                    if (_membroOrganizadorRepository.VerificarMembro(id, membro.ComissaoOrganizadoraId, true))
+                    if (_membroOrganizadorRepository.VerificarMembro(SessionId(), membro.ComissaoOrganizadoraId, true))
                     {
                        var result = _membroOrganizadorRepository.ObterPorMembroComissao(membro.MembroId, membro.ComissaoOrganizadoraId, true);
                         _membroOrganizadorRepository.Actualizar(result);
                     }
-                    else if(!_membroOrganizadorRepository.VerificarMembro(id, membro.ComissaoOrganizadoraId, false))
+                    else if(!_membroOrganizadorRepository.VerificarMembro(SessionId(), membro.ComissaoOrganizadoraId, false))
                     {
                         _membroOrganizadorRepository.Adicionar(membro);
+                        IdentityUser identityUser = await _userManager.FindByEmailAsync(_membroRepository.ObterPorId(SessionId()).Email);
+                        if (identityUser != null)
+                        {
+                           IdentityResult identityResult = await _userManager.AddToRoleAsync(identityUser, "Organizador");
+                            if(identityResult != null)
+                                return RedirectToAction("Index", new { msg = "Membro adicionado." });
+                        }
                     }
-                    return RedirectToAction("Index", new { msg = "Membro adicionado." });
+                   
                 }
                 return View(comissao);
             }
@@ -138,7 +156,7 @@ namespace SDGE.UI.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Adicionar(MembroOrganizadorViewModel organizadorViewModel)
+        public async Task<ActionResult> Adicionar(MembroOrganizadorViewModel organizadorViewModel)
         {
             //return PartialView("_addMember", organizador);
             try
@@ -162,8 +180,15 @@ namespace SDGE.UI.Web.Controllers
                         else if (!_membroOrganizadorRepository.VerificarMembro(membro.MembroId, membro.ComissaoOrganizadoraId, false))
                         {
                             _membroOrganizadorRepository.Adicionar(membro);
+                            IdentityUser identityUser = await _userManager.FindByEmailAsync(_membroRepository.ObterPorId(membro.MembroId).Email);
+                            if (identityUser != null)
+                            {
+                                IdentityResult identityResult = await _userManager.AddToRoleAsync(identityUser, "Organizador");
+                                if (identityResult != null)
+                                    return RedirectToAction("Index", new { msg = "Membro(s) adicionado(s)" });
+                            }
                         }
-                        return RedirectToAction("Index", new { msg = "Membro(s) adicionado(s)" });
+                      
                     }
                     /*_membroOrganizadorRepository.Adicionar(organizador);*/
                     return RedirectToAction(nameof(Index));
@@ -260,7 +285,7 @@ namespace SDGE.UI.Web.Controllers
                 return Json($"O código {codigo} não existe."); 
             }
             int comissaoId = _comissaoOrganizadoraRepository.ObterPorCodigo(codigo).ComissaoOrganizadoraId;
-           if(_membroOrganizadorRepository.VerificarMembro(id, comissaoId, false))
+           if(_membroOrganizadorRepository.VerificarMembro(SessionId(), comissaoId, false))
            {
                 return Json($"O membro existe neste código {codigo}.");
            }
@@ -276,6 +301,10 @@ namespace SDGE.UI.Web.Controllers
                 return Json($"O membro existe neste código {codigo}.");
             }
             return Json(true);
+        }
+        private int SessionId()
+        {
+            return int.Parse(_httpContextAccessor.HttpContext.Session.GetString("_Membro"));
         }
     }
 }

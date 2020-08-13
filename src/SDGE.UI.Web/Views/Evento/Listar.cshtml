@@ -45,9 +45,6 @@
                                         <button type="button" onclick="location.href='@Url.Action("Index", "EventoParticipante", new { id = item.EventoId })'" rel="tooltip" title="Listar Inscrições" class="btn btn-success btn-link btn-sm">
                                             <i class="material-icons">view_list</i>
                                         </button>
-                                        <button type="button" onclick="location.href='@Url.Action("Edit", new { id = item.EventoId })'" rel="tooltip" title="Editar" class="btn btn-primary btn-link btn-sm">
-                                            <i class="material-icons">edit</i>
-                                        </button>
                                         <button type="button" data-toggle="ajax-modal" data-target="#modalConfirmDelete" data-url="@Url.Action($"Delete/{item.EventoId}")" rel="tooltip" title="Remover" class="btn btn-danger btn-link btn-lg">
                                             <i class="material-icons">remove</i>
                                         </button>

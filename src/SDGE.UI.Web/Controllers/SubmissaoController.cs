@@ -27,8 +27,9 @@ namespace SDGE.UI.Web.Controllers
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IDataImportanteRepository _dataImportanteRepository;
         private readonly IAlertaRepository _alertaRepository;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        private int sessionId = 1;
+
 
         public SubmissaoController(ISubmissaoRepository submissaoRepository, 
             IParticipanteRepository participanteRepository, 
@@ -37,7 +38,8 @@ namespace SDGE.UI.Web.Controllers
             IEventoParticipanteRepository eventoParticipanteRepository,
             IWebHostEnvironment webHostEnvironment,
             IDataImportanteRepository dataImportanteRepository,
-            IAlertaRepository alertaRepository)
+            IAlertaRepository alertaRepository,
+            IHttpContextAccessor httpContextAccessor)
         {
             _submissaoRepository = submissaoRepository;
             _participanteRepository = participanteRepository;
@@ -47,6 +49,7 @@ namespace SDGE.UI.Web.Controllers
             _webHostEnvironment = webHostEnvironment;
             _dataImportanteRepository = dataImportanteRepository;
             _alertaRepository = alertaRepository;
+            _httpContextAccessor = httpContextAccessor;
         }
         // GET: Submissao
         public ActionResult Index(int id, string msg = null)
@@ -57,7 +60,7 @@ namespace SDGE.UI.Web.Controllers
         public ActionResult Listar(string msg = null)
         {
             ViewBag.Alert = msg;
-            return View(_submissaoRepository.ObterPorParticipante(sessionId));
+            return View(_submissaoRepository.ObterPorParticipante(SessionId()));
         }
 
         // GET: Submissao/Details/5
@@ -94,27 +97,16 @@ namespace SDGE.UI.Web.Controllers
                             Descricao = collection.Descricao,
                             Ficheiro = fileName,
                             TipoId = collection.TipoId,
-                            ParticipanteId = sessionId,
+                            ParticipanteId = SessionId(),
                             EventoId = collection.EventoId
                         };
 
                        var _result =  _submissaoRepository.Adicionar(submissao);
                         if(_result != null)
                         {
-                            var result = _eventoRepository.ObterPorId(_result.EventoId);
-                            Alerta alerta = new Alerta
-                            {
-                                Messagem = "Fez uma nova submissão",
-                                ParticipanteId = _result.ParticipanteId,
-                                ComissaoCientificaId = result.ComissaoCientificaId,
-                                ComissaoOrganizadoraId = result.ComissaoOrganizadoraId,
-                                Destino = false
-
-                            };
-                            _alertaRepository.Adicionar(alerta);
+                            _alertaRepository.Adicionar(Alerta(_result, "Fez uma nova submissão"));
+                            return RedirectToAction("Listar", new { msg = "Submissão criada." });
                         }
-                        
-                        return RedirectToAction("Listar", new { msg = "Submissão criada." });
 
                     }
                 }
@@ -217,6 +209,7 @@ namespace SDGE.UI.Web.Controllers
                     result.Observacoes = collection.Observacoes;
                     result.Status = "Reprovado";
                     _submissaoRepository.Actualizar(result);
+                    _alertaRepository.Adicionar(Alerta(result, "Resultado de avaliacão disponível para a submissão: "+result.Titulo, true));
                     return RedirectToAction("Index", new { id = id, msg = "Submissão reprovada" });
                 }
                 return View(collection);
@@ -246,7 +239,8 @@ namespace SDGE.UI.Web.Controllers
                         result.Status = "Aprovado com Revisão";
                     status = result.Status;
                     id = result.EventoId;
-                    _submissaoRepository.Actualizar(result);
+                   _submissaoRepository.Actualizar(result);
+                   _alertaRepository.Adicionar(Alerta(result, "Resultado de avaliacão disponível para a submissão: " + result.Titulo, true));
                 }
             }
             if(aprovado != null)
@@ -262,8 +256,15 @@ namespace SDGE.UI.Web.Controllers
                 result.Confirmado = !result.Confirmado;
             _submissaoRepository.Actualizar(result);
             if(result.Confirmado)
+            {
+                _alertaRepository.Adicionar(Alerta(result, "Confirmou a submissão"));
                 return RedirectToAction("Listar", new { msg = "Submissão confirmada." });
-            return RedirectToAction("Listar", new { msg = "Submissão cancelada." });
+            }
+            else
+            {
+                _alertaRepository.Adicionar(Alerta(result, "Cancelou a submissão"));
+                return RedirectToAction("Listar", new { msg = "Submissão cancelada." });
+            }
         }
 
         public ActionResult Download(int id)
@@ -294,7 +295,7 @@ namespace SDGE.UI.Web.Controllers
                 Titulo = submissao.Titulo,
                 Descricao = submissao.Descricao,
                 TipoId = submissao.TipoId,
-                ParticipanteId = sessionId,
+                ParticipanteId = SessionId(),
                 EventoId = submissao.EventoId,
                 Ficheiro = submissao.Ficheiro
             };
@@ -308,7 +309,7 @@ namespace SDGE.UI.Web.Controllers
                 Descricao = submeterFicheiro.Descricao,
                 Ficheiro = submeterFicheiro.Ficheiro,
                 TipoId = submeterFicheiro.TipoId,
-                ParticipanteId = sessionId,
+                ParticipanteId = SessionId(),
                 EventoId = submeterFicheiro.EventoId
             };
         }
@@ -343,9 +344,9 @@ namespace SDGE.UI.Web.Controllers
 
             foreach (var item in result)
             {
-                if (_eventoParticipanteRepository.VerificarEvento(item.EventoId, sessionId))
+                if (_eventoParticipanteRepository.VerificarEvento(item.EventoId, SessionId()))
                 {
-                    var eventoParticipante = _eventoParticipanteRepository.ObterPorEventoParticipante(item.EventoId, sessionId);
+                    var eventoParticipante = _eventoParticipanteRepository.ObterPorEventoParticipante(item.EventoId, SessionId());
                     if (eventoParticipante.Confirmado)
                     {
                         if (_dataImportanteRepository.VerificarPrazoFinalidade("Submissões", item.EventoId))
@@ -405,6 +406,24 @@ namespace SDGE.UI.Web.Controllers
                 result = e.Message;
                 return result;
             }
+        }
+        private int SessionId()
+        {
+            return int.Parse(_httpContextAccessor.HttpContext.Session.GetString("_Participante"));
+        }
+        public Alerta Alerta(Submissao submissao, string msg, bool destino = false)
+        {
+            var result = _eventoRepository.ObterPorId(submissao.EventoId);
+            Alerta alerta = new Alerta
+            {
+                Messagem = msg,
+                ParticipanteId = submissao.ParticipanteId,
+                ComissaoCientificaId = result.ComissaoCientificaId,
+                ComissaoOrganizadoraId = result.ComissaoOrganizadoraId,
+                Destino = destino
+
+            };
+            return alerta;
         }
     }
 }

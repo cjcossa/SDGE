@@ -103,9 +103,9 @@ namespace SDGE.UI.Web.Areas.Identity.Pages.Account
                     }
                     else
                     {
-                        return RedirectToAction("Index", "Register", new { email = Input.Email, returnUrl = returnUrl });
+                        //return RedirectToAction("Index", "Register", new { email = Input.Email, returnUrl = returnUrl });
                         //await _signInManager.SignInAsync(user, isPersistent: false);
-                        //return LocalRedirect(returnUrl);
+                        return LocalRedirect(returnUrl);
                     }
                 }
                 foreach (var error in result.Errors)
