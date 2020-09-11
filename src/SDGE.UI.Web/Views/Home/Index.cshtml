@@ -1,8 +1,55 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model IEnumerable<SDGE.ApplicationCore.Entity.Evento>
+
+@{
+    ViewData["Title"] = "Index";
+    bool state = true;
+    foreach (var item in Model)
+    {
+        if (item.EventoId.ToString() != null)
+            state = false;
+    }
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+
+@if (!state)
+{
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row">
+                @foreach (var item in Model)
+                {
+                    <div class="col-md-6">
+                        <div class="card card-stats">
+                            <div class="card-header card-header-primary card-header-icon">
+                                <div class="card-icon">
+                                    <i class="material-icons">event_available</i>
+                                </div>
+                                <a asp-action="Details" asp-route-id="@item.EventoId">
+                                    <p class="card-category">@item.Titulo</p>
+                                </a>
+                                <h3 class="card-title">@item.DataInicio</h3>
+                            </div>
+                            <div class="card-footer">
+                                <div class="stats">
+                                    <p class="card-category">@item.Categoria</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+}
+
+@if (state)
+{
+    <br />
+    <br />
+    <br />
+    <div class="text-lg-center align-text-bottom">
+        <p class="card-title"><h1>Bem-vindo ao Sistema de Gestão e Divulgação dos Eventos de UP-Maputo</h1></p>
+        <p class="card-category"><h2>Não existem eventos publicados</h2></p>
+    </div>
+}
+

@@ -40,6 +40,9 @@ namespace SDGE.UI.Web.Controllers
         public ActionResult Index(string msg = null)
         {
             ViewBag.Alert = msg;
+            if(IsParticipante())
+                return View(_eventoRepository.ObterPorParticipante(SessionId()));
+
             return View(_eventoRepository.ObterEventos(SessionId()));
         }
         public ActionResult Eventos()
@@ -286,7 +289,25 @@ namespace SDGE.UI.Web.Controllers
         }
         private int SessionId()
         {
-            return int.Parse(_httpContextAccessor.HttpContext.Session.GetString("_Membro"));
+            int id = -1;
+            if (IsParticipante())
+                id = int.Parse(_httpContextAccessor.HttpContext.Session.GetString("_Participante"));
+            else if(IsMembro())
+                id = int.Parse(_httpContextAccessor.HttpContext.Session.GetString("_Membro"));
+
+            return id;
+        }
+        private bool IsMembro()
+        {
+            if (_httpContextAccessor.HttpContext.Session.GetString("_Membro") != null)
+                return true;
+            return false;
+        }
+        private bool IsParticipante()
+        {
+            if (_httpContextAccessor.HttpContext.Session.GetString("_Participante") != null)
+                return true;
+            return false;
         }
     }
 }

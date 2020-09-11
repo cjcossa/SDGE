@@ -1,76 +1,104 @@
-﻿@model IEnumerable<SDGE.ApplicationCore.Entity.MembroOrganizador>
+﻿@using SDGE.ApplicationCore.Interfaces.Repository;
+@using Microsoft.AspNetCore.Http;
+@inject IComissaoOrganizadoraRepository Comissao;
+
+@inject IHttpContextAccessor HttpContextAccessor
+@model IEnumerable<SDGE.ApplicationCore.Entity.MembroOrganizador>
+
 @{
     ViewData["Title"] = "Listar";
+    bool confirm = false;
+    int id = -1;
+
+    if (HttpContextAccessor.HttpContext.Session.GetString("_Membro") != null)
+    {
+        id = int.Parse(HttpContextAccessor.HttpContext.Session.GetString("_Membro"));
+        if (Comissao.ObterPorMembro(id).Any(x => x.CriadoPorId == id))
+            confirm = true;
+    }
+    foreach(var item in Model)
+    {
+        ViewData["Id"] = item.ComissaoOrganizadoraId;
+        ViewData["Codigo"] = item.ComissaoOrganizadora.Codigo;
+        break;
+    }
 }
 
-<div id="modalView" class="col-md-12"></div>
-
-<div class="row">
-    <div class="col-md-12">
-        @if (ViewBag.Alert != null)
-        {
-            <div class="alert alert-success">
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <i class="material-icons">close</i>
-                </button>
-                <span>
-                    <b> Sucesso - </b> @ViewBag.Alert
-                </span>
-            </div>
-        }
-        <div class="card">
-            <div class="card-header card-header-primary">
-                <h4 class="card-title">
-                    Lista de membros da comissão organizadora  @foreach (var item in Model)
-                    {@Html.DisplayFor(modelItem => item.ComissaoOrganizadora.Codigo)break;
-                }
-                </h4>
-                <p class="card-category">Comissao responsavel pelo controlo total do sistema</p>
-            </div>
-            <div class="card-body">
-                <table class="table" id="dtMaterialDesignExample">
-                    <thead>
-                        <tr>
-                            <th>
-                                @Html.DisplayNameFor(model => model.Membro.Nome)
-                            </th>
-                            <th>
-                                @Html.DisplayNameFor(model => model.Membro.Email)
-                            </th>
-                            <th>
-                                @Html.DisplayNameFor(model => model.Membro.Telefone)
-                            </th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in Model)
-                        {
+    <div class="row">
+        <div id="modalView" class="col-md-12"></div>
+        <div class="col-md-12">
+            @if (ViewBag.Alert != null)
+            {
+                <div class="alert alert-success">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <i class="material-icons">close</i>
+                    </button>
+                    <span>
+                        <b> Sucesso - </b> @ViewBag.Alert
+                    </span>
+                </div>
+            }
+            <button type="button" onclick="location.href='@Url.Action("Adicionar", new { id = ViewData["Id"] })'" class="btn btn-outline-success btn-sm">
+                <i class="material-icons">person_add</i>
+                Novo Membro
+            </button>
+            <div class="card">
+                <div class="card-header card-header-primary">
+                    <h4 class="card-title">
+                        Lista de membros da comissão organizadora @ViewData["Codigo"]
+                    </h4>
+                    <p class="card-category">Comissao responsavel pelo controlo total do sistema</p>
+                </div>
+                <div class="card-body">
+                    <table class="table" id="dtMaterialDesignExample">
+                        <thead>
                             <tr>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.Membro.Nome)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.Membro.Email)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.Membro.Telefone)
-                                </td>
-                                <td class="td-actions text-right">
-                                    <button type="button" data-toggle="ajax-modal" data-target="#modalConfirmDelete" data-url="@Url.Action($"RemoverMembro/{item.MembroOrganizadorId}")" rel="tooltip" title="Remover" class="btn btn-danger btn-link btn-lg">
-                                        <i class="material-icons">remove</i>
-                                    </button>
-                                </td>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Membro.Nome)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Membro.Email)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Membro.Telefone)
+                                </th>
+                                <th></th>
                             </tr>
-                        }
-                    </tbody>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Membro.Nome)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Membro.Email)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Membro.Telefone)
+                                    </td>
+                                    <td class="td-actions text-right">
+                                        @if (confirm || id == item.MembroId)
+                                        {
+                                            <button type="button" data-toggle="ajax-modal" data-target="#modalConfirmDelete" data-url="@Url.Action($"RemoverMembro/{item.MembroOrganizadorId}")" rel="tooltip" title="Remover" class="btn btn-danger btn-link btn-lg">
+                                                <i class="material-icons">person_remove</i>
+                                            </button>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
 
-                </table>
-                <div class="form-group">
-                    <button onclick="location.href='@Url.Action("Index")'" class="btn btn-primary btn-sm waves-effect">Voltar</button>
-                    <a asp-action="Index"></a>
+                    </table>
+                    <hr />
+                    <div class="form-group">
+                        <button onclick="location.href='@Url.Action("Index")'" class="btn btn-outline-info btn-sm waves-effect">
+                            <i class="material-icons">navigate_before</i>
+                            Voltar
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>

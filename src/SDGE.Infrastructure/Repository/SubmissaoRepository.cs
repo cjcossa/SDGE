@@ -55,5 +55,21 @@ namespace SDGE.Infrastructure.Repository
             entity.Removido = !entity.Removido;
             base.Actualizar(entity);
         }
+
+        public int Total(int id)
+        {
+            return _dbContext.Set<Submissao>().Include(x => x.Participante)
+                .Where(x => x.ParticipanteId == id && x.Removido == state &&
+               x.Participante.Removido == state)
+               .ToList().Count();
+        }
+
+        public IEnumerable<Submissao> ObterPorMembro(int id)
+        {
+            return _dbContext.Set<Submissao>().Include(x => x.Participante).Include(x => x.Evento).Include(x => x.Tipo)
+            .Where(x => x.Removido == state && x.Evento.Removido == state && x.Tipo.Removido == state && x.Participante.Removido == state && (
+            x.Evento.ComissaoCientifica.MembroCientificos.Any(x => x.MembroId == id && x.Removido == state) || 
+            x.Evento.ComissaoOrganizadora.MembroOrganizadors.Any(x => x.MembroId == id && x.Removido == state)));
+        }
     }
 }

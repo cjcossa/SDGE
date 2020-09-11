@@ -31,6 +31,7 @@ namespace SDGE.UI.Web.Controllers
                 ComissaoOrganizadoraId = result.ComissaoOrganizadoraId,
                 Destino = false
 
+
             };
             _alertaRepository.Adicionar(alerta);
             return RedirectToAction("Listar", "Submissao", new { msg = "Submissão criada." });

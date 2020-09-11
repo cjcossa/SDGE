@@ -24,8 +24,14 @@
                                 <span asp-validation-for="Codigo" class="text-danger"></span>
                             </div>
                             <div class="form-group text-right">
-                                <button asp-action="Index" class="btn btn-primary btn-sm waves-effect">Voltar</button>
-                                <input type="submit" id="criar" value="Criar" class="btn btn-outline-primary btn-sm" />
+                                <button type="button" onclick="location.href='@Url.Action("Index")'" class="btn btn-outline-danger btn-sm">
+                                    <i class="material-icons">close</i>
+                                    Cancelar
+                                </button>
+                                <button type="submit" id="criar" class="btn btn-outline-success btn-sm">
+                                    <i class="material-icons">done</i>
+                                    Guardar
+                                </button>
                             </div>
                         </div>
                     </div>

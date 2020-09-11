@@ -1,27 +1,50 @@
-﻿@model IEnumerable<SDGE.ApplicationCore.Entity.ComissaoOrganizadora>
+﻿@using SDGE.ApplicationCore.Interfaces.Repository;
+@using Microsoft.AspNetCore.Http;
+
+@inject IMembroOrganizadorRepository Organizador;
+@inject IHttpContextAccessor HttpContextAccessor
+
+@model IEnumerable<SDGE.ApplicationCore.Entity.ComissaoOrganizadora>
 
 @{
     ViewData["Title"] = "Index";
+    bool state = false;
+    int id = -1;
+
+    if (HttpContextAccessor.HttpContext.Session.GetString("_Membro") != null)
+    {
+        id = int.Parse(HttpContextAccessor.HttpContext.Session.GetString("_Membro"));
+       
+        if (Organizador.ObterPorMembro(id).Any())
+            state = true;
+    }
 }
 
-<div id="modalView" class="col-md-12"></div>
 
-<div class="row">
-    <div class="col-md-12">
-        @if (ViewBag.Alert != null)
-        {
-            <div class="alert alert-success">
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <i class="material-icons">close</i>
-                </button>
-                <span>
-                    <b> Sucesso - </b> @ViewBag.Alert
-                </span>
-            </div>
-        }
+
+    <div class="row">
+        <div id="modalView" class="col-md-12"></div>
+        <div class="col-md-12">
+            @if (ViewBag.Alert != null)
+            {
+                <div class="alert alert-success">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <i class="material-icons">close</i>
+                    </button>
+                    <span>
+                        <b> Sucesso - </b> @ViewBag.Alert
+                    </span>
+                </div>
+            }
             <div class="text-sm-left">
-                <button onclick="location.href='@Url.Action("Criar")'" class="btn btn-outline-primary btn-sm">Criar</button>
-                <button onclick="location.href='@Url.Action("Participar")'" class="btn btn-outline-primary btn-sm">Participar</button>
+                <button type="button" onclick="location.href='@Url.Action("Criar")'" class="btn btn-outline-success btn-sm">
+                    <i class="material-icons">group_add</i>
+                    Nova Comissão
+                </button>
+                <button type="button" onclick="location.href='@Url.Action("Participar")'" class="btn btn-outline-success btn-sm">
+                    <i class="material-icons">keyboard</i>
+                    Participar
+                </button>
             </div>
             <div class="card">
                 <div class="card-header card-header-primary">
@@ -47,15 +70,27 @@
                                         @Html.DisplayFor(modelItem => item.Codigo)
                                     </td>
                                     <td class="td-actions text-right">
-                                        <button type="button" onclick="location.href='@Url.Action("Adicionar", new { id = item.ComissaoOrganizadoraId })'" rel="tooltip" title="Adicionar" class="btn btn-success btn-link btn-lg">
-                                            <i class="material-icons">add</i>
-                                        </button>
-                                        <button type="button" onclick="location.href='@Url.Action("Listar", new { id = item.ComissaoOrganizadoraId })'" rel="tooltip" title="Detalhes" class="btn btn-success btn-link btn-lg">
-                                            <i class="material-icons">details</i>
-                                        </button>
-                                        <button type="button" data-toggle="ajax-modal" data-target="#modalConfirmDelete" data-url="@Url.Action($"Remover/{item.ComissaoOrganizadoraId}")" rel="tooltip" title="Apagar" class="btn btn-danger btn-link btn-lg">
-                                            <i class="material-icons">delete_outline</i>
-                                        </button>
+                                        @if (state)
+                                        {
+                                            <button type="button" onclick="location.href='@Url.Action("Adicionar", new { id = item.ComissaoOrganizadoraId })'" rel="tooltip" title="Adicionar" class="btn btn-success btn-link btn-lg">
+                                                <i class="material-icons">person_add</i>
+                                            </button>
+                                            <button type="button" onclick="location.href='@Url.Action("Listar", new { id = item.ComissaoOrganizadoraId })'" rel="tooltip" title="Detalhes" class="btn btn-info btn-link btn-lg">
+                                                <i class="material-icons">details</i>
+                                            </button>
+                                        }
+
+                                        @if (item.CriadoPorId == id)
+                                        {
+                                            <button type="button" onclick="location.href='@Url.Action("Confirmar", new { id = item.ComissaoOrganizadoraId })'" rel="tooltip" title="Confirmar" class="btn btn-success btn-link btn-lg">
+                                                <i class="material-icons">done</i>
+                                            </button>
+
+                                            <button type="button" data-toggle="ajax-modal" data-target="#modalConfirmDelete" data-url="@Url.Action($"Remover/{item.ComissaoOrganizadoraId}")" rel="tooltip" title="Apagar" class="btn btn-danger btn-link btn-lg">
+                                                <i class="material-icons">delete_outline</i>
+                                            </button>
+                                        }
+
                                     </td>
                                 </tr>
                             }
@@ -64,7 +99,7 @@
                 </div>
             </div>
         </div>
-</div>
+    </div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

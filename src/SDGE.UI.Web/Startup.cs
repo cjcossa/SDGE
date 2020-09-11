@@ -49,7 +49,7 @@ namespace SDGE.UI.Web
             services.AddDistributedMemoryCache();
             services.AddSession(options =>
             {
-                options.IdleTimeout = TimeSpan.FromMinutes(120);// 2h timeout
+                options.IdleTimeout = TimeSpan.FromMinutes(15);// 2h timeout
                 options.Cookie.HttpOnly = true;
                 options.Cookie.IsEssential = true;
             });
@@ -89,7 +89,7 @@ namespace SDGE.UI.Web
 
 
                 // Lockout settings.
-                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
                 options.Lockout.MaxFailedAccessAttempts = 5;
                 options.Lockout.AllowedForNewUsers = true;
 
@@ -104,7 +104,7 @@ namespace SDGE.UI.Web
             {
                 // Cookie settings
                 options.Cookie.HttpOnly = true;
-                options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(15);
 
                 options.LoginPath = "/Identity/Account/Login";
                 options.AccessDeniedPath = "/Identity/Account/AccessDenied";
@@ -141,7 +141,7 @@ namespace SDGE.UI.Web
              {
                  endpoints.MapControllerRoute(
                      name: "default",
-                     pattern: "{controller=Evento}/{action=Eventos}/{id?}");
+                     pattern: "{controller=Home}/{action=Index}/{id?}");
                  endpoints.MapRazorPages();
              });
             /*app.UseMvc(routes =>

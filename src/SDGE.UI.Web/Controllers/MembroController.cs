@@ -16,14 +16,17 @@ namespace SDGE.UI.Web.Controllers
         private readonly IMembroRepository _membroRepository;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
-       
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
         public MembroController(IMembroRepository membroRepository, 
             UserManager<IdentityUser> userManager,
-            SignInManager<IdentityUser> signInManager)
+            SignInManager<IdentityUser> signInManager,
+            IHttpContextAccessor httpContextAccessor)
         {
             _membroRepository = membroRepository;
             _userManager = userManager;
             _signInManager = signInManager;
+            _httpContextAccessor = httpContextAccessor;
         }
         // GET: Membro
         public ActionResult Index()
@@ -32,9 +35,10 @@ namespace SDGE.UI.Web.Controllers
         }
 
         // GET: Membro/Details/5
-        public ActionResult Details(int id)
+        public ActionResult Details(string msg = null)
         {
-            return View(_membroRepository.ObterPorId(id));
+            ViewBag.Alert = msg;
+            return View(Membro(_membroRepository.ObterPorId(SessionId())));
         }
 
         // GET: Membro/Create
@@ -48,7 +52,7 @@ namespace SDGE.UI.Web.Controllers
             var user = await _userManager.FindByEmailAsync(email);
             if (user == null)
             {
-                return NotFound($"Unable to load user with email '{email}'.");
+                return NotFound($"Não foi possível carregar o usuário com o email '{email}'.");
             }
             if (userId == null || code == null)
             {
@@ -58,7 +62,7 @@ namespace SDGE.UI.Web.Controllers
             user = await _userManager.FindByIdAsync(userId);
             if (user == null)
             {
-                return NotFound($"Unable to load user with ID '{userId}'.");
+                return NotFound($"Não foi possível carregar o usuário com ID '{userId}'.");
             }
             MembroViewModel membro = new MembroViewModel();
             membro.Email = email;
@@ -106,21 +110,22 @@ namespace SDGE.UI.Web.Controllers
         }
 
         // GET: Membro/Edit/5
-        public ActionResult Edit(int id)
+        public ActionResult Edit()
         {
-            return View(_membroRepository.ObterPorId(id));
+            return View(Membro(_membroRepository.ObterPorId(SessionId())));
         }
 
         // POST: Membro/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, Membro collection)
+        public ActionResult Edit(int id, MembroViewModel collection)
         {
             try
             {
                 // TODO: Add update logic here
-                _membroRepository.Actualizar(collection);
-                return RedirectToAction(nameof(Index));
+                _membroRepository.Actualizar(Membro(collection));
+                string msg = "Dados alterados";
+                return RedirectToAction("Details", new { msg = msg });
             }
             catch
             {
@@ -154,6 +159,7 @@ namespace SDGE.UI.Web.Controllers
         {
             return new Membro
             {
+                MembroId = model.MembroId,
                 Nome = model.Nome,
                 Email = model.Email,
                 Telefone = model.Telefone
@@ -163,10 +169,18 @@ namespace SDGE.UI.Web.Controllers
         {
             return new MembroViewModel
             {
+                MembroId = model.MembroId,
                 Nome = model.Nome,
                 Email = model.Email,
                 Telefone = model.Telefone
             };
+        }
+        private int SessionId()
+        {
+            if (_httpContextAccessor.HttpContext.Session.GetString("_Membro") != null)
+                return int.Parse(_httpContextAccessor.HttpContext.Session.GetString("_Membro"));
+
+            return -1;
         }
     }
 }

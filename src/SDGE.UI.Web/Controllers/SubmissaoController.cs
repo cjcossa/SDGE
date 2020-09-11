@@ -52,14 +52,37 @@ namespace SDGE.UI.Web.Controllers
             _httpContextAccessor = httpContextAccessor;
         }
         // GET: Submissao
-        public ActionResult Index(int id, string msg = null)
+        public ActionResult Index(int id = -1, string msg = null)
         {
             ViewBag.Alert = msg;
-            return View(_submissaoRepository.ObterPorEvento(id));
+
+            if (IsMembro())
+            {
+                if(id > 0)
+                {
+                    var _result = _alertaRepository.ObterPorId(id);
+                    if(_result != null)
+                    {
+                        _alertaRepository.Actualizar(_result);
+                    }
+
+                }
+                return View(_submissaoRepository.ObterPorMembro(SessionId()));
+            }
+            return View();
         }
-        public ActionResult Listar(string msg = null)
+        public ActionResult Listar(int id = -1, string msg = null)
         {
             ViewBag.Alert = msg;
+            if (id > 0)
+            {
+                var _result = _alertaRepository.ObterPorId(id);
+                if (_result != null)
+                {
+                    _alertaRepository.Actualizar(_result);
+                }
+
+            }
             return View(_submissaoRepository.ObterPorParticipante(SessionId()));
         }
 
@@ -125,7 +148,7 @@ namespace SDGE.UI.Web.Controllers
         public ActionResult Edit(int id)
         {
             ViewBag.ParticipanteId = ObterParticipantes();
-            ViewBag.EventoId = ObterEventos();
+            ViewBag.EventoId = ObterEventos(id.ToString());
             ViewBag.TipoId = ObterTipos();
             ViewBag.Ficheiro =_submissaoRepository.ObterPorId(id).Ficheiro;
             
@@ -331,11 +354,8 @@ namespace SDGE.UI.Web.Controllers
         {
             return new SelectList(_participanteRepository.ObterTodos(), "ParticipanteId", "Nome", id);
         }
-        private SelectList ObterEventos(string id = null)
-        {
-            return new SelectList(_eventoRepository.ObterTodos(), "EventoId", "Titulo", id);
-        }
-        private List<SelectListItem> ObterEventos()
+       
+        private List<SelectListItem> ObterEventos(string id = null)
         {
             List<SelectListItem> items = new List<SelectListItem>();
             var result = _eventoRepository.ObterTodos();
@@ -365,8 +385,13 @@ namespace SDGE.UI.Web.Controllers
                         
                 }
             }
+            if(id != null)
+            {
+                var data = _submissaoRepository.ObterPorId(int.Parse(id));
+                items.Add(new SelectListItem() { Value = data.EventoId.ToString(), Text = data.Evento.Titulo });
+            }
            
-            if (!state)
+            if (!state && id == null)
                 items.Add(new SelectListItem() { Value = "", Text = "Não existe nenhum evento" });
             return items;
 
@@ -409,7 +434,25 @@ namespace SDGE.UI.Web.Controllers
         }
         private int SessionId()
         {
-            return int.Parse(_httpContextAccessor.HttpContext.Session.GetString("_Participante"));
+            int id = -1;
+            if (IsParticipante())
+                id = int.Parse(_httpContextAccessor.HttpContext.Session.GetString("_Participante"));
+            else if (IsMembro())
+                id = int.Parse(_httpContextAccessor.HttpContext.Session.GetString("_Membro"));
+
+            return id;
+        }
+        private bool IsMembro()
+        {
+            if (_httpContextAccessor.HttpContext.Session.GetString("_Membro") != null)
+                return true;
+            return false;
+        }
+        private bool IsParticipante()
+        {
+            if (_httpContextAccessor.HttpContext.Session.GetString("_Participante") != null)
+                return true;
+            return false;
         }
         public Alerta Alerta(Submissao submissao, string msg, bool destino = false)
         {
@@ -420,8 +463,8 @@ namespace SDGE.UI.Web.Controllers
                 ParticipanteId = submissao.ParticipanteId,
                 ComissaoCientificaId = result.ComissaoCientificaId,
                 ComissaoOrganizadoraId = result.ComissaoOrganizadoraId,
-                Destino = destino
-
+                Destino = destino,
+                Tipo = "Submissao"
             };
             return alerta;
         }

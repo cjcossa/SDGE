@@ -10,7 +10,7 @@
         <div class="col-md-12">
             <div class="col-md-12">
                 <div class="card card-chart">
-                    <div class="card-header card-header-info">
+                    <div class="card-header card-header-primary">
                         <h4 class="card-title ">Detalhes</h4>
                         <p class="card-category">Título do Evento: @Html.DisplayFor(model => model.Titulo)</p>
                     </div>
@@ -75,27 +75,27 @@
                 {
                     <div class="col-md-4">
                         <div class="card card-chart">
-                            <div class="card-header card-header-info">
+                            <div class="card-header card-header-primary">
                                 <h4 class="card-title">@item.Finalidade</h4>
                             </div>
                             <div class="card-body">
                                 <dl class="row">
-                                    <dt class="col-sm-4">
+                                    <dt class="col-sm-6">
                                         Data de Início
                                     </dt>
-                                    <dd class="col-sm-8">
+                                    <dd class="col-sm-6">
                                         @item.DataInicio
                                     </dd> 
-                                    <dt class="col-sm-4">
-                                        Data de Fim
+                                    <dt class="col-sm-6">
+                                        Data de Término
                                     </dt>
-                                    <dd class="col-sm-8">
+                                    <dd class="col-sm-6">
                                         @item.DataFim
                                     </dd> 
-                                    <dt class="col-sm-4">
+                                    <dt class="col-sm-6">
                                         Descrição
                                     </dt>
-                                    <dd class="col-sm-8">
+                                    <dd class="col-sm-6">
                                         @item.Descricao
                                     </dd>
                                 </dl>

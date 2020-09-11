@@ -11,12 +11,12 @@ namespace SDGE.UI.Web.Models
         public int DataImportanteId { get; set; }
         public string Titulo { get; set; }
 
-        [Display(Name = "Iniciar em")]
-        [Required(ErrorMessage = "Introduza a Data Inicio")]
+        [Display(Name = "Data de Início")]
+        [Required(ErrorMessage = "Introduza a Data de Início")]
         public string DataInicio { get; set; }
 
-        [Display(Name = "Terminar em")]
-        [Required(ErrorMessage = "Introduza a Data Termino")]
+        [Display(Name = "Data de Término")]
+        [Required(ErrorMessage = "Introduza a Data de Término")]
         public string DataFim { get; set; }
 
         [Required(ErrorMessage = "Introduza a Finalidade")]

@@ -12,7 +12,9 @@ namespace SDGE.ApplicationCore.Interfaces.Repository
         public Evento ObterPorEmail(string email);
         public Evento ObterPorTitulo(string titulo);
         public IEnumerable<Evento> ObterEventos(int membroId);
+        public IEnumerable<Evento> ObterPorParticipante(int id);
         public Evento ObterPorEvento(int id);
+        
 
     }
 }

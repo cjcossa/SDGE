@@ -66,5 +66,19 @@ namespace SDGE.Infrastructure.Repository
             return _dbContext.Set<EventoParticipante>()
                  .Where(c => c.EventoId == eventoId && c.ParticipanteId == participanteId && c.Removido == state).FirstOrDefault();
         }
+
+        public int Total(int id)
+        {
+            return _dbContext.Set<EventoParticipante>().Include(m => m.Participante)
+               .Where(e => e.ParticipanteId == id && e.Removido == state && e.Participante.Removido == state).ToList().Count();
+        }
+
+        public IEnumerable<EventoParticipante> ObterPorMembro(int id)
+        {
+            return _dbContext.Set<EventoParticipante>().Include(m => m.Participante).Include(m => m.Evento)
+             .Where(e => e.Removido == state && e.Participante.Removido == state && e.Evento.Removido == state &&(
+            e.Evento.ComissaoCientifica.MembroCientificos.Any(x => x.MembroId == id && x.Removido == state) ||
+            e.Evento.ComissaoOrganizadora.MembroOrganizadors.Any(x => x.MembroId == id && x.Removido == state)));
+        }
     }
 }

@@ -1,3 +1,14 @@
-﻿@{
-    Layout = "_AdminLayout";
+﻿@using Microsoft.AspNetCore.Http;
+@using Microsoft.AspNetCore.Identity
+
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+@inject IHttpContextAccessor HttpContextAccessor
+@{
+    if (!SignInManager.IsSignedIn(User) || HttpContextAccessor.HttpContext.Session.GetString("_UserEmail") == null)
+        Layout = "_Layout";
+    else
+        Layout = "_ALayout";
+
+    //Layout = "_Layout";
 }

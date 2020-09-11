@@ -20,7 +20,7 @@ namespace SDGE.Infrastructure.Repository
         public IEnumerable<Alerta> ObterPorParticipante(int id)
         {
             return _dbContext.Set<Alerta>().Include(a => a.Participante).Include(a => a.ComissaoOrganizadora)
-                  .Where(a => a.Destino == !state && a.ParticipanteId == id && a.Removido == state)
+                  .Where(a => a.Destino == !state && a.ParticipanteId == id && a.Removido == state && a.Status == state)
                   .AsEnumerable();
 
         }
@@ -37,6 +37,42 @@ namespace SDGE.Infrastructure.Repository
             return _dbContext.Set<Alerta>().Include(a => a.ComissaoCientifica).Include(a => a.ComissaoCientifica.MembroCientificos).Include(a => a.Participante)
                 .Where(a => a.Destino == state && a.ComissaoCientifica.MembroCientificos.Any(a => a.MembroId == id) && a.Removido == state)
                 .AsEnumerable();
+        }
+
+        public int TotalPorParticipante(int id)
+        {
+            return _dbContext.Set<Alerta>().Include(a => a.Participante).Include(a => a.ComissaoOrganizadora)
+                  .Where(a => a.Destino == !state && a.ParticipanteId == id && a.Removido == state && a.Status == state)
+                  .ToList().Count;
+        }
+
+        public int TotalPorOrganizador(int id)
+        {
+            return _dbContext.Set<Alerta>().Include(a => a.ComissaoOrganizadora).Include(a => a.ComissaoOrganizadora.MembroOrganizadors).Include(a => a.Participante)
+                 .Where(a => a.Destino == state && a.ComissaoOrganizadora.MembroOrganizadors.Any(a => a.MembroId == id) && a.Removido == state)
+                 .ToList().Count();
+        }
+
+        public override void Actualizar(Alerta entity)
+        {
+            entity.Status = true;
+            base.Actualizar(entity);
+        }
+
+        public IEnumerable<Alerta> ObterPorMembro(int id)
+        {
+            return _dbContext.Set<Alerta>().Include(a => a.ComissaoOrganizadora).Include(a => a.ComissaoOrganizadora.MembroOrganizadors).Include(a => a.Participante)
+                  .Where(a => a.Destino == state && (a.ComissaoOrganizadora.MembroOrganizadors.Any(a => a.MembroId == id) || a.ComissaoCientifica.MembroCientificos.Any(a => a.MembroId == id)) 
+                  && a.Removido == state && a.Status == state)
+                  .AsEnumerable();
+        }
+
+        public int TotalPorMembro(int id)
+        {
+            return _dbContext.Set<Alerta>().Include(a => a.ComissaoOrganizadora).Include(a => a.ComissaoOrganizadora.MembroOrganizadors).Include(a => a.Participante)
+                 .Where(a => a.Destino == state && (a.ComissaoOrganizadora.MembroOrganizadors.Any(a => a.MembroId == id) || a.ComissaoCientifica.MembroCientificos.Any(a => a.MembroId == id))
+                 && a.Removido == state && a.Status == state)
+                 .ToList().Count();
         }
     }
 }

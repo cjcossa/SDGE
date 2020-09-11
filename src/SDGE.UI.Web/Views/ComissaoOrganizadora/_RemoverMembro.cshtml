@@ -13,8 +13,14 @@
                         <form asp-action="RemoverMembro">
                             <input type="hidden" asp-for="MembroOrganizadorId" />
                             <div class="form-group text-right">
-                                <button class="btn  btn-danger btn-sm waves-effect" data-dismiss="modal">Cancelar</button>
-                                <input type="submit" value="Remover" class="btn btn-outline-danger btn-sm" />
+                                <button class="btn  btn-danger btn-sm waves-effect" data-dismiss="modal">
+                                    <i class="material-icons">close</i>
+                                    Cancelar
+                                </button>
+                                <button type="submit" id="criar" class="btn btn-outline-danger btn-sm">
+                                    <i class="material-icons">done</i>
+                                    Remover
+                                </button>
                             </div>
                         </form>
                     </div>

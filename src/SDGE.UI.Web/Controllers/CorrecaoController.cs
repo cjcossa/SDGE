@@ -42,10 +42,41 @@ namespace SDGE.UI.Web.Controllers
             _alertaRepository = alertaRepository;
         }
         // GET: MembroEvento
-        public ActionResult Index(int id, string msg = null)
+        public ActionResult Index(int id = -1, string msg = null)
         {
             ViewBag.Alert = msg;
+            if (id > 0)
+            {
+                var _result = _alertaRepository.ObterPorId(id);
+                if (_result != null)
+                {
+                    _alertaRepository.Actualizar(_result);
+                }
+
+            }
+            if (IsParticipante())
+            {
+                //id = int.Parse(_httpContextAccessor.HttpContext.Session.GetString("_Participante"));
+                return View(_correcaoRepository.ObterPorParticipante(SessionId()));
+            }
+
+            if (IsMembro())
+            {
+                //id = int.Parse(_httpContextAccessor.HttpContext.Session.GetString("_Membro"));
+                return View(_correcaoRepository.ObterPorMembro(SessionId()));
+            }
+
             return View(_correcaoRepository.ObterPorSubmissao(id));
+
+        }
+        public ActionResult Listar(int id = -1, string msg = null)
+        {
+            ViewBag.Alert = msg;
+            int sessionId = int.Parse(_httpContextAccessor.HttpContext.Session.GetString("_Participante"));
+            if(id != -1)
+                return View(_correcaoRepository.ObterPorSubmissao(id));
+
+            return View(_correcaoRepository.ObterPorParticipante(sessionId));
         }
 
         // GET: MembroEvento/Details/5
@@ -257,7 +288,25 @@ namespace SDGE.UI.Web.Controllers
 
         private int SessionId()
         {
-            return int.Parse(_httpContextAccessor.HttpContext.Session.GetString("_Membro"));
+            int id = -1;
+            if (IsParticipante())
+                id = int.Parse(_httpContextAccessor.HttpContext.Session.GetString("_Participante"));
+            else if (IsMembro())
+                id = int.Parse(_httpContextAccessor.HttpContext.Session.GetString("_Membro"));
+
+            return id;
+        }
+        private bool IsMembro()
+        {
+            if (_httpContextAccessor.HttpContext.Session.GetString("_Membro") != null)
+                return true;
+            return false;
+        }
+        private bool IsParticipante()
+        {
+            if (_httpContextAccessor.HttpContext.Session.GetString("_Participante") != null)
+                return true;
+            return false;
         }
         public Alerta Alerta(Submissao submissao, string msg, bool destino = false)
         {
@@ -268,8 +317,8 @@ namespace SDGE.UI.Web.Controllers
                 ParticipanteId = submissao.ParticipanteId,
                 ComissaoCientificaId = result.ComissaoCientificaId,
                 ComissaoOrganizadoraId = result.ComissaoOrganizadoraId,
-                Destino = destino
-
+                Destino = destino,
+                Tipo = "Correcao"
             };
             return alerta;
         }

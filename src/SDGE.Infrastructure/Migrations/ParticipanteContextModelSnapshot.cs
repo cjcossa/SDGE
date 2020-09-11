@@ -47,6 +47,9 @@ namespace SDGE.Infrastructure.Migrations
                     b.Property<bool>("Status")
                         .HasColumnType("bit");
 
+                    b.Property<string>("Tipo")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("AlertaId");
 
                     b.HasIndex("ComissaoCientificaId");
@@ -69,6 +72,9 @@ namespace SDGE.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(250)");
 
+                    b.Property<int>("CriadoPorId")
+                        .HasColumnType("int");
+
                     b.Property<bool>("Removido")
                         .HasColumnType("bit");
 
@@ -87,6 +93,9 @@ namespace SDGE.Infrastructure.Migrations
                     b.Property<string>("Codigo")
                         .IsRequired()
                         .HasColumnType("varchar(250)");
+
+                    b.Property<int>("CriadoPorId")
+                        .HasColumnType("int");
 
                     b.Property<bool>("Removido")
                         .HasColumnType("bit");
@@ -291,6 +300,9 @@ namespace SDGE.Infrastructure.Migrations
                     b.Property<int>("ComissaoCientificaId")
                         .HasColumnType("int");
 
+                    b.Property<bool>("Confirmado")
+                        .HasColumnType("bit");
+
                     b.Property<int>("MembroId")
                         .HasColumnType("int");
 
@@ -340,6 +352,9 @@ namespace SDGE.Infrastructure.Migrations
 
                     b.Property<int>("ComissaoOrganizadoraId")
                         .HasColumnType("int");
+
+                    b.Property<bool>("Confirmado")
+                        .HasColumnType("bit");
 
                     b.Property<int>("MembroId")
                         .HasColumnType("int");

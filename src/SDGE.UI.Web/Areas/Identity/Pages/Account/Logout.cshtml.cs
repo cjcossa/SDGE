@@ -33,11 +33,12 @@ namespace SDGE.UI.Web.Areas.Identity.Pages.Account
             _logger.LogInformation("User logged out.");
             if (returnUrl != null)
             {
-               
-               
-                if(HttpContext.Session.GetString("_Membro") != null)
+                
+                if (HttpContext.Session.GetString("_Membro") != null)
                 {
                     HttpContext.Session.Remove("_Membro");
+                    HttpContext.Session.Remove("_Organizador");
+                    HttpContext.Session.Remove("_Cientifico");
                     HttpContext.Session.Remove("_UserEmail");
                 }
                 if (HttpContext.Session.GetString("_Participante") != null)

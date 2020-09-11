@@ -45,17 +45,40 @@ namespace SDGE.UI.Web.Controllers
             _alertaRepository = alertaRepository;
         }
         // GET: MembroEvento
-        public ActionResult Index(int id, string msg = null, string type = null)
+        public ActionResult Index(int id = -1, string msg = null, string type = null)
         {
             ViewBag.Alert = msg;
             ViewBag.Type = type;
-            return View(_eventoParticipanteRepository.ObterPorEvento(id));
+            if(IsMembro())
+            {
+                if (id > 0)
+                {
+                    var _result = _alertaRepository.ObterPorId(id);
+                    if (_result != null)
+                    {
+                        _alertaRepository.Actualizar(_result);
+                    }
+
+                }
+                return View(_eventoParticipanteRepository.ObterPorMembro(SessionId()));
+            }
+
+            return View();
         }
 
-        public ActionResult Listar(string msg = null)
+        public ActionResult Listar(int id = -1, string msg = null)
         {
             ViewBag.Alert = msg;
             //ViewBag.Prazo = _dataImportanteRepository.VerificarPrazoFinalidade("Inscrições", data.EventoId);
+            if (id > 0)
+            {
+                var _result = _alertaRepository.ObterPorId(id);
+                if (_result != null)
+                {
+                    _alertaRepository.Actualizar(_result);
+                }
+
+            }
             return View(_eventoParticipanteRepository.ObterPorParticipante(SessionId()));
         }
 
@@ -129,9 +152,11 @@ namespace SDGE.UI.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Confirmar(string [] confirmar, string cnf)
+        public ActionResult Confirmar(string [] confirmar, string cnf, int Id)
         {
-            int eventoId = 0;
+            int eventoId = Id;
+            string msg = "Seleccione pelo menos uma inscrição.";
+            string type = "danger";
             if(confirmar != null)
             {
                 foreach (var epId in confirmar)
@@ -140,18 +165,23 @@ namespace SDGE.UI.Web.Controllers
                     var result = _eventoParticipanteRepository.ObterPorId(id);
                     eventoId = result.EventoId;
                     if (cnf != null)
+                    {
                         result.Confirmado = true;
+                        msg = "Inscrição confirmada.";
+                        type = "success";
+                    }
                     else
+                    {
                         result.Confirmado = false;
-
+                        msg = "Inscrição cancelada.";
+                    }
+                       
                     _eventoParticipanteRepository.Actualizar(result);
                     _alertaRepository.Adicionar(Alerta(result, "Resultado de inscrição disponível para o evento: ", true));
                 }
             }
-            if(cnf != null)
-                return RedirectToAction("Index", new {id = eventoId , msg = "Inscrição confirmada.", type = "success" });
 
-            return RedirectToAction("Index", new {id = eventoId , msg = "Inscrição cancelada.", type = "danger" });
+            return RedirectToAction("Index", new {id = eventoId , msg = msg, type = type });
         }
         
         // GET: MembroEvento/Edit/5
@@ -249,10 +279,10 @@ namespace SDGE.UI.Web.Controllers
             {
                 var data = _eventoParticipanteRepository.ObterPorId(int.Parse(id));
                
-                if (_dataImportanteRepository.VerificarPrazoFinalidade("Inscrições", data.EventoId))
-                {
+                //if (_dataImportanteRepository.VerificarPrazoFinalidade("Inscrições", data.EventoId))
+                //{
                     items.Add(new SelectListItem() { Value = data.EventoId.ToString(), Text = data.Evento.Titulo });
-                }
+                //}
             }
            
             if (state && id == null)
@@ -310,7 +340,25 @@ namespace SDGE.UI.Web.Controllers
         }
         private int SessionId()
         {
-            return int.Parse(_httpContextAccessor.HttpContext.Session.GetString("_Participante"));
+            int id = -1;
+            if (IsParticipante())
+                id = int.Parse(_httpContextAccessor.HttpContext.Session.GetString("_Participante"));
+            else if (IsMembro())
+                id = int.Parse(_httpContextAccessor.HttpContext.Session.GetString("_Membro"));
+
+            return id;
+        }
+        private bool IsMembro()
+        {
+            if (_httpContextAccessor.HttpContext.Session.GetString("_Membro") != null)
+                return true;
+            return false;
+        }
+        private bool IsParticipante()
+        {
+            if (_httpContextAccessor.HttpContext.Session.GetString("_Participante") != null)
+                return true;
+            return false;
         }
         public Alerta Alerta(EventoParticipante eventoParticipante, string msg, bool destino = false)
         {
@@ -321,7 +369,8 @@ namespace SDGE.UI.Web.Controllers
                 ParticipanteId = eventoParticipante.ParticipanteId,
                 ComissaoCientificaId = result.ComissaoCientificaId,
                 ComissaoOrganizadoraId = result.ComissaoOrganizadoraId,
-                Destino = destino
+                Destino = destino,
+                Tipo = "Inscricao"
 
             };
             return alerta;

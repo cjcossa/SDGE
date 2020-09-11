@@ -44,5 +44,29 @@ namespace SDGE.Infrastructure.Repository
             entity.Removido = !entity.Removido;
             base.Actualizar(entity);
         }
+
+        public int Total(int id)
+        {
+            return _dbContext.Set<Correcao>().Include(x => x.Submissao).Include(x => x.Submissao.Participante)
+               .Where(x => x.Submissao.ParticipanteId == id && x.Removido == state &&
+              x.Submissao.Participante.Removido == state && x.Submissao.Removido == state)
+              .ToList().Count();
+        }
+
+        public IEnumerable<Correcao> ObterPorParticipante(int id)
+        {
+            return _dbContext.Set<Correcao>().Include(x => x.Submissao).Include(x => x.Submissao.Participante).Include( x => x.Membro)
+              .Where(x => x.Submissao.ParticipanteId == id && x.Removido == state &&
+             x.Submissao.Participante.Removido == state && x.Submissao.Removido == state && x.Membro.Removido == state)
+             .AsEnumerable();
+        }
+
+        public IEnumerable<Correcao> ObterPorMembro(int id)
+        {
+            return _dbContext.Set<Correcao>().Include(x => x.Submissao).Include(x => x.Submissao.Participante).Include(x => x.Membro)
+              .Where(x => x.MembroId == id && x.Removido == state &&
+             x.Submissao.Participante.Removido == state && x.Submissao.Removido == state && x.Membro.Removido == state)
+             .AsEnumerable();
+        }
     }
 }

@@ -19,17 +19,17 @@ namespace SDGE.Infrastructure.Repository
         }
         private bool state = false;
 
-        public IEnumerable<MembroOrganizador> ObterPorComissao(int id)
+        public IEnumerable<MembroOrganizador> ObterPorComissao(int id, bool confirmado = false)
         {
             return _dbContext.Set<MembroOrganizador>().Include(c => c.ComissaoOrganizadora).Include(m => m.Membro)
                 .Where(c => c.ComissaoOrganizadoraId == id && c.Removido == state &&
-                 c.ComissaoOrganizadora.Removido == state && c.Membro.Removido == state).AsEnumerable();
+                 c.ComissaoOrganizadora.Removido == state && c.Membro.Removido == state &&  c.Confirmado == confirmado).AsEnumerable();
         }
 
-        public bool VerificarMembro(int membroId, int comissaoId, bool state)
+        public bool VerificarMembro(int membroId, int comissaoId, bool _state)
         {
             var result = _dbContext.Set<MembroOrganizador>().Include(c => c.ComissaoOrganizadora).Include(m => m.Membro)
-                .Where(c => c.ComissaoOrganizadoraId == comissaoId && c.MembroId == membroId && c.Removido == state &&
+                .Where(c => c.ComissaoOrganizadoraId == comissaoId && c.MembroId == membroId && c.Removido == _state &&
                  c.ComissaoOrganizadora.Removido == state && c.Membro.Removido == state).FirstOrDefault();
             if (result == null)
                 return false;
@@ -37,10 +37,10 @@ namespace SDGE.Infrastructure.Repository
             return true;
         }
 
-        public MembroOrganizador ObterPorMembroComissao(int membroId, int comissaoId, bool state)
+        public MembroOrganizador ObterPorMembroComissao(int membroId, int comissaoId, bool _state)
         {
            return _dbContext.Set<MembroOrganizador>().Include(c => c.ComissaoOrganizadora).Include(m => m.Membro)
-                .Where(c => c.ComissaoOrganizadora.ComissaoOrganizadoraId == comissaoId && c.Membro.MembroId == membroId && c.Removido == state &&
+                .Where(c => c.ComissaoOrganizadora.ComissaoOrganizadoraId == comissaoId && c.Membro.MembroId == membroId && c.Removido == _state &&
                  c.ComissaoOrganizadora.Removido == state && c.Membro.Removido == state).FirstOrDefault();
         }
 
@@ -54,7 +54,12 @@ namespace SDGE.Infrastructure.Repository
         {
             return _dbContext.Set<MembroOrganizador>().Include(c => c.ComissaoOrganizadora).Include(m => m.ComissaoOrganizadora.Eventos)
                .Where(c => c.MembroId == id && c.Removido == state &&
-                c.ComissaoOrganizadora.Removido == state).AsEnumerable();
+                c.ComissaoOrganizadora.Removido == state && c.Confirmado == !state).AsEnumerable();
+        }
+
+        public void Confirmar(MembroOrganizador entity)
+        {
+            base.Actualizar(entity);
         }
     }
 }

@@ -2,65 +2,54 @@
 
 @{
     ViewData["Title"] = "Index";
+    bool state = true;
+    foreach (var item in Model)
+    {
+        if (item.EventoId.ToString() != null)
+            state = false;
+    }
 }
 
-<div id="modalView" class="col-md-12"></div>
 
-<div class="row">
-    <div class="col-md-12">
-        <div class="row">
-            @foreach (var item in Model)
-            {
-
-                <div class="col-md-6">
-                    <div class="card card-chart">
-                        <div class="card-header card-header-info">
-                            <h4 class="card-title">Título do Evento: @item.Titulo</h4>
-                        </div>
-                        <div class="card-body">
-                            <dl class="row">
-                                <dt class="col-sm-3">
-                                    Lema
-                                </dt>
-                                <dd class="col-sm-9">
-                                    @item.Lema
-                                </dd>
-                                <dt class="col-sm-3">
-                                    Data de Início
-                                </dt>
-                                <dd class="col-sm-9">
-                                    @item.DataInicio
-                                </dd>
-                                <dt class="col-sm-3">
-                                    Data de Fim
-                                </dt>
-                                <dd class="col-sm-9">
-                                    @item.DataFim
-                                </dd>
-                                <dt class="col-sm-3">
-                                    Local
-                                </dt>
-                                <dd class="col-sm-9">
-                                    @item.Local
-                                </dd>
-                                <dt class="col-sm-3">
-                                    Categoria
-                                </dt>
-                                <dd class="col-sm-9">
-                                    @item.Categoria
-                                </dd>
-                            </dl>
-                        </div>
-                        <div class="card-footer text-right">
-                            <button type="button" onclick="location.href='@Url.Action("Details", new { id = item.EventoId })'" class="btn btn-outline-info btn-sm">
-                                <i class="material-icons">details</i>
-                                Detahles
-                            </button>
+@if (!state)
+{
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row">
+                @foreach (var item in Model)
+                {
+                    <div class="col-md-6">
+                        <div class="card card-stats">
+                            <div class="card-header card-header-primary card-header-icon">
+                                <div class="card-icon">
+                                    <i class="material-icons">event_available</i>
+                                </div>
+                                <a asp-action="Details" asp-route-id="@item.EventoId">
+                                    <p class="card-category">@item.Titulo</p>
+                                </a>
+                                <h3 class="card-title">@item.DataInicio</h3>
+                            </div>
+                            <div class="card-footer">
+                                <div class="stats">
+                                    <p class="card-category">@item.Categoria</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            }
+                }
+            </div>
         </div>
     </div>
-</div>
+}
+
+@if (state)
+{
+    <br />
+    <br />
+    <br />
+    <div class="text-lg-center align-text-bottom">
+        <p class="card-title"><h1>Bem-vindo ao Sistema de Gestão e Divulgação dos Eventos de UP-Maputo</h1></p>
+        <p class="card-category"><h2>Não existem eventos publicados</h2></p>
+    </div>
+}
 

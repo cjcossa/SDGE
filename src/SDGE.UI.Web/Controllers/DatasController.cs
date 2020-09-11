@@ -25,6 +25,7 @@ namespace SDGE.UI.Web.Controllers
         public ActionResult Index(int id, string msg = null)
         {
             ViewBag.Alert = msg;
+            ViewBag.Id = id;
             return View(_datasImportanteRepository.ObterPorEvento(id));
         }
 

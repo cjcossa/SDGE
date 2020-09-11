@@ -1,0 +1,58 @@
+﻿@model IEnumerable<SDGE.ApplicationCore.Entity.Correcao>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+
+    <div class="row">
+        <div id="modalView" class="col-md-12"></div>
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header card-header-primary">
+                    <h4>Lista de Avaliações</h4>
+                </div>
+                <div class="card-body">
+
+                    <table class="table" id="dtMaterialDesignExample">
+                        <thead>
+                            <tr>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Submissao)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Membro)
+                                </th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Submissao.Titulo)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Membro.Nome)
+                                    </td>
+                                    <td class="td-actions text-right">
+                                        <button type="button" onclick="location.href='@Url.Action("Download", new { id = item.CorrecaoId })'" rel="tooltip" title="Baixar" class="btn btn-success btn-link btn-sm">
+                                            <i class="material-icons">archive</i>
+                                        </button>
+                                        <button type="button" data-toggle="ajax-modal" data-target="#modalConfirmDelete" data-url="@Url.Action($"Details/{item.CorrecaoId}")" rel="tooltip" title="Detalhes" class="btn btn-info btn-link btn-lg">
+                                            <i class="material-icons">details</i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

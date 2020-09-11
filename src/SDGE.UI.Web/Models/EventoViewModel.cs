@@ -26,12 +26,12 @@ namespace SDGE.UI.Web.Models
         [Display(Name = "Email")]
         public string Email { get; set; }
 
-        [Required(ErrorMessage = "Introduza a Data Inicio")]
-        [Display(Name = "Iniciar Evento em")]
+        [Required(ErrorMessage = "Introduza a Data Início")]
+        [Display(Name = "Data de Início")]
         public string DataInicio { get; set; }
 
-        [Required(ErrorMessage = "Introduza a Data Termino")]
-        [Display(Name = "Terminar Evento em")]
+        [Required(ErrorMessage = "Introduza a Data de Término")]
+        [Display(Name = "Data de Término")]
         public string DataFim { get; set; }
 
         [Required(ErrorMessage = "Introduza o Local")]

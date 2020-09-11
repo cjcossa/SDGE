@@ -1,8 +1,17 @@
 ﻿@model IEnumerable<SDGE.ApplicationCore.Entity.EventoParticipante>
 
 @{
-    ViewData["Title"] = "Index";
     bool state = false;
+    foreach (var item in Model)
+    {
+        if (item.EventoParticipanteId.ToString() != null)
+        {
+            state = true;
+            ViewData["Title"] = item.Evento.Titulo;
+            ViewData["Id"] = item.EventoId;
+            break;
+        }
+    }
 }
 
 <div class="row">
@@ -19,40 +28,33 @@
             </div>
         }
        
-        <form asp-action="Confirmar">
-            <div class="card">
-                <div class="card-header card-header-primary">
-                    <h4 class="card-title ">Lista de Inscrições</h4>
-                    @foreach (var item in Model)
-                    {
-                        if (item.EventoParticipanteId.ToString() != null)
-                        {
-                            state = true;
-                            <p class="card-category ">Evento: @Html.DisplayFor(modelItem => item.Evento.Titulo)</p>break;
-                        }
-                    }
-                   
-                </div>
-                <div class="card-body">
-
-                    <div class="table-responsive">
-                        <table class="table" id="dtMaterialDesignExample">
-                            <thead class=" text-primary">
-                                <tr>
-                                    <th></th>
-                                    
-                                    <th>
-                                        @Html.DisplayNameFor(model => model.Confirmado)
-                                    </th>
-                                    <th>
-                                        @Html.DisplayNameFor(model => model.Participante)
-                                    </th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var item in Model)
-                                {
+    <form asp-action="Confirmar" method="post">
+        <input type="hidden" name="Id" id="Id" value="@ViewData["Id"]" />
+        <div class="card">
+            <div class="card-header card-header-primary">
+                <h4 class="card-title ">Lista de Inscrições</h4>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table" id="dtMaterialDesignExample">
+                        <thead class=" text-primary">
+                            <tr>
+                                <th></th>
+                                <th>
+                                    Título
+                                </th>
+                                <th>
+                                    Confirmada
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Participante)
+                                </th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
                                 <tr>
                                     <td>
                                         <div class="form-check">
@@ -65,7 +67,9 @@
                                         </div>
                                         <input type="hidden" asp-for="@item.EventoParticipanteId" />
                                     </td>
-                                   
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Evento.Titulo)
+                                    </td>
                                     <td>
                                         @if (item.Confirmado == false)
                                         {
@@ -87,21 +91,22 @@
                                         </button>
                                     </td>
                                 </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-
+                            }
+                        </tbody>
+                    </table>
                 </div>
+
             </div>
+            <hr />
             <div class="form-group text-right">
                 @if (state)
                 {
                     <input type="submit" value="Cancelar" class="btn btn-outline-danger btn-sm" name="cancelar" />
                     <input type="submit" value="Confirmar" class="btn btn-outline-success btn-sm" icon="done" name="cnf" />
                 }
-
             </div>
-        </form>
+        </div>
+        
+    </form>
     </div>
 </div>

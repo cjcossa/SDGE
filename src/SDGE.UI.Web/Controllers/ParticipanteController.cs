@@ -43,9 +43,10 @@ namespace SDGE.UI.Web.Controllers
         }
 
         // GET: Participante/Details/5
-        public ActionResult Details(int id)
+        public ActionResult Details(string msg = null)
         {
-            return View(_participanteRepository.ObterPorId(id));
+            ViewBag.Alert = msg;
+            return View(ParticipanteViewModel(_participanteRepository.ObterPorId(SessionId())));
         }
 
         // GET: Participante/Create
@@ -60,7 +61,7 @@ namespace SDGE.UI.Web.Controllers
             
             if (user == null)
             {
-                return NotFound($"Unable to load user with email '{email}'.");
+                return NotFound($"Não foi possível carregar o usuário com o email '{email}'.");
             }
             if (userId == null || code == null)
             {
@@ -70,7 +71,7 @@ namespace SDGE.UI.Web.Controllers
             user = await _userManager.FindByIdAsync(userId);
             if (user == null)
             {
-                return NotFound($"Unable to load user with ID '{userId}'.");
+                return NotFound($"Não foi possível carregar o usuário com ID '{userId}'.");
             }
             ParticipanteViewModel model = new ParticipanteViewModel();
             model.Email = email;
@@ -126,7 +127,8 @@ namespace SDGE.UI.Web.Controllers
                 // TODO: Add update logic here
                // var result = _participanteRepository.ObterPorId(collection.ParticipanteId);
                 _participanteRepository.Actualizar(Participante(collection));
-                return RedirectToAction(nameof(Index));
+                string msg = "Dados alterados";
+                return RedirectToAction("Details", new { msg = msg });
             }
             catch
             {

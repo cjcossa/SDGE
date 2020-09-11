@@ -47,7 +47,7 @@ namespace SDGE.Infrastructure.Repository
 
         public IEnumerable<ComissaoCientifica> ObterPorMembro(int membroId)
         {
-            return Buscar(m => m.MembroCientificos.Any(m => m.MembroId == membroId && m.Removido == state)).Where(m => m.Removido == state).AsEnumerable();
+            return Buscar(m => m.MembroCientificos.Any(m => m.MembroId == membroId && m.Removido == state && m.Confirmado == !state)).Where(m => m.Removido == state).AsEnumerable();
         }
 
         public bool VerificarCodigo(string codigo)

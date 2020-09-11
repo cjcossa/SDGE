@@ -25,7 +25,7 @@ namespace SDGE.Infrastructure.Repository
         public IEnumerable<ComissaoOrganizadora> ObterPorMembro(int membroId)
         {
             //string Removido = "False";
-            return Buscar(m => m.MembroOrganizadors.Any(m => m.MembroId == membroId && m.Removido == state)).Where(m => m.Removido == state).AsEnumerable();
+            return Buscar(m => m.MembroOrganizadors.Any(m => m.MembroId == membroId && m.Removido == state && m.Confirmado == !state)).Where(m => m.Removido == state).AsEnumerable();
         }
         public override void Actualizar(ComissaoOrganizadora entity)
         {

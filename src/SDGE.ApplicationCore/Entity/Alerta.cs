@@ -14,6 +14,7 @@ namespace SDGE.ApplicationCore.Entity
 
         public int AlertaId { get; set; }
         public string Messagem { get; set; }
+        public string Tipo { get; set; } 
         public bool Status { get; set; }
         public bool Removido { get; set; }
         public bool Destino { get; set; }

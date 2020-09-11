@@ -50,15 +50,16 @@ namespace SDGE.UI.Web.Areas.Identity.Pages.Account
 
         public class InputModel
         {
-            [Required]
-            [EmailAddress]
+            [Required(ErrorMessage = "O campo Email actual é obrigatório")]
+            [EmailAddress(ErrorMessage = "O campo Email não é um endereço de email válido.")]
             public string Email { get; set; }
 
-            [Required]
+            [Required(ErrorMessage = "O campo Senha actual é obrigatório")]
             [DataType(DataType.Password)]
+            [Display(Name = "Senha")]
             public string Password { get; set; }
 
-            [Display(Name = "Remember me?")]
+            [Display(Name = "Esqueci a senha")]
             public bool RememberMe { get; set; }
         }
 
@@ -106,14 +107,24 @@ namespace SDGE.UI.Web.Areas.Identity.Pages.Account
                         {
                             var id = _membroRepository.ObterPorEmail(identityUser.Email).MembroId;
                             HttpContext.Session.SetString("_Membro", id.ToString());
+                            if(await _userManager.IsInRoleAsync(identityUser, "Organizador"))
+                            {
+                                HttpContext.Session.SetString("_Organizador", id.ToString());
+                            } 
+                            if(await _userManager.IsInRoleAsync(identityUser, "Cientifico"))
+                            {
+                                HttpContext.Session.SetString("_Cientifico", id.ToString());
+                            }
+
                         }
                         else
                         {
                             var id = _participanteRepository.ObterPorEmail(identityUser.Email).ParticipanteId;
                             HttpContext.Session.SetString("_Participante", id.ToString());
+                            return RedirectToAction("PIndex", "Home");
                         }
                            
-                        return RedirectToAction("Eventos", "Evento");
+                        return RedirectToAction("Index", "Home");
                     }
                     
                 }
@@ -123,12 +134,12 @@ namespace SDGE.UI.Web.Areas.Identity.Pages.Account
                 }
                 if (result.IsLockedOut)
                 {
-                    _logger.LogWarning("User account locked out.");
+                    _logger.LogWarning("Conta de usuário bloqueada.");
                     return RedirectToPage("./Lockout");
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                    ModelState.AddModelError(string.Empty, "Tentativa de login inválida.");
                     return Page();
                 }
             }

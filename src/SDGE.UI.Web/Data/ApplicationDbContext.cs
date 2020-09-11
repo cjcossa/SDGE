@@ -11,6 +11,7 @@ namespace SDGE.UI.Web.Data
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
+            
         }
     }
 }

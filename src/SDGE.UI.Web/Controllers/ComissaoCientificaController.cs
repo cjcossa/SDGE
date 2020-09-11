@@ -42,7 +42,7 @@ namespace SDGE.UI.Web.Controllers
 
 
         // GET: ComissaoOrganizadora/Create
-        [Authorize(Roles = "Organizador")]
+       // [Authorize(Roles = "Organizador")]
         public ActionResult Criar()
         {
             ComissaoCientificaViewModel comissao = new ComissaoCientificaViewModel();
@@ -64,7 +64,8 @@ namespace SDGE.UI.Web.Controllers
                 {
                     ComissaoCientifica comissaoCientifica = new ComissaoCientifica
                     {
-                        Codigo = comissao.Codigo
+                        Codigo = comissao.Codigo,
+                        CriadoPorId = SessionId()
                     };
                     var result = _comissaoCientificaRepository.Adicionar(comissaoCientifica);
                     if (result != null)
@@ -72,7 +73,8 @@ namespace SDGE.UI.Web.Controllers
                         MembroCientifico membro = new MembroCientifico
                         {
                             MembroId = SessionId(),
-                            ComissaoCientificaId = result.ComissaoCientificaId
+                            ComissaoCientificaId = result.ComissaoCientificaId,
+                            Confirmado = true
                         };
                         _membroCientificoRepository.Adicionar(membro);
                     }
@@ -88,7 +90,7 @@ namespace SDGE.UI.Web.Controllers
             }
         }
 
-        [Authorize(Roles = "Organizador")]
+        //[Authorize(Roles = "Organizador")]
         public ActionResult Adicionar(int id)
         {
             ViewBag.MembroId = ObterMembros(id);
@@ -101,6 +103,11 @@ namespace SDGE.UI.Web.Controllers
         public ActionResult Listar(int id, string msg = null)
         {
             ViewBag.Alert = msg;
+            return View(_membroCientificoRepository.ObterPorComissao(id, true));
+        }
+        public ActionResult Confirmar(int id, string msg = null)
+        {
+            ViewBag.Alert = msg;
             return View(_membroCientificoRepository.ObterPorComissao(id));
         }
         public ActionResult Participar()
@@ -110,7 +117,7 @@ namespace SDGE.UI.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Participar(ComissaoCientificaViewModel comissao)
+        public ActionResult Participar(ComissaoCientificaViewModel comissao)
         {
            
             try
@@ -133,15 +140,9 @@ namespace SDGE.UI.Web.Controllers
                     else if(!_membroCientificoRepository.VerificarMembro(SessionId(), membro.ComissaoCientificaId, false))
                     {
                         _membroCientificoRepository.Adicionar(membro);
-                        IdentityUser identityUser = await _userManager.FindByEmailAsync(_membroRepository.ObterPorId(SessionId()).Email);
-                        if (identityUser != null)
-                        {
-                           IdentityResult identityResult = await _userManager.AddToRoleAsync(identityUser, "Organizador");
-                            if(identityResult != null)
-                            return RedirectToAction("Index", new { msg = "Membro adicionado." });
-                        }
                     }
-                   
+                    return RedirectToAction("Index", new { msg = "Membro adicionado." });
+
                 }
                 return View(comissao);
             }
@@ -166,7 +167,8 @@ namespace SDGE.UI.Web.Controllers
                         MembroCientifico membro = new MembroCientifico
                         {
                             ComissaoCientificaId = cientificoViewModel.ComissaoCientificaId,
-                            MembroId = selectedId
+                            MembroId = selectedId,
+                            Confirmado = true
                         };
                         //_membroOrganizadorRepository.Adicionar(organizador);
                         if (_membroCientificoRepository.VerificarMembro(membro.MembroId, membro.ComissaoCientificaId, true))
@@ -180,14 +182,12 @@ namespace SDGE.UI.Web.Controllers
                             IdentityUser identityUser = await _userManager.FindByEmailAsync(_membroRepository.ObterPorId(membro.MembroId).Email);
                             if (identityUser != null)
                             {
-                                IdentityResult identityResult = await _userManager.AddToRoleAsync(identityUser, "Organizador");
-                                if (identityResult != null)
-                                    return RedirectToAction("Index", new { msg = "Membro(s) adicionado(s)" });
+                                IdentityResult identityResult = await _userManager.AddToRoleAsync(identityUser, "Cientifico");
                             }
                         }
                     }
                     /*_membroOrganizadorRepository.Adicionar(organizador);*/
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction("Index", new { msg = "Membro(s) adicionado(s)" });
                 }
                 return View(cientificoViewModel);
             }
@@ -196,7 +196,35 @@ namespace SDGE.UI.Web.Controllers
                 return View(cientificoViewModel);
             }
         }
-        
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> Confirmar(string[] confirmar, int Id)
+        {
+            int cientificoId = Id;
+            string msg = "Seleccione pelo menos uma linha.";
+            if (confirmar != null)
+            {
+                foreach (var epId in confirmar)
+                {
+                    int id = int.Parse(epId);
+                    var result = _membroCientificoRepository.ObterPorId(id);
+                    cientificoId = result.ComissaoCientificaId;
+                    result.Confirmado = true;
+                    msg = "Pedido(s) confirmado(s).";
+                    IdentityUser identityUser = await _userManager.FindByEmailAsync(_membroRepository.ObterPorId(result.MembroId).Email);
+                    if (identityUser != null)
+                    {
+                        IdentityResult identityResult = await _userManager.AddToRoleAsync(identityUser, "Cientifico");
+                    }
+                    _membroCientificoRepository.Confirmar(result);
+                }
+                return RedirectToAction("Confirmar", new { id = cientificoId, msg = msg });
+            }
+
+            return RedirectToAction("Confirmar", new { id = cientificoId, msg = msg });
+        }
+
         // GET: ComissaoOrganizadora/Delete/5
         public ActionResult Remover(int id)
         {
@@ -259,17 +287,21 @@ namespace SDGE.UI.Web.Controllers
         {
             List<SelectListItem> items  = new List<SelectListItem>();
             var result = _membroRepository.ObterTodos();
+            bool state = false;
             //string codigo = _comissaoOrganizadoraRepository.ObterPorId(id).Codigo;
 
-            foreach(var item in result)
+            foreach (var item in result)
             {
                 if(!_membroCientificoRepository.VerificarMembro(item.MembroId, id, false))
                 {
+                    state = true;
                     items.Add(new SelectListItem() { Value = item.MembroId.ToString(), Text = item.Email });
                 }
             }
-            return items;
+            if (!state)
+                items.Add(new SelectListItem() { Value = "", Text = "Não existe nenhum membro" });
 
+            return items;
         }
        
         [AcceptVerbs("GET", "POST")]

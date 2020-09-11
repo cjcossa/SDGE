@@ -1,0 +1,73 @@
+﻿@using SDGE.ApplicationCore.Interfaces.Repository;
+@using Microsoft.AspNetCore.Http;
+
+@inject IHttpContextAccessor HttpContextAccessor
+@inject IEventoParticipanteRepository _inscricoes;
+@inject ISubmissaoRepository _submissoes;
+@inject ICorrecaoRepository _correcoes;
+@{
+    ViewData["Title"] = "Dashboard";
+    int itotal = 0;
+    int stotal = 0;
+    int ctotal = 0;
+    int id = -1;
+    if (HttpContextAccessor.HttpContext.Session.GetString("_Participante") != null)
+    {
+        id = int.Parse(HttpContextAccessor.HttpContext.Session.GetString("_Participante"));
+        itotal = _inscricoes.Total(id);
+        stotal = _submissoes.Total(id);
+        ctotal = _correcoes.Total(id);
+
+    }
+}
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card card-stats">
+            <div class="card-header card-header-warning card-header-icon">
+                <div class="card-icon">
+                    <i class="material-icons">assignment_turned_in</i>
+                </div>
+                <p class="card-category">Inscrições</p>
+                <h3 class="card-title">@itotal</h3>
+            </div>
+            <div class="card-footer">
+                <div class="stats">
+                    <a href="javascript:;">Listar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card card-stats">
+            <div class="card-header card-header-success card-header-icon">
+                <div class="card-icon">
+                    <i class="material-icons">unarchive</i>
+                </div>
+                <p class="card-category">Submissões</p>
+                <h3 class="card-title">@stotal</h3>
+            </div>
+            <div class="card-footer">
+                <div class="stats">
+                    <a href="javascript:;">Listar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card card-stats">
+            <div class="card-header card-header-danger card-header-icon">
+                <div class="card-icon">
+                    <i class="material-icons">check</i>
+                </div>
+                <p class="card-category">Avaliações</p>
+                <h3 class="card-title">@ctotal</h3>
+            </div>
+            <div class="card-footer">
+                <div class="stats">
+                    <a href="javascript:;">Listar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -69,5 +69,10 @@ namespace SDGE.Infrastructure.Repository
         {
             throw new NotImplementedException();
         }
+
+        public IEnumerable<Evento> ObterPorParticipante(int id)
+        {
+            return Buscar(e => e.EventoParticipantes.Any(m => m.Removido == state && m.ParticipanteId == id) && e.Removido == state);
+        }
     }
 }

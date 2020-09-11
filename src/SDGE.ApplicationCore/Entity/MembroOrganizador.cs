@@ -12,9 +12,11 @@ namespace SDGE.ApplicationCore.Entity
         public MembroOrganizador()
         {
             this.Removido = false;
+            this.Confirmado = false;
         }
         public int MembroOrganizadorId { get; set; }
         public bool Removido { get; set; }
+        public bool Confirmado { get; set; }
         public int ComissaoOrganizadoraId { get; set; }
         public ComissaoOrganizadora ComissaoOrganizadora { get; set; }
         public int MembroId { get; set; }
