@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using EmailService;
+using MailKit.Net.Smtp;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -13,6 +15,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using MimeKit;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace SDGE.UI.Web.Areas.Identity.Pages.Account
 {
@@ -22,13 +26,13 @@ namespace SDGE.UI.Web.Areas.Identity.Pages.Account
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly ILogger<RegisterModel> _logger;
-        private readonly IEmailSender _emailSender;
+        private readonly EmailService.IEmailSender _emailSender;
 
         public RegisterModel(
             UserManager<IdentityUser> userManager,
             SignInManager<IdentityUser> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+            EmailService.IEmailSender emailSender)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -87,24 +91,18 @@ namespace SDGE.UI.Web.Areas.Identity.Pages.Account
                         pageHandler: null,
                         values: new { area = "Identity", userId = user.Id, code = code, returnUrl = returnUrl },
                         protocol: Request.Scheme);
-
-                    await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                        $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                    
+                    var message = new Message(new string[] { Input.Email },
+                        "Confirme seu email", $"Por favor, confirme sua conta <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'> clicando aqui</a>.", null);
+                    await _emailSender.SendEmailAsync(message);
 
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {
                         return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
-                        //return RedirectToAction("Index", "Register", new { email = Input.Email, returnUrl = returnUrl });
-                        /*IdentityResult identityResult = await _userManager.AddToRoleAsync(user, "Admin");
-                        if(identityResult.Succeeded)
-                        {
-                            return RedirectToAction("Index", "Register", new { email = Input.Email, returnUrl = returnUrl });
-                        }*/
                     }
                     else
                     {
-                        //return RedirectToAction("Index", "Register", new { email = Input.Email, returnUrl = returnUrl });
-                        //await _signInManager.SignInAsync(user, isPersistent: false);
+                        await _signInManager.SignInAsync(user, isPersistent: false);
                         return LocalRedirect(returnUrl);
                     }
                 }
@@ -117,5 +115,6 @@ namespace SDGE.UI.Web.Areas.Identity.Pages.Account
             // If we got this far, something failed, redisplay form
             return Page();
         }
+
     }
 }

@@ -1,7 +1,24 @@
 ﻿@page
 @model ConfirmEmailModel
 @{
-    ViewData["Title"] = "Confirm email";
+    ViewData["Title"] = "Confirmar e-mail";
 }
 
-<h1>@ViewData["Title"]</h1>
+<br />
+<br />
+<br />
+<div class="text-center">
+    <div class="row">
+        <div class="col-md-2"></div>
+        <div class="col-md-8">
+            <div class="card card-chart">
+                <div class="card-header card-header-primary">
+                    <h3 class="card-title">@ViewData["Title"]</h3>
+                </div>
+                <div class="card-body">
+                    <h4>@Model.StatusMessage</h4> 
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

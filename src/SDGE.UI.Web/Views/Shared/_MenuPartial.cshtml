@@ -16,97 +16,127 @@
     </div>
     <div class="sidebar-wrapper">
         <ul class="nav">
+            @if (HttpContextAccessor.HttpContext.Session.GetString("_Admin") != null)
+            {
+                <li class="nav-item active">
+                    <a class="nav-link" asp-area="" asp-controller="Faculdade" asp-action="Index">
+                        <i class="material-icons">home</i>
+                        <p>Faculdades</p>
+                    </a>
+                </li>
+                <li class="nav-item ">
+                    <a class="nav-link" asp-area="" asp-controller="Director" asp-action="Index">
+                        <i class="material-icons">person</i>
+                        <p>Directores Científicos</p>
+                    </a>
+                </li>
+            }
+            else if (HttpContextAccessor.HttpContext.Session.GetString("_Director") != null)
+            {
+                <li class="nav-item active">
+                    <a class="nav-link" asp-area="" asp-controller="Membro" asp-action="Index">
+                        <i class="material-icons">groups</i>
+                        <p>Membros</p>
+                    </a>
+                </li>
+               
+            }
+            else if (HttpContextAccessor.HttpContext.Session.GetString("_Membro") != null)
+            {
+            <li class="nav-item active ">
+                <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">
+                    <i class="material-icons">dashboard</i>
+                    <p>Página Principal</p>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" asp-area="" asp-controller="ComissaoOrganizadora" asp-action="Index">
+                    <i class="material-icons">groups</i>
+                    <p>Comissões Organizadoras</p>
+                </a>
+            </li>
+            <li class="nav-item ">
+                <a class="nav-link" asp-area="" asp-controller="ComissaoCientifica" asp-action="Index">
+                    <i class="material-icons">groups</i>
+                    <p>Comissões Científicas</p>
+                </a>
+            </li>
+            if (HttpContextAccessor.HttpContext.Session.GetString("_Organizador") != null)
+            {
+            <li class="nav-item ">
+                <a class="nav-link" asp-area="" asp-controller="Evento" asp-action="Index">
+                    <i class="material-icons">event_available</i>
+                    <p>Eventos</p>
+                </a>
+            </li>
+            <li class="nav-item ">
+                <a class="nav-link" asp-area="" asp-controller="EventoParticipante" asp-action="Index">
+                    <i class="material-icons">assignment_turned_in</i>
+                    <p>Inscrições</p>
+                </a>
+            </li>
+            }
+            if (HttpContextAccessor.HttpContext.Session.GetString("_Cientifico") != null)
+            {
+            <li class="nav-item ">
+                <a class="nav-link" asp-area="" asp-controller="Submissao" asp-action="Index">
+                    <i class="material-icons">unarchive</i>
+                    <p>Submissões</p>
+                </a>
+            </li>
+            <li class="nav-item ">
+                <a class="nav-link" asp-area="" asp-controller="Correcao" asp-action="Index">
+                    <i class="material-icons">check</i>
+                    <p>Avaliações</p>
+                </a>
+            </li>
+            }
+            <li class="nav-item ">
+                <a class="nav-link" asp-area="" asp-controller="Membro" asp-action="Details">
+                    <i class="material-icons">person</i>
+                    <p>Dados Pessoais</p>
+                </a>
+            </li>
+
+            }
+            else if (HttpContextAccessor.HttpContext.Session.GetString("_Participante") != null)
+            {
             <li class="nav-item active ">
                 <a class="nav-link" asp-area="" asp-controller="Home" asp-action="PIndex">
                     <i class="material-icons">dashboard</i>
                     <p>Página Principal</p>
                 </a>
             </li>
-            @if (HttpContextAccessor.HttpContext.Session.GetString("_Membro") != null)
-            {
-                <li class="nav-item">
-                    <a class="nav-link" asp-area="" asp-controller="ComissaoOrganizadora" asp-action="Index">
-                        <i class="material-icons">groups</i>
-                        <p>Comissões Organizadoras</p>
-                    </a>
-                </li>
-                <li class="nav-item ">
-                    <a class="nav-link" asp-area="" asp-controller="ComissaoCientifica" asp-action="Index">
-                        <i class="material-icons">groups</i>
-                        <p>Comissões Científicas</p>
-                    </a>
-                </li>
-                if (await UserManager.IsInRoleAsync(identityUser, "Organizador"))
-                {
-                    <li class="nav-item ">
-                        <a class="nav-link" asp-area="" asp-controller="Evento" asp-action="Index">
-                            <i class="material-icons">event_available</i>
-                            <p>Eventos</p>
-                        </a>
-                    </li>
-                    <li class="nav-item ">
-                        <a class="nav-link" asp-area="" asp-controller="EventoParticipante" asp-action="Index">
-                            <i class="material-icons">assignment_turned_in</i>
-                            <p>Inscrições</p>
-                        </a>
-                    </li>
-                }
-                if (await UserManager.IsInRoleAsync(identityUser, "Cientifico"))
-                {
-                    <li class="nav-item ">
-                        <a class="nav-link" asp-area="" asp-controller="Submissao" asp-action="Index">
-                            <i class="material-icons">unarchive</i>
-                            <p>Submissões</p>
-                        </a>
-                    </li>
-                    <li class="nav-item ">
-                        <a class="nav-link" asp-area="" asp-controller="Correcao" asp-action="Index">
-                            <i class="material-icons">check</i>
-                            <p>Avaliações</p>
-                        </a>
-                    </li>
-                }
-                <li class="nav-item ">
-                    <a class="nav-link" asp-area="" asp-controller="Membro" asp-action="Details">
-                        <i class="material-icons">person</i>
-                        <p>Dados Pessoais</p>
-                    </a>
-                </li>
-
-            }
-            else if (HttpContextAccessor.HttpContext.Session.GetString("_Participante") != null)
-            {
-
-                <li class="nav-item ">
-                    <a class="nav-link" asp-area="" asp-controller="EventoParticipante" asp-action="Listar">
-                        <i class="material-icons">content_paste</i>
-                        <p>Inscrições</p>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" asp-area="" asp-controller="Evento" asp-action="Index">
-                        <i class="material-icons">event</i>
-                        <p>Eventos</p>
-                    </a>
-                </li>
-                <li class="nav-item ">
-                    <a class="nav-link" asp-area="" asp-controller="Submissao" asp-action="Listar">
-                        <i class="material-icons">unarchive</i>
-                        <p>Submissões</p>
-                    </a>
-                </li>
-                <li class="nav-item ">
-                    <a class="nav-link" asp-area="" asp-controller="Correcao" asp-action="Index">
-                        <i class="material-icons">check</i>
-                        <p>Avaliações</p>
-                    </a>
-                </li>
-                <li class="nav-item ">
-                    <a class="nav-link" asp-area="" asp-controller="Participante" asp-action="Details">
-                        <i class="material-icons">person</i>
-                        <p>Dados Pessoais</p>
-                    </a>
-                </li>
+            <li class="nav-item ">
+                <a class="nav-link" asp-area="" asp-controller="EventoParticipante" asp-action="Listar">
+                    <i class="material-icons">content_paste</i>
+                    <p>Inscrições</p>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" asp-area="" asp-controller="Evento" asp-action="Index">
+                    <i class="material-icons">event</i>
+                    <p>Eventos</p>
+                </a>
+            </li>
+            <li class="nav-item ">
+                <a class="nav-link" asp-area="" asp-controller="Submissao" asp-action="Listar">
+                    <i class="material-icons">unarchive</i>
+                    <p>Submissões</p>
+                </a>
+            </li>
+            <li class="nav-item ">
+                <a class="nav-link" asp-area="" asp-controller="Correcao" asp-action="Index">
+                    <i class="material-icons">check</i>
+                    <p>Avaliações</p>
+                </a>
+            </li>
+            <li class="nav-item ">
+                <a class="nav-link" asp-area="" asp-controller="Participante" asp-action="Details">
+                    <i class="material-icons">person</i>
+                    <p>Dados Pessoais</p>
+                </a>
+            </li>
             }
             <li class="nav-item active-pro ">
                 <a class="nav-link" asp-area="Identity" asp-page="/Account/Manage/Index">

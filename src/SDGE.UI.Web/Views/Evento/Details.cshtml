@@ -3,7 +3,7 @@
 @model SDGE.UI.Web.Models.EventoViewModel
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Detalhes";
     var _result = _datas.ObterPorEvento(Model.EventoId);
 }
     <div class="row">
@@ -11,7 +11,7 @@
             <div class="col-md-12">
                 <div class="card card-chart">
                     <div class="card-header card-header-primary">
-                        <h4 class="card-title ">Detalhes</h4>
+                        <h4 class="card-title ">@ViewData["Title"]</h4>
                         <p class="card-category">Título do Evento: @Html.DisplayFor(model => model.Titulo)</p>
                     </div>
                     <div class="card-body">

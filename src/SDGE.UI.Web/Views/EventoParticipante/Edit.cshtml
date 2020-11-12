@@ -1,7 +1,7 @@
 ﻿@model SDGE.UI.Web.Models.InscricaoViewModel
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Alterar Inscrição";
 }
 
 
@@ -10,7 +10,7 @@
     <div class="col-md-8">
         <div class="card">
             <div class="card-header card-header-primary">
-                <h4 class="card-title">Alterar Inscrição</h4>
+                <h4 class="card-title">@ViewData["Title"]</h4>
             </div>
             <div class="card-body">
                 <form method="post" enctype="multipart/form-data" asp-action="Edit">

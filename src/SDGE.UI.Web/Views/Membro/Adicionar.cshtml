@@ -1,0 +1,36 @@
+﻿@model SDGE.UI.Web.Models.MembroOrganizadorViewModel
+
+@{
+    ViewData["Title"] = "Adicionar Membros";
+}
+
+<div class="row">
+    <div class="col-md-2"></div>
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header card-header-primary">
+                <h4 class="card-title">@ViewData["Title"]</h4>
+            </div>
+            <div class="card-body">
+                <form asp-action="Adicionar">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input type="hidden" asp-for="ComissaoOrganizadoraId" />
+                    <div class="form-group">
+                        <select asp-for="Membros" class="form-control selectpicker" asp-items="ViewBag.MembroId" multiple title="SELECCIONE O(S) MEMBRO(S)" data-width="100%" data-style="btn-outline-primary" data-live-search="true" data-selected-text-format="count > 1"></select>
+                        <span asp-validation-for="Membros" class="text-danger"></span>
+                    </div>
+                    <div class="form-group text-right">
+                        <button type="button" onclick="location.href='@Url.Action("Index")'" class="btn btn-outline-danger btn-sm">
+                            <i class="material-icons">close</i>
+                            Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-outline-success btn-sm">
+                            <i class="material-icons">done</i>
+                            Guardar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,16 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UserSecretsId>aspnet-SDGE.UI.Web-B5EEA4C8-5C1D-48AE-91F4-102AB41358A6</UserSecretsId>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Compile Remove="EmailService\**" />
-    <Content Remove="EmailService\**" />
-    <EmbeddedResource Remove="EmailService\**" />
-    <None Remove="EmailService\**" />
-  </ItemGroup>
 
 
   <ItemGroup>
@@ -21,6 +14,7 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.2" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.4" />
     <PackageReference Include="NETCore.MailKit" Version="2.0.2" />
+    <PackageReference Include="SendGrid" Version="9.21.0" />
   </ItemGroup>
 
 
@@ -38,6 +32,7 @@
 
 
   <ItemGroup>
+    <None Include="EmailService\EmailService.csproj" />
     <None Include="wwwroot\assets\css\material-dashboard.css.map" />
     <None Include="wwwroot\assets\demo\demo.js" />
     <None Include="wwwroot\assets\js\core\bootstrap-material-design.min.js" />

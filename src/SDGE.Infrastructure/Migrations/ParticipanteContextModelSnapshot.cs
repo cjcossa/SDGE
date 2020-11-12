@@ -174,6 +174,38 @@ namespace SDGE.Infrastructure.Migrations
                     b.ToTable("DataImportante");
                 });
 
+            modelBuilder.Entity("SDGE.ApplicationCore.Entity.Director", b =>
+                {
+                    b.Property<int>("DirectorId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<int>("FaculdadeId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<bool>("Removido")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Telefone")
+                        .IsRequired()
+                        .HasColumnType("varchar(20)");
+
+                    b.HasKey("DirectorId");
+
+                    b.HasIndex("FaculdadeId");
+
+                    b.ToTable("Director");
+                });
+
             modelBuilder.Entity("SDGE.ApplicationCore.Entity.Evento", b =>
                 {
                     b.Property<int>("EventoId")
@@ -261,6 +293,25 @@ namespace SDGE.Infrastructure.Migrations
                     b.HasIndex("ParticipanteId");
 
                     b.ToTable("EventoParticipante");
+                });
+
+            modelBuilder.Entity("SDGE.ApplicationCore.Entity.Faculdade", b =>
+                {
+                    b.Property<int>("FaculdadeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Designacao")
+                        .IsRequired()
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<bool>("Removido")
+                        .HasColumnType("bit");
+
+                    b.HasKey("FaculdadeId");
+
+                    b.ToTable("Faculdade");
                 });
 
             modelBuilder.Entity("SDGE.ApplicationCore.Entity.Membro", b =>
@@ -525,6 +576,15 @@ namespace SDGE.Infrastructure.Migrations
                     b.HasOne("SDGE.ApplicationCore.Entity.Evento", "Evento")
                         .WithMany("DataImportantes")
                         .HasForeignKey("EventoId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("SDGE.ApplicationCore.Entity.Director", b =>
+                {
+                    b.HasOne("SDGE.ApplicationCore.Entity.Faculdade", "Faculdade")
+                        .WithMany("Directors")
+                        .HasForeignKey("FaculdadeId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });

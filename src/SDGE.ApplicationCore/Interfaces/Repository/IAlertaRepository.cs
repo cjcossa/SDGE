@@ -1,4 +1,5 @@
 ﻿using SDGE.ApplicationCore.Entity;
+using SDGE.ApplicationCore.Entity;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -13,6 +14,7 @@ namespace SDGE.ApplicationCore.Interfaces.Repository
         public IEnumerable<Alerta> ObterPorCientifico(int id);
         public int TotalPorParticipante(int id);
         public int TotalPorOrganizador(int id);
+        public int TotalPorCientifico(int id);
         public int TotalPorMembro(int id);
     }
 }

@@ -1,13 +1,13 @@
 ﻿@model SDGE.UI.Web.Models.EventoViewModel
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Actualizar Evento";
 }
 <div class="row">
     <div class="col-md-12">
         <div class="card">
             <div class="card-header card-header-primary">
-                <h4 class="card-title">Actualizar Evento</h4>
+                <h4 class="card-title">@ViewData["Title"]</h4>
             </div>
             <div class="card-body">
                 <form asp-action="Edit">

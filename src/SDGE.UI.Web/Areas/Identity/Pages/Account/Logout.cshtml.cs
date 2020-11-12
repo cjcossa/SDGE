@@ -46,6 +46,17 @@ namespace SDGE.UI.Web.Areas.Identity.Pages.Account
                     HttpContext.Session.Remove("_Participante");
                     HttpContext.Session.Remove("_UserEmail");
                 }
+                if (HttpContext.Session.GetString("_Admin") != null)
+                {
+                    HttpContext.Session.Remove("_Admin");
+                    HttpContext.Session.Remove("_UserEmail");
+                }
+                if (HttpContext.Session.GetString("_Director") != null)
+                {
+                    HttpContext.Session.Remove("_Director");
+                    HttpContext.Session.Remove("_UserEmail");
+                }
+
                 return LocalRedirect(returnUrl);
             }
             else

@@ -14,7 +14,6 @@ namespace SDGE.ApplicationCore.Interfaces.Repository
         public IEnumerable<Evento> ObterEventos(int membroId);
         public IEnumerable<Evento> ObterPorParticipante(int id);
         public Evento ObterPorEvento(int id);
-        
 
     }
 }

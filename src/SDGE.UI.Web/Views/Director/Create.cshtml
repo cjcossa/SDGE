@@ -1,0 +1,66 @@
+﻿@model SDGE.UI.Web.Models.DirectorViewModel
+
+@{
+    ViewData["Title"] = "Registar Director";
+}
+
+<div class="row">
+    <div class="col-md-2"></div>
+    <div class="col-md-8">
+        @if (ViewBag.Alert != null)
+        {
+            <div class="alert alert-success">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <i class="material-icons">close</i>
+                </button>
+                <span>
+                    <b> Sucesso - </b> @ViewBag.Alert
+                </span>
+            </div>
+        }
+        <div class="card">
+            <div class="card-header card-header-primary">
+                <h4 class="card-title">@ViewData["Title"]</h4>
+            </div>
+            <div class="card-body">
+                <form asp-action="Create">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="form-group">
+                        <label asp-for="Nome" class="bmd-label-floating"></label>
+                        <input asp-for="Nome" class="form-control" />
+                        <span asp-validation-for="Nome" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Email" class="bmd-label-floating"></label>
+                        <input asp-for="Email" class="form-control" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Telefone" class="bmd-label-floating"></label>
+                        <input asp-for="Telefone" class="form-control" />
+                        <span asp-validation-for="Telefone" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <select asp-for="FaculdadeId" asp-items="ViewBag.FaculdadeId" class="selectpicker" title="SELECCIONE A FACULDADE" data-width="100%" data-style="btn-outline-primary" data-live-search="true"></select>
+                        <span asp-validation-for="FaculdadeId" class="text-danger"></span>
+                    </div>
+                    <div class="form-group text-right">
+                        <button type="button" onclick="location.href='@Url.Action("Index")'" class="btn btn-outline-danger btn-sm">
+                            <i class="material-icons">close</i>
+                            Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-outline-success btn-sm">
+                            <i class="material-icons">done</i>
+                            Guardar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+

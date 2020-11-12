@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using EmailService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.StaticFiles;
@@ -25,13 +27,19 @@ namespace SDGE.UI.Web.Controllers
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IEventoRepository _eventoRepository;
         private readonly IAlertaRepository _alertaRepository;
+        private readonly UserManager<IdentityUser> _userManager;
+        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly IEmailSender _emailSender;
         public CorrecaoController(ICorrecaoRepository correcaoRepository, 
             ISubmissaoRepository submissaoRepository, 
             IMembroRepository membroRepository, 
             IWebHostEnvironment webHostEnvironment,
             IHttpContextAccessor httpContextAccessor,
             IEventoRepository eventoRepository,
-            IAlertaRepository alertaRepository)
+            IAlertaRepository alertaRepository,
+            UserManager<IdentityUser> userManager,
+            SignInManager<IdentityUser> signInManager,
+            IEmailSender emailSender)
         {
             _correcaoRepository = correcaoRepository;
             _submissaoRepository = submissaoRepository;
@@ -40,6 +48,9 @@ namespace SDGE.UI.Web.Controllers
             _httpContextAccessor = httpContextAccessor;
             _eventoRepository = eventoRepository;
             _alertaRepository = alertaRepository;
+            _userManager = userManager;
+            _signInManager = signInManager;
+            _emailSender = emailSender;
         }
         // GET: MembroEvento
         public ActionResult Index(int id = -1, string msg = null)
@@ -118,14 +129,25 @@ namespace SDGE.UI.Web.Controllers
                             MembroId = SessionId()
                         };
 
-                       
-
                         _correcaoRepository.Adicionar(correcao);
-                        var result = _submissaoRepository.ObterPorId(collection.SubmissaoId);
+                        var result = _submissaoRepository.ObterPorSubmissao(collection.SubmissaoId);
                         if(result != null)
                         {
-                            _alertaRepository.Adicionar(Alerta(result, "Correção disponível para a submissão: " + result.Titulo, true));
-                            return RedirectToAction("Index", new { id = collection.SubmissaoId, msg = "Avaliação efectuada." });
+                           
+                            var alert = _alertaRepository.Adicionar(Alerta(result, "Correção disponível para a submissão: "+result.Titulo, true));
+                            if(alert != null)
+                            {
+                               // var result2 = _submissaoRepository.ObterPorSubmissao(result.SubmissaoId);
+                                var msg = $"Olá, {result.Participante.Nome}. <br><br> Correção disponível para a submissão: {result.Titulo}.<br>Observações<br> {collection.Observacoes}.<br>Em anexo o documento.";
+                              
+                                var message = new Message(new string[] { result.Participante.Email }, "Resultado de avaliação", msg, collection.File);
+                                if (Notificar(message))
+                                    return RedirectToAction("Index", new { id = result.SubmissaoId, msg = "Avaliação efectuada." });
+                            }
+                        }
+                        else
+                        {
+                            return RedirectToAction("Index", new { id = result.SubmissaoId, msg = "Avaliação efectuada. N" });
                         }
                     }
                     
@@ -157,18 +179,21 @@ namespace SDGE.UI.Web.Controllers
         {
             try
             {
-                // TODO: Add update logic here
-                
-                    if (submeterCorrecao.File != null)
-                    {
-                        var fileName = UploadFile(submeterCorrecao);
-                        submeterCorrecao.Ficheiro = fileName;
-                    }
-                    _correcaoRepository.Actualizar(Submeter(submeterCorrecao));
+                if (submeterCorrecao.File != null)
+                {
+                    var fileName = UploadFile(submeterCorrecao);
+                    submeterCorrecao.Ficheiro = fileName;
+                }
+                _correcaoRepository.Actualizar(Submeter(submeterCorrecao));
+               
+                var result2 = _submissaoRepository.ObterPorSubmissao(submeterCorrecao.SubmissaoId);
+                var msg = $"Olá, {result2.Participante.Nome}, a correção da submissão: {result2.Titulo}, foi actualizada!<br>Observações <br> {submeterCorrecao.Observacoes}. <br> Em anexo o documento.";
+                var message = new Message(new string[] { result2.Participante.Email }, "Resultado de avaliação", msg, submeterCorrecao.File);
+                if (Notificar(message))
                     return RedirectToAction("Index", new { id = submeterCorrecao.SubmissaoId, msg = "Avaliação alterada." });
 
                 //PreencherCombobox();
-                //return View(submeterCorrecao);
+                return View(submeterCorrecao);
             }
             catch
             {
@@ -321,6 +346,16 @@ namespace SDGE.UI.Web.Controllers
                 Tipo = "Correcao"
             };
             return alerta;
+        }
+        private bool Notificar(Message message)
+        {
+            if (message.To != null)
+            {
+                _emailSender.SendEmailAsync(message);
+                return true;
+            }
+
+            return false;
         }
     }
 }

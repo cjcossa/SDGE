@@ -1,0 +1,32 @@
+﻿@model SDGE.ApplicationCore.Entity.Faculdade
+
+<div class="modal fade" id="modalConfirmDelete" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-md modal-notify modal-danger" role="document">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card modal-content">
+                        <div class="card-header card-header-danger">
+                            <h4 class="card-title ">Remover a @Html.DisplayFor(model => model.Designacao)?</h4>
+                        </div>
+                        <div class="card-body">
+                            <form asp-action="Delete">
+                                <input type="hidden" asp-for="FaculdadeId" />
+                                <div class="form-group text-right">
+                                    <button class="btn  btn-danger btn-sm waves-effect" data-dismiss="modal">
+                                        <i class="material-icons">close</i>
+                                        Cancelar
+                                    </button>
+                                    <button type="submit" class="btn btn-outline-danger btn-sm">
+                                        <i class="material-icons">done</i>
+                                        Remover
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </div>
+</div>
+

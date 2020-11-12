@@ -28,6 +28,9 @@ namespace SDGE.Infrastructure.Data
         public DbSet<ComissaoCientifica> ComissaoCientificas { get; set; }
         public DbSet<MembroCientifico> MembroCientificos { get; set; }
         public DbSet<MembroOrganizador> MembroOrganizadors { get; set; }
+        public DbSet<Director> Directors { get; set; }
+        public DbSet<Faculdade> Faculdades { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -44,7 +47,10 @@ namespace SDGE.Infrastructure.Data
             modelBuilder.Entity<ComissaoOrganizadora>().ToTable("ComissaoOrganizadora");
             modelBuilder.Entity<MembroOrganizador>().ToTable("MembroOrganizador");
             modelBuilder.Entity<MembroCientifico>().ToTable("MembroCientifico");
+            modelBuilder.Entity<Director>().ToTable("Director");
+            modelBuilder.Entity<Faculdade>().ToTable("Faculdade");
             modelBuilder.Entity<DataImportante>().ToTable("DataImportante");
+
 
             modelBuilder.ApplyConfiguration(new ParticipanteMap());
             modelBuilder.ApplyConfiguration(new SubmissaoMap());
@@ -60,6 +66,8 @@ namespace SDGE.Infrastructure.Data
             modelBuilder.ApplyConfiguration(new ComissaoOrganizadoraMap());
             modelBuilder.ApplyConfiguration(new ComissaoCientificaMap());
             modelBuilder.ApplyConfiguration(new DataImportanteMap());
+            modelBuilder.ApplyConfiguration(new FaculdadeMap());
+            modelBuilder.ApplyConfiguration(new DirectorMap());
 
         }
     }

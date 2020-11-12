@@ -34,20 +34,24 @@
                         <i class="material-icons">close</i>
                     </button>
                     <span>
-                        <b> Sucesso - </b> @ViewBag.Alert
+                        @ViewBag.Alert
                     </span>
                 </div>
             }
-            <button type="button" onclick="location.href='@Url.Action("Adicionar", new { id = ViewData["Id"] })'" class="btn btn-outline-success btn-sm">
-                <i class="material-icons">person_add</i>
-                Novo Membro
-            </button>
+
+            @if (HttpContextAccessor.HttpContext.Session.GetString("_Organizador") != null)
+            {
+                <button type="button" onclick="location.href='@Url.Action("Adicionar", new { id = ViewData["Id"] })'" class="btn btn-outline-success btn-sm">
+                    <i class="material-icons">person_add</i>
+                    Novo Membro
+                </button>
+            }
+
             <div class="card">
                 <div class="card-header card-header-primary">
                     <h4 class="card-title">
                         Lista de membros da comissão organizadora @ViewData["Codigo"]
                     </h4>
-                    <p class="card-category">Comissao responsavel pelo controlo total do sistema</p>
                 </div>
                 <div class="card-body">
                     <table class="table" id="dtMaterialDesignExample">

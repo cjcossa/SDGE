@@ -4,7 +4,7 @@
 @model IEnumerable<SDGE.ApplicationCore.Entity.Evento>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Lista de Eventos";
 }
 
 
@@ -19,7 +19,7 @@
                         <i class="material-icons">close</i>
                     </button>
                     <span>
-                        <b> Sucesso - </b> @ViewBag.Alert
+                        @ViewBag.Alert
                     </span>
                 </div>
             }
@@ -33,7 +33,7 @@
             }
             <div class="card">
                 <div class="card-header card-header-primary">
-                    <h4 class="card-title ">Eventos</h4>
+                    <h4 class="card-title ">@ViewData["Title"] </h4>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">

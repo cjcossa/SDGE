@@ -72,7 +72,7 @@ namespace SDGE.Infrastructure.Repository
             return _dbContext.Set<EventoParticipante>().Include(m => m.Participante)
                .Where(e => e.ParticipanteId == id && e.Removido == state && e.Participante.Removido == state).ToList().Count();
         }
-
+   
         public IEnumerable<EventoParticipante> ObterPorMembro(int id)
         {
             return _dbContext.Set<EventoParticipante>().Include(m => m.Participante).Include(m => m.Evento)

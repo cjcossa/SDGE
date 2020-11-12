@@ -1,7 +1,7 @@
 ﻿@model SDGE.UI.Web.Models.ComissaoCientificaViewModel
 
 @{
-    ViewData["Title"] = "Participar";
+    ViewData["Title"] = "Tem um código da comissão científica?";
 }
 
 <div class="row">
@@ -9,8 +9,8 @@
     <div class="col-md-8">
         <div class="card">
             <div class="card-header card-header-primary">
-                <h4 class="card-title">Participar na comissão científica</h4>
-                <p class="card-category">Comissão responsável por avaliar as submissões.</p>
+                <h4 class="card-title">@ViewData["Title"]</h4>
+                <p class="card-category">Para participar numa comissão científica, introduza o código fornecido pelo organizador.</p>
             </div>
             <div class="card-body">
                 <form asp-action="Participar">

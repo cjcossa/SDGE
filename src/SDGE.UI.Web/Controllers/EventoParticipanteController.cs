@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using EmailService;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -25,7 +26,9 @@ namespace SDGE.UI.Web.Controllers
         private readonly IDataImportanteRepository _dataImportanteRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IAlertaRepository _alertaRepository;
-       
+        private readonly IEmailSender _emailSender;
+        private readonly IMembroOrganizadorRepository _membroOrganizadorRepository;
+
         public EventoParticipanteController(IEventoParticipanteRepository eventoParticipanteRepository, 
             IEventoRepository eventoRepository,
             IParticipanteRepository participanteRepository, 
@@ -33,7 +36,9 @@ namespace SDGE.UI.Web.Controllers
             IComissaoOrganizadoraRepository comissaoOrganizadoraRepository,
             IDataImportanteRepository dataImportanteRepository,
             IHttpContextAccessor httpContextAccessor,
-            IAlertaRepository alertaRepository)
+            IAlertaRepository alertaRepository,
+            IEmailSender emailSender,
+            IMembroOrganizadorRepository membroOrganizadorRepository)
         {
             _eventoParticipanteRepository = eventoParticipanteRepository;
             _eventoRepository = eventoRepository;
@@ -43,6 +48,8 @@ namespace SDGE.UI.Web.Controllers
             _dataImportanteRepository = dataImportanteRepository;
             _httpContextAccessor = httpContextAccessor;
             _alertaRepository = alertaRepository;
+            _emailSender = emailSender;
+            _membroOrganizadorRepository = membroOrganizadorRepository;
         }
         // GET: MembroEvento
         public ActionResult Index(int id = -1, string msg = null, string type = null)
@@ -106,9 +113,11 @@ namespace SDGE.UI.Web.Controllers
             try
             {
                 // TODO: Add insert logic here
+                EventoParticipante _result = null;
+                              
                 if (_eventoParticipanteRepository.VerificarEvento(collection.EventoId, SessionId()))
                 {
-                    ModelState.AddModelError("EventoId", $"O participante ja esta inscrito no evento.");
+                    ModelState.AddModelError("EventoId", $"O candidato ja esta inscrito no evento.");
                 }
                 if (ModelState.IsValid)
                 {
@@ -119,7 +128,7 @@ namespace SDGE.UI.Web.Controllers
                         
                         if (_eventoParticipanteRepository.VerificarEvento(collection.EventoId, SessionId(), true))
                         {
-                            var _result = _eventoParticipanteRepository.ObterPorEventoParticipante(collection.EventoId, SessionId(), true);
+                            _result = _eventoParticipanteRepository.ObterPorEventoParticipante(collection.EventoId, SessionId(), true);
                             _result.Comprovativo = fileName;
                             _result.Removido = false;
                             _result.Confirmado = false;
@@ -135,8 +144,45 @@ namespace SDGE.UI.Web.Controllers
                             };
                             _eventoParticipanteRepository.Adicionar(eventoParticipante);
                         }
-                       
-                        return RedirectToAction("Listar", new { msg = "Inscrição criada." });
+                        var evento = _eventoRepository.ObterPorId(collection.EventoId);
+                        if(evento != null)
+                        {
+                            var result2 = _membroOrganizadorRepository.ObterPorComissao(evento.ComissaoOrganizadoraId, true);
+                            bool state = false;
+                            if (result2 != null)
+                            {
+                                foreach (var item in result2)
+                                {
+                                    var participante = _participanteRepository.ObterPorId(SessionId());
+
+                                    if(participante != null)
+                                    {
+                                        var msg = $"Olá, {item.Membro.Nome}. <br><br> { participante.Nome } fez uma nova inscrição no evento: {evento.Titulo}." +
+                                            $"<br> Em anexo o comprovativo de pagamento.";
+                                        var message = new Message(new string[] { item.Membro.Email }, "Nova Inscrição", msg, collection.File);
+                                        if (Notificar(message))
+                                            state = true;
+                                    }
+                                   
+                                }
+                               
+                                if(state)
+                                    return RedirectToAction("Listar", new { msg = "Inscrição criada." });
+                                else
+                                    ModelState.AddModelError(string.Empty, "Erro ao notificar a comissão organizadora.");
+                            }
+                            else
+                            {
+
+                                ModelState.AddModelError(string.Empty, "Erro ao carregar a comissão organizadora.");
+                            }
+
+                        }
+                        else
+                        {
+                            ModelState.AddModelError(string.Empty, "Erro ao carregar o evento.");
+                        }
+
                     }
                         
                 }
@@ -167,21 +213,32 @@ namespace SDGE.UI.Web.Controllers
                     if (cnf != null)
                     {
                         result.Confirmado = true;
-                        msg = "Inscrição confirmada.";
+                        msg = "confirmada.";
                         type = "success";
                     }
                     else
                     {
                         result.Confirmado = false;
-                        msg = "Inscrição cancelada.";
+                        msg = "cancelada.";
                     }
                        
                     _eventoParticipanteRepository.Actualizar(result);
-                    _alertaRepository.Adicionar(Alerta(result, "Resultado de inscrição disponível para o evento: ", true));
+                 
+                    var eventoParticipante = _eventoParticipanteRepository.ObterPorEventoParticipante(result.EventoId, result.ParticipanteId);
+                    if(eventoParticipante != null)
+                    {
+                        var message = new Message(new string[] { eventoParticipante.Participante.Email }, 
+                            "Resultado de inscrição", $"Olá, {eventoParticipante.Participante.Nome}.<br><br> " +
+                            $"Resultado de inscrição disponível para o evento: { eventoParticipante.Evento.Titulo}. <br> A sua inscrição foi { msg }.", null);
+                        if (Notificar(message))
+                        {
+                            _alertaRepository.Adicionar(Alerta(result, "Resultado de inscrição disponível para o evento: ", true));
+                        }
+                    }
                 }
             }
 
-            return RedirectToAction("Index", new {id = eventoId , msg = msg, type = type });
+            return RedirectToAction("Index", new {id = eventoId , msg = "Inscrição " + msg, type = type });
         }
         
         // GET: MembroEvento/Edit/5
@@ -201,18 +258,56 @@ namespace SDGE.UI.Web.Controllers
         {
             try
             {
-                // TODO: Add update logic here
-                
-                    if (inscricao.File != null)
-                    {
-                        var fileName = UploadFile(inscricao);
-                        inscricao.Comprovativo = fileName;
-                    }
+                if (inscricao.File != null)
+                {
+                    var fileName = UploadFile(inscricao);
+                    inscricao.Comprovativo = fileName;
+                }
                     
-                        _eventoParticipanteRepository.Actualizar(Inscricao(inscricao));
-                    //}
-                     return RedirectToAction("Listar", new { msg = "Inscrição actualizada." });
-                
+                _eventoParticipanteRepository.Actualizar(Inscricao(inscricao));
+
+                var evento = _eventoRepository.ObterPorId(inscricao.EventoId);
+                if (evento != null)
+                {
+                    var result2 = _membroOrganizadorRepository.ObterPorComissao(evento.ComissaoOrganizadoraId, true);
+                    bool state = false;
+                    if (result2 != null)
+                    {
+                        foreach (var item in result2)
+                        {
+                            var participante = _participanteRepository.ObterPorId(SessionId());
+
+                            if (participante != null)
+                            {
+                                var msg = $"Olá, {item.Membro.Nome}. <br><br> { participante.Nome } fez uma actualização na inscrição do evento: {evento.Titulo}." +
+                                    $"<br> Em anexo o comprovativo de pagamento.";
+                                var message = new Message(new string[] { item.Membro.Email }, "Actualização de Inscrição", msg, inscricao.File);
+                                if (Notificar(message))
+                                    state = true;
+                            }
+
+                        }
+
+                        if (state)
+                            return RedirectToAction("Listar", new { msg = "Inscrição actualizada." });
+                        else
+                            ModelState.AddModelError(string.Empty, "Erro ao notificar a comissão organizadora.");
+                    }
+                    else
+                    {
+
+                        ModelState.AddModelError(string.Empty, "Erro ao carregar a comissão organizadora.");
+                    }
+
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "Erro ao carregar o evento.");
+                }
+
+                ViewBag.EventoId = ObterEventos(inscricao.EventoParticipanteId.ToString());
+                return View(inscricao);
+
             }
             catch
             {
@@ -237,7 +332,7 @@ namespace SDGE.UI.Web.Controllers
                 // TODO: Add delete logic here
                 var result = _eventoParticipanteRepository.ObterPorId(collection.EventoParticipanteId);
                 _eventoParticipanteRepository.Remover(result);
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Listar", new { msg = "Inscrição cancelada." });
             }
             catch
             {
@@ -278,11 +373,9 @@ namespace SDGE.UI.Web.Controllers
             if (id != null)
             {
                 var data = _eventoParticipanteRepository.ObterPorId(int.Parse(id));
-               
-                //if (_dataImportanteRepository.VerificarPrazoFinalidade("Inscrições", data.EventoId))
-                //{
-                    items.Add(new SelectListItem() { Value = data.EventoId.ToString(), Text = data.Evento.Titulo });
-                //}
+                
+                items.Add(new SelectListItem() { Value = data.EventoId.ToString(), Text = data.Evento.Titulo });
+                
             }
            
             if (state && id == null)
@@ -367,13 +460,38 @@ namespace SDGE.UI.Web.Controllers
             {
                 Messagem = msg + result.Titulo,
                 ParticipanteId = eventoParticipante.ParticipanteId,
-                ComissaoCientificaId = result.ComissaoCientificaId,
+                //ComissaoCientificaId = result.ComissaoCientificaId,
                 ComissaoOrganizadoraId = result.ComissaoOrganizadoraId,
                 Destino = destino,
                 Tipo = "Inscricao"
 
             };
+            //if(alerta != null)
             return alerta;
+        }
+
+        private bool Notificar(Message message)
+        {
+            if (message.To != null)
+            {
+                _emailSender.SendEmailAsync(message);
+                return true;
+            }
+
+            return false;
+        }
+
+        private bool NotificarComissao()
+        {
+            /* var result2 = _membroOrganizadorRepository.ObterPorComissao(_eventoRepository.ObterPorId(_result.EventoId).ComissaoCientificaId);
+             var i = 0;
+             foreach (var item in result2)
+             {
+                 destino[i] = item.Membro.Email;
+                 i++;
+             }
+             */
+            return false;
         }
     }
 }

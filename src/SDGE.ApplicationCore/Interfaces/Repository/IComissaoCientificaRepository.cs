@@ -11,5 +11,6 @@ namespace SDGE.ApplicationCore.Interfaces.Repository
         public string GenerateCode();
         public bool VerificarCodigo(string codigo);
         public IEnumerable<ComissaoCientifica> ObterPorMembro(int membroId);
+
     }
 }

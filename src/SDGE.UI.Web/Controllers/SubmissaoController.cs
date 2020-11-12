@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Mail;
 using System.Threading.Tasks;
+using EmailService;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -28,8 +29,8 @@ namespace SDGE.UI.Web.Controllers
         private readonly IDataImportanteRepository _dataImportanteRepository;
         private readonly IAlertaRepository _alertaRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
-
-
+        private readonly IEmailSender _emailSender;
+        private readonly IMembroCientificoRepository _membroCientificoRepository;
 
         public SubmissaoController(ISubmissaoRepository submissaoRepository, 
             IParticipanteRepository participanteRepository, 
@@ -39,7 +40,9 @@ namespace SDGE.UI.Web.Controllers
             IWebHostEnvironment webHostEnvironment,
             IDataImportanteRepository dataImportanteRepository,
             IAlertaRepository alertaRepository,
-            IHttpContextAccessor httpContextAccessor)
+            IHttpContextAccessor httpContextAccessor,
+            IEmailSender emailSender,
+            IMembroCientificoRepository membroCientificoRepository)
         {
             _submissaoRepository = submissaoRepository;
             _participanteRepository = participanteRepository;
@@ -50,6 +53,8 @@ namespace SDGE.UI.Web.Controllers
             _dataImportanteRepository = dataImportanteRepository;
             _alertaRepository = alertaRepository;
             _httpContextAccessor = httpContextAccessor;
+            _emailSender = emailSender;
+            _membroCientificoRepository = membroCientificoRepository;
         }
         // GET: Submissao
         public ActionResult Index(int id = -1, string msg = null)
@@ -108,7 +113,7 @@ namespace SDGE.UI.Web.Controllers
             try
             {
                 // TODO: Add insert logic here
-                
+                //string [] destino = null;
                 if (ModelState.IsValid)
                 {
                     if(collection.File != null)
@@ -127,8 +132,37 @@ namespace SDGE.UI.Web.Controllers
                        var _result =  _submissaoRepository.Adicionar(submissao);
                         if(_result != null)
                         {
-                            _alertaRepository.Adicionar(Alerta(_result, "Fez uma nova submissão"));
-                            return RedirectToAction("Listar", new { msg = "Submissão criada." });
+                            bool state = false;
+                            var alert = _alertaRepository.Adicionar(Alerta(_result, "Fez uma nova submissão"));
+
+                            if(alert != null)
+                            {
+                                var evento = _eventoRepository.ObterPorId(_result.EventoId);
+                                if (evento != null)
+                                {
+                                    var result2 = _membroCientificoRepository.ObterPorComissao(evento.ComissaoCientificaId, true);
+                                    if (result2 != null)
+                                    {
+                                        foreach (var item in result2)
+                                        {
+                                            var msg = $"Olá { item.Membro.Nome}. <br><br> { _participanteRepository.ObterPorId(SessionId()).Nome } " +
+                                                $"fez uma nova submissão no evento: {evento.Titulo}. <br> Em enexo o documento.";
+
+                                            var message = new Message(new string[] { item.Membro.Email }, "Nova Submissão", msg, collection.File);
+                                            if (Notificar(message))
+                                                state = true;
+                                        }
+                                    }
+
+
+                                }
+
+                                if (state)
+                                    return RedirectToAction("Listar", new { msg = "Submissão criada." });
+                                else
+                                    ModelState.AddModelError(string.Empty, "Erro ao notificar a comissão científica.");
+                            }
+                            
                         }
 
                     }
@@ -160,7 +194,8 @@ namespace SDGE.UI.Web.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Edit(int id, SubmissaoViewModel submeterFicheiro)
         {
-            
+
+            string[] destino = null;
             try
             {
                 // TODO: Add update logic here
@@ -171,7 +206,32 @@ namespace SDGE.UI.Web.Controllers
                     submeterFicheiro.Ficheiro = fileName;
                 }
                 _submissaoRepository.Actualizar(Submissao(submeterFicheiro));
-                return RedirectToAction("Listar", new { msg = "Submissão actualizada." });
+
+                bool state = false;
+              
+                var evento = _eventoRepository.ObterPorId(submeterFicheiro.EventoId);
+                if (evento != null)
+                {
+                    var result2 = _membroCientificoRepository.ObterPorComissao(evento.ComissaoCientificaId, true);
+
+                    foreach (var item in result2)
+                    {
+                        var msg = $"Olá, { item.Membro.Nome}. <br><br> { _participanteRepository.ObterPorId(SessionId()).Nome } " +
+                            $"actualizou a submissão: {submeterFicheiro.Titulo}. <br> Em enexo o documento.";
+
+                        var message = new Message(new string[] { item.Membro.Email }, "Nova Submissão", msg, submeterFicheiro.File);
+                        if (Notificar(message))
+                            state = true;
+                    }
+                }
+
+                if (state)
+                    return RedirectToAction("Listar", new { msg = "Submissão actualizada." });
+                else
+                    ModelState.AddModelError(string.Empty, "Erro ao notificar a comissão científica.");
+
+                PreencherCombobox();
+                return View(submeterFicheiro);
 
             }
             catch
@@ -233,7 +293,13 @@ namespace SDGE.UI.Web.Controllers
                     result.Status = "Reprovado";
                     _submissaoRepository.Actualizar(result);
                     _alertaRepository.Adicionar(Alerta(result, "Resultado de avaliacão disponível para a submissão: "+result.Titulo, true));
-                    return RedirectToAction("Index", new { id = id, msg = "Submissão reprovada" });
+
+                    var result2 = _submissaoRepository.ObterPorSubmissao(collection.SubmissaoId);
+                    var msg = $"Olá, {result2.Participante.Nome}. <br><br> A submissão: {result2.Titulo} foi reprovada.<br> Observações<br> {collection.Observacoes}";
+
+                    var message = new Message(new string[] { result2.Participante.Email }, "Resultado de avaliação", msg, null);
+                    if (Notificar(message))
+                        return RedirectToAction("Index", new { id = id, msg = "Submissão reprovada." });
                 }
                 return View(collection);
             }
@@ -249,13 +315,17 @@ namespace SDGE.UI.Web.Controllers
         public ActionResult Aprovar(string [] aprovar, string aprovado)
         {
             string status = null;
+            string [] destino = null;
+            Participante participante = null;
+            Submissao result = null;
+            bool state = false;
             int id = -1;
             if (aprovar != null)
             {
                 foreach (var sId in aprovar)
                 {
                     id = int.Parse(sId);
-                    var result = _submissaoRepository.ObterPorId(id);
+                    result = _submissaoRepository.ObterPorId(id);
                     if (aprovado != null)
                         result.Status = "Aprovado";
                     else
@@ -264,9 +334,20 @@ namespace SDGE.UI.Web.Controllers
                     id = result.EventoId;
                    _submissaoRepository.Actualizar(result);
                    _alertaRepository.Adicionar(Alerta(result, "Resultado de avaliacão disponível para a submissão: " + result.Titulo, true));
+                    participante = _participanteRepository.ObterPorId(result.ParticipanteId);
+
+                    var msg = $"Olá, {participante.Nome}. <br><br> A sua submissão: {result.Titulo} foi {result.Status}.";
+
+                    var message = new Message(new string[] { participante.Email}, "Resultado de Submissão", msg, null);
+                    if (Notificar(message))
+                    {
+                        state = true;
+                    }
                 }
+                
+
             }
-            if(aprovado != null)
+            if(aprovado != null && state)
                 return RedirectToAction("Index", new { id = id, msg = $"Submissão(ões) Aprovado(s)" });
 
             return RedirectToAction("Index", new { id = id, msg = $"Submissão(ões) Aprovado(s) com Revisão" });
@@ -275,19 +356,40 @@ namespace SDGE.UI.Web.Controllers
        
         public ActionResult Confirmar(int id)
         {
+            bool state = false;
+            string ms = null; 
             var result = _submissaoRepository.ObterPorId(id);
                 result.Confirmado = !result.Confirmado;
             _submissaoRepository.Actualizar(result);
-            if(result.Confirmado)
+            var result2 = _membroCientificoRepository.ObterPorComissao(_eventoRepository.ObterPorId(result.EventoId).ComissaoCientificaId, true);
+            if (result.Confirmado)
             {
-                _alertaRepository.Adicionar(Alerta(result, "Confirmou a submissão"));
-                return RedirectToAction("Listar", new { msg = "Submissão confirmada." });
+                ms = "confirmou";
             }
             else
             {
-                _alertaRepository.Adicionar(Alerta(result, "Cancelou a submissão"));
-                return RedirectToAction("Listar", new { msg = "Submissão cancelada." });
+                ms = "cancelou";
             }
+            var alert = _alertaRepository.Adicionar(Alerta(result, "Cancelou a submissão"));
+            if (alert != null)
+            {
+                foreach (var item in result2)
+                {
+                    var msg = $"Olá, {item.Membro.Nome}. <br><br> { _participanteRepository.ObterPorId(SessionId()).Nome } {ms} a submissão: {result.Titulo}.";
+
+                    var message = new Message(new string[] { item.Membro.Email }, "Confirmação de Participação", msg, null);
+                    if (Notificar(message))
+                        state = true;
+                }
+
+                //if (state)
+                    
+            }
+
+            if(ms.Equals("confirmou"))
+                return RedirectToAction("Listar", new { msg = "Submissão confirmada." });
+
+            return RedirectToAction("Listar", new { msg = "Submissão cancelada." });
         }
 
         public ActionResult Download(int id)
@@ -406,32 +508,7 @@ namespace SDGE.UI.Web.Controllers
             ViewBag.EventoId = ObterEventos();
             ViewBag.TipoId = ObterTipos();
         }
-        public string Email()
-        {
-            string result = null;
-            try
-            {
-                SmtpClient s = new SmtpClient("smtp.gmail.com", 587);
-                s.EnableSsl = true;
-                s.DeliveryMethod = SmtpDeliveryMethod.Network;
-                s.UseDefaultCredentials = false;
-                s.Credentials = new NetworkCredential("narciojoao14@gmail.com", "Halima*14");
-                MailMessage m = new MailMessage();
-                m.To.Add("carloscossa62@gmail.com");
-                m.From = new MailAddress("narciojoao14@gmail.com");
-                m.Subject = "SGDE";
-                m.Body = "New Email";
-                s.Send(m);
-                result = "Email enviado";
-                return result;
-
-            }
-            catch(Exception e)
-            {
-                result = e.Message;
-                return result;
-            }
-        }
+        
         private int SessionId()
         {
             int id = -1;
@@ -467,6 +544,17 @@ namespace SDGE.UI.Web.Controllers
                 Tipo = "Submissao"
             };
             return alerta;
+        }
+
+        private bool Notificar(Message message)
+        {
+            if (message.To != null)
+            {
+                _emailSender.SendEmailAsync(message);
+                return true;
+            }
+
+            return false;
         }
     }
 }

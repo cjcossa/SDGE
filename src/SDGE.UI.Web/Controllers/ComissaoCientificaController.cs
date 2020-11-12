@@ -141,7 +141,7 @@ namespace SDGE.UI.Web.Controllers
                     {
                         _membroCientificoRepository.Adicionar(membro);
                     }
-                    return RedirectToAction("Index", new { msg = "Membro adicionado." });
+                    return RedirectToAction("Index", new { msg = "Pedido de participação enviado, aguarde pela confirmação da comissão organizadora." });
 
                 }
                 return View(comissao);
@@ -333,7 +333,10 @@ namespace SDGE.UI.Web.Controllers
 
         private int SessionId()
         {
-            return int.Parse(_httpContextAccessor.HttpContext.Session.GetString("_Membro"));
+            if(_httpContextAccessor.HttpContext.Session.GetString("_Membro") != null)
+                return int.Parse(_httpContextAccessor.HttpContext.Session.GetString("_Membro"));
+
+            return -1;
         }
     }
 }

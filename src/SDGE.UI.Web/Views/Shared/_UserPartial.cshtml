@@ -5,6 +5,9 @@
 @inject IAlertaRepository _alerta;
 @{
     bool isMembro = false;
+    bool isCientifico= false;
+    bool isOrganizador= false;
+
     ViewData["Controller"] = null;
     ViewData["Action"] = null;
     ViewData["Id"] = null;
@@ -20,7 +23,17 @@
     {
         id = int.Parse(HttpContextAccessor.HttpContext.Session.GetString("_Membro"));
         isMembro = true;
-        total = _alerta.TotalPorMembro(id);
+        if(HttpContextAccessor.HttpContext.Session.GetString("_Cientifico") != null)
+        {
+            isCientifico = true;
+            total = _alerta.TotalPorCientifico(id);
+        }
+        else if(HttpContextAccessor.HttpContext.Session.GetString("_Organizador") != null)
+        {
+            total = _alerta.TotalPorOrganizador(id);
+            isOrganizador = true;
+        }
+
     }
 }
 
@@ -65,14 +78,43 @@
                             if (isMembro)
                             {
                                 ViewData["Action"] = "Index";
-                                foreach (var item in _alerta.ObterPorMembro(id))
+                                if (isOrganizador)
+                                {
+                                    foreach (var item in _alerta.ObterPorOrganizador(id))
+                                    {
+                                        ViewData["Id"] = item.AlertaId;
+                                        if (item.Tipo.Equals("Inscricao"))
+                                        {
+                                            ViewData["Controller"] = "EventoParticipante";
+                                        }
+                                        <a class="dropdown-item" asp-area="" asp-controller="@ViewData["Controller"]" asp-action="@ViewData["Action"]" asp-route-id="@ViewData["Id"]">@item.Participante.Nome @item.Messagem</a>
+
+                                    }
+                                }
+                                else if (isCientifico)
+                                {
+                                    foreach (var item in _alerta.ObterPorCientifico(id))
+                                    {
+                                        ViewData["Id"] = item.AlertaId;
+                                        if (item.Tipo.Equals("Submissao"))
+                                        {
+                                            ViewData["Controller"] = "Submissao";
+                                        }
+                                        else if (item.Tipo.Equals("Correcao"))
+                                        {
+                                            ViewData["Controller"] = "Correcao";
+                                        }
+                                        <a class="dropdown-item" asp-area="" asp-controller="@ViewData["Controller"]" asp-action="@ViewData["Action"]" asp-route-id="@ViewData["Id"]">@item.Participante.Nome @item.Messagem</a>
+                                    }
+                                }
+                                /*foreach (var item in _alerta.ObterPorMembro(id))
                                 {
                                     ViewData["Id"] = item.AlertaId;
                                     if (item.Tipo.Equals("Inscricao"))
                                     {
                                         ViewData["Controller"] = "EventoParticipante";
                                     }
-                                    else if (item.Tipo.Equals("Submissao"))
+                                    if (item.Tipo.Equals("Submissao"))
                                     {
                                         ViewData["Controller"] = "Submissao";
                                     }
@@ -81,7 +123,7 @@
                                         ViewData["Controller"] = "Correcao";
                                     }
                                     <a class="dropdown-item" asp-area="" asp-controller="@ViewData["Controller"]" asp-action="@ViewData["Action"]" asp-route-id="@ViewData["Id"]">@item.Participante.Nome @item.Messagem</a>
-                                }
+                                }*/
                             }
                             else
                             {

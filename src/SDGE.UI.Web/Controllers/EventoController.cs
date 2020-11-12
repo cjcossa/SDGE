@@ -87,7 +87,6 @@ namespace SDGE.UI.Web.Controllers
                 ValidarEvento(collection);
                 if (ModelState.IsValid)
                 {
-                    
                      _eventoRepository.Adicionar(SetEvento(collection));
                         // return RedirectToAction(nameof(Index));
                      return RedirectToAction("Index", new { msg = "Evento criado." });

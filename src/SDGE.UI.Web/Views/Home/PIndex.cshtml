@@ -7,6 +7,7 @@
 @inject ICorrecaoRepository _correcoes;
 @{
     ViewData["Title"] = "Dashboard";
+    bool isParticipante = false;
     int itotal = 0;
     int stotal = 0;
     int ctotal = 0;
@@ -17,9 +18,10 @@
         itotal = _inscricoes.Total(id);
         stotal = _submissoes.Total(id);
         ctotal = _correcoes.Total(id);
-
+        isParticipante = true;
     }
 }
+
 
 <div class="row">
     <div class="col-md-4">

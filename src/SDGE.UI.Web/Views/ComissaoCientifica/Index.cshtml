@@ -7,7 +7,7 @@
 @model IEnumerable<SDGE.ApplicationCore.Entity.ComissaoCientifica>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Lista de Comissões Científica";
     bool state = false;
     int id = -1;
 
@@ -30,15 +30,20 @@
                         <i class="material-icons">close</i>
                     </button>
                     <span>
-                        <b> Sucesso - </b> @ViewBag.Alert
+                         @ViewBag.Alert
                     </span>
                 </div>
             }
             <div class="text-sm-left">
-                <button type="button" onclick="location.href='@Url.Action("Criar")'" class="btn btn-outline-success btn-sm">
+
+                @if (HttpContextAccessor.HttpContext.Session.GetString("_Organizador") != null)
+                {
+                 <button type="button" onclick="location.href='@Url.Action("Criar")'" class="btn btn-outline-success btn-sm">
                     <i class="material-icons">group_add</i>
                     Nova Comissão
-                </button>
+                 </button>
+                }
+               
                 <button type="button" onclick="location.href='@Url.Action("Participar")'" class="btn btn-outline-success btn-sm">
                     <i class="material-icons">keyboard</i>
                     Participar
@@ -46,8 +51,7 @@
             </div>
             <div class="card">
                 <div class="card-header card-header-primary">
-                    <h4 class="card-title">Comissão Científica</h4>
-                    <p class="card-category">Comissão responsável por avaliar as submissões.</p>
+                    <h4 class="card-title">@ViewData["Title"]</h4>
                 </div>
                 <div class="card-body">
 
@@ -63,32 +67,32 @@
                         <tbody>
                             @foreach (var item in Model)
                             {
-                                <tr>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => item.Codigo)
-                                    </td>
-                                    <td class="td-actions text-right">
-                                        @if (state)
-                                        {
-                                            <button type="button" onclick="location.href='@Url.Action("Adicionar", new { id = item.ComissaoCientificaId })'" rel="tooltip" title="Adicionar" class="btn btn-success btn-link btn-lg">
-                                                <i class="material-icons">add</i>
-                                            </button>
-                                            <button type="button" onclick="location.href='@Url.Action("Listar", new { id = item.ComissaoCientificaId })'" rel="tooltip" title="Detalhes" class="btn btn-info btn-link btn-lg">
-                                                <i class="material-icons">details</i>
-                                            </button>
-                                        }
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Codigo)
+                                </td>
+                                <td class="td-actions text-right">
+                                    @if (state || item.CriadoPorId == id)
+                                    {
+                                        <button type="button" onclick="location.href='@Url.Action("Listar", new { id = item.ComissaoCientificaId })'" rel="tooltip" title="Detalhes" class="btn btn-info btn-link btn-lg">
+                                            <i class="material-icons">details</i>
+                                        </button>
+                                    }
 
-                                        @if (item.CriadoPorId == id)
-                                        {
-                                            <button type="button" onclick="location.href='@Url.Action("Confirmar", new { id = item.ComissaoCientificaId })'" rel="tooltip" title="Confirmar" class="btn btn-success btn-link btn-lg">
-                                                <i class="material-icons">done</i>
-                                            </button>
-                                            <button type="button" data-toggle="ajax-modal" data-target="#modalConfirmDelete" data-url="@Url.Action($"Remover/{item.ComissaoCientificaId}")" rel="tooltip" title="Apagar" class="btn btn-danger btn-link btn-lg">
-                                                <i class="material-icons">delete_outline</i>
-                                            </button>
-                                        }
-                                    </td>
-                                </tr>
+                                    @if (item.CriadoPorId == id)
+                                    {
+                                        <button type="button" onclick="location.href='@Url.Action("Adicionar", new { id = item.ComissaoCientificaId })'" rel="tooltip" title="Adicionar" class="btn btn-success btn-link btn-lg">
+                                            <i class="material-icons">add</i>
+                                        </button>
+                                        <button type="button" onclick="location.href='@Url.Action("Confirmar", new { id = item.ComissaoCientificaId })'" rel="tooltip" title="Confirmar" class="btn btn-success btn-link btn-lg">
+                                            <i class="material-icons">done</i>
+                                        </button>
+                                        <button type="button" data-toggle="ajax-modal" data-target="#modalConfirmDelete" data-url="@Url.Action($"Remover/{item.ComissaoCientificaId}")" rel="tooltip" title="Apagar" class="btn btn-danger btn-link btn-lg">
+                                            <i class="material-icons">delete_outline</i>
+                                        </button>
+                                    }
+                                </td>
+                            </tr>
                             }
                         </tbody>
                     </table>

@@ -7,7 +7,7 @@
 @model IEnumerable<SDGE.ApplicationCore.Entity.ComissaoOrganizadora>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Lista de Comissões Organizadoras";
     bool state = false;
     int id = -1;
 
@@ -32,15 +32,19 @@
                         <i class="material-icons">close</i>
                     </button>
                     <span>
-                        <b> Sucesso - </b> @ViewBag.Alert
+                        @ViewBag.Alert
                     </span>
                 </div>
             }
             <div class="text-sm-left">
-                <button type="button" onclick="location.href='@Url.Action("Criar")'" class="btn btn-outline-success btn-sm">
+                
+                 @if (HttpContextAccessor.HttpContext.Session.GetString("_Organizador") != null)
+                {
+                 <button type="button" onclick="location.href='@Url.Action("Criar")'" class="btn btn-outline-success btn-sm">
                     <i class="material-icons">group_add</i>
                     Nova Comissão
-                </button>
+                 </button>
+                }
                 <button type="button" onclick="location.href='@Url.Action("Participar")'" class="btn btn-outline-success btn-sm">
                     <i class="material-icons">keyboard</i>
                     Participar
@@ -48,8 +52,7 @@
             </div>
             <div class="card">
                 <div class="card-header card-header-primary">
-                    <h4 class="card-title">Comissão Organizadora</h4>
-                    <p class="card-category">Comissao responsavel pelo controlo total do sistema</p>
+                    <h4 class="card-title">@ViewData["Title"]</h4>
                 </div>
                 <div class="card-body">
 

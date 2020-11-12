@@ -74,5 +74,12 @@ namespace SDGE.Infrastructure.Repository
                  && a.Removido == state && a.Status == state)
                  .ToList().Count();
         }
+
+        public int TotalPorCientifico(int id)
+        {
+            return _dbContext.Set<Alerta>().Include(a => a.ComissaoCientifica).Include(a => a.ComissaoCientifica.MembroCientificos).Include(a => a.Participante)
+                .Where(a => a.Destino == state && a.ComissaoCientifica.MembroCientificos.Any(a => a.MembroId == id) && a.Removido == state)
+                .ToList().Count();
+        }
     }
 }

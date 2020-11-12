@@ -1,7 +1,7 @@
 ﻿@model SDGE.UI.Web.Models.MembroOrganizadorViewModel
 
 @{
-    ViewData["Title"] = "Adicionar";
+    ViewData["Title"] = "Adicionar Membros";
 }
 
 <div class="row">
@@ -9,7 +9,7 @@
     <div class="col-md-8">
         <div class="card">
             <div class="card-header card-header-primary">
-                <h4 class="card-title">Adicionar Membros</h4>
+                <h4 class="card-title">@ViewData["Title"]</h4>
                 <p class="card-category">Partilhe o codigo da comissão com as pessoas que deseja incluir na comissão organizadora.</p>
             </div>
             <div class="card-body">
@@ -17,7 +17,7 @@
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                     <input type="hidden" asp-for="ComissaoOrganizadoraId" />
                     <div class="form-group">
-                        <select asp-for="Membros" class="form-control selectpicker" asp-items="ViewBag.MembroId" multiple title="SELECCIONE O(S) MEMBRO(S)" data-width="100%" data-style="btn-outline-info" data-live-search="true" data-selected-text-format="count > 1"></select>
+                        <select asp-for="Membros" class="form-control selectpicker" asp-items="ViewBag.MembroId" multiple title="SELECCIONE O(S) MEMBRO(S)" data-width="100%" data-style="btn-outline-primary" data-live-search="true" data-selected-text-format="count > 1"></select>
                         <span asp-validation-for="Membros" class="text-danger"></span>
                     </div>
                     <div class="form-group text-right">

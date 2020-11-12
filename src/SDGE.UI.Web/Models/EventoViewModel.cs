@@ -23,6 +23,7 @@ namespace SDGE.UI.Web.Models
 
         [Required(ErrorMessage = "Introduza o Email")]
         [Remote(action: "VerificarEmail", controller: "Evento")]
+        [EmailAddress]
         [Display(Name = "Email")]
         public string Email { get; set; }
 

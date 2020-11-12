@@ -32,11 +32,11 @@ namespace SDGE.Infrastructure.EntityConfig
                   .HasForeignKey(s => s.ComissaoOrganizadoraId)
                   .HasPrincipalKey(s => s.ComissaoOrganizadoraId)
                   .OnDelete(DeleteBehavior.Restrict);
+
             builder.Property(a => a.Messagem)
                .HasColumnType("varchar(250)")
                .IsRequired();
 
-          
         }
     }
 }

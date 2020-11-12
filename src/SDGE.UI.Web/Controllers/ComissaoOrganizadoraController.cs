@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using EmailService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -20,17 +21,20 @@ namespace SDGE.UI.Web.Controllers
         private readonly IMembroOrganizadorRepository _membroOrganizadorRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly UserManager<IdentityUser> _userManager;
+        private readonly IEmailSender _emailSender;
         public ComissaoOrganizadoraController(IComissaoOrganizadoraRepository comissaoOrganizadoraRepository, 
             IMembroRepository membroRepository, 
             IMembroOrganizadorRepository membroOrganizadorRepository,
             IHttpContextAccessor httpContextAccessor,
-            UserManager<IdentityUser> userManager)
+            UserManager<IdentityUser> userManager,
+            IEmailSender emailSender)
         {
             _comissaoOrganizadoraRepository = comissaoOrganizadoraRepository;
             _membroRepository = membroRepository;
             _membroOrganizadorRepository = membroOrganizadorRepository;
             _httpContextAccessor = httpContextAccessor;
             _userManager = userManager;
+            _emailSender = emailSender;
         }
         // GET: ComissaoOrganizadora
         public ActionResult Index(string msg = null)
@@ -55,9 +59,8 @@ namespace SDGE.UI.Web.Controllers
         // POST: ComissaoOrganizadora/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Criar(ComissaoOrganizadoraViewModel comissao)
+        public ActionResult Criar(ComissaoOrganizadoraViewModel comissao)
         {
-            IdentityResult identityResult;
             try
             {
                 // TODO: Add insert logic here
@@ -79,13 +82,8 @@ namespace SDGE.UI.Web.Controllers
                             Confirmado = true
                         };
                         _membroOrganizadorRepository.Adicionar(membro);
-                        IdentityUser identityUser = await _userManager.FindByEmailAsync(_membroRepository.ObterPorId(SessionId()).Email);
-                        if(identityUser != null)
-                        {
-                            identityResult = await _userManager.AddToRoleAsync(identityUser, "Organizador");
-                            if(identityResult != null)
-                                return RedirectToAction("Index", new { msg = "Comissão criada." });
-                        }
+                        
+                        return RedirectToAction("Index", new { msg = "Comissão criada." });
                     }
                 }
                 return View(comissao);
@@ -148,7 +146,7 @@ namespace SDGE.UI.Web.Controllers
                     {
                         _membroOrganizadorRepository.Adicionar(membro);
                     }
-                    return RedirectToAction("Index", new { msg = "Membro adicionado." });
+                    return RedirectToAction("Index", new { msg = "Pedido de participação enviado, aguarde pela confirmação da comissão organizadora." });
                 }
                 return View(comissao);
             }
@@ -189,14 +187,11 @@ namespace SDGE.UI.Web.Controllers
                             if (identityUser != null)
                             {
                                 IdentityResult identityResult = await _userManager.AddToRoleAsync(identityUser, "Organizador");
-                                if (identityResult != null)
-                                    return RedirectToAction("Index", new { msg = "Membro(s) adicionado(s)" });
                             }
                         }
                       
                     }
-                    /*_membroOrganizadorRepository.Adicionar(organizador);*/
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction("Index", new { msg = "Membro(s) adicionado(s)" });
                 }
                 return View(organizadorViewModel);
             }
@@ -205,6 +200,7 @@ namespace SDGE.UI.Web.Controllers
                 return View(organizadorViewModel);
             }
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Confirmar(string[] confirmar, int Id)
@@ -302,7 +298,7 @@ namespace SDGE.UI.Web.Controllers
                 if(!_membroOrganizadorRepository.VerificarMembro(item.MembroId, id, false))
                 {
                     state = true;
-                    items.Add(new SelectListItem() { Value = item.MembroId.ToString(), Text = item.Email });
+                    items.Add(new SelectListItem() { Value = item.MembroId.ToString(), Text = item.Nome + "-" + item.Email });
                 }
             }
             if(!state)
@@ -350,6 +346,17 @@ namespace SDGE.UI.Web.Controllers
             IdentityUser identityUser = await _userManager.FindByEmailAsync(_membroRepository.ObterPorId(SessionId()).Email);
             if (await _userManager.IsInRoleAsync(identityUser, "Organizador"))
                 return true;
+
+            return false;
+        }
+
+        private bool Notificar(Message message)
+        {
+            if (message.To != null)
+            {
+                _emailSender.SendEmailAsync(message);
+                return true;
+            }
 
             return false;
         }

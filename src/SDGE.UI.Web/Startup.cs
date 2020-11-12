@@ -18,6 +18,7 @@ using SDGE.Infrastructure.Repository;
 using SDGE.ApplicationCore.Interfaces.Services;
 using SDGE.ApplicationCore.Interfaces.Repository;
 using Microsoft.AspNetCore.Mvc;
+using EmailService;
 
 namespace SDGE.UI.Web
 {
@@ -37,8 +38,7 @@ namespace SDGE.UI.Web
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
            
-            //services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-            services.AddDefaultIdentity<IdentityUser>().AddRoles<IdentityRole>()
+            services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true).AddRoles<IdentityRole>()
                .AddEntityFrameworkStores<ApplicationDbContext>();
 
             services.AddDbContext<ParticipanteContext>(options =>
@@ -76,7 +76,11 @@ namespace SDGE.UI.Web
             services.AddScoped<IMembroCientificoRepository, MembroCientificoRepository>();
             services.AddScoped<IMembroOrganizadorRepository, MembroOrganizadorRepository>();
             services.AddScoped<IAlertaRepository, AlertaRepository>();
-            
+            services.AddScoped<IFaculdadeRepository, FaculdadeRepository>();
+            services.AddScoped<IDirectorRepository, DirectorRepository>();
+
+
+
             services.Configure<IdentityOptions>(options =>
             {
                 // Password settings.
@@ -97,8 +101,15 @@ namespace SDGE.UI.Web
                 options.User.AllowedUserNameCharacters =
                 "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
                 options.User.RequireUniqueEmail = true;
-                options.SignIn.RequireConfirmedEmail = false;
+                options.SignIn.RequireConfirmedEmail = true;
+                //options.Tokens.EmailConfirmationTokenProvider = "emailconfirmation";
             });
+
+            var emailConfig = Configuration
+                .GetSection("EmailConfiguration")
+                .Get<EmailConfiguration>();
+            services.AddSingleton(emailConfig);
+            services.AddScoped<IEmailSender, EmailSender>();
 
             services.ConfigureApplicationCookie(options =>
             {
@@ -114,7 +125,10 @@ namespace SDGE.UI.Web
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, 
+            IWebHostEnvironment env, 
+            UserManager<IdentityUser> userManager,
+            RoleManager<IdentityRole> roleManager)
         {
             if (env.IsDevelopment())
             {
@@ -136,6 +150,10 @@ namespace SDGE.UI.Web
             app.UseAuthorization();
 
             app.UseSession();
+
+            //seed
+            Seed.SeedData(userManager, roleManager);
+            //signInManager.SignOutAsync();
 
             app.UseEndpoints(endpoints =>
              {

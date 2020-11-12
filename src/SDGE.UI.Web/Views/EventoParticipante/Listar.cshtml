@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<SDGE.ApplicationCore.Entity.EventoParticipante>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Lista de Inscrições";
 }
     
     <div class="row">
@@ -14,7 +14,7 @@
                         <i class="material-icons">close</i>
                     </button>
                     <span>
-                        <b> Sucesso - </b> @ViewBag.Alert
+                        @ViewBag.Alert
                     </span>
                 </div>
             }
@@ -24,7 +24,7 @@
             </button>
             <div class="card">
                 <div class="card-header card-header-primary">
-                    <h4 class="card-title ">Lista de Inscrições</h4>
+                    <h4 class="card-title ">@ViewData["Title"]</h4>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -70,7 +70,7 @@
                                                 </a>
                                             }
 
-                                            <button type="button" data-toggle="ajax-modal" data-target="#modalConfirmDelete" data-url="@Url.Action($"Delete/{item.EventoId}")" rel="tooltip" title="Cancelar" class="btn btn-danger btn-link btn-lg">
+                                            <button type="button" data-toggle="ajax-modal" data-target="#modalConfirmDelete" data-url="@Url.Action($"Delete/{item.EventoParticipanteId}")" rel="tooltip" title="Cancelar" class="btn btn-danger btn-link btn-lg">
                                                 <i class="material-icons">close</i>
                                             </button>
                                         </td>

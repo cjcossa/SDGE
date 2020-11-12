@@ -95,7 +95,10 @@ namespace SDGE.UI.Web.Areas.Identity.Pages.Account
                     //return LocalRedirect(returnUrl);
                     IdentityUser identityUser = await _userManager.FindByEmailAsync(Input.Email);
                    
-                    if (!await _userManager.IsInRoleAsync(identityUser, "Membro") && !await _userManager.IsInRoleAsync(identityUser, "Participante"))
+                    if (!await _userManager.IsInRoleAsync(identityUser, "Admin") &&
+                        !await _userManager.IsInRoleAsync(identityUser, "Membro") && 
+                        !await _userManager.IsInRoleAsync(identityUser, "Participante") &&
+                        !await _userManager.IsInRoleAsync(identityUser, "Director"))
                     {
                         return RedirectToAction("Index", "Register", new { email = Input.Email, returnUrl = returnUrl });
                     }
@@ -116,14 +119,21 @@ namespace SDGE.UI.Web.Areas.Identity.Pages.Account
                                 HttpContext.Session.SetString("_Cientifico", id.ToString());
                             }
 
-                        }
-                        else
+                        }else if(await _userManager.IsInRoleAsync(identityUser, "Participante"))
                         {
                             var id = _participanteRepository.ObterPorEmail(identityUser.Email).ParticipanteId;
                             HttpContext.Session.SetString("_Participante", id.ToString());
                             return RedirectToAction("PIndex", "Home");
                         }
-                           
+                        else if(await _userManager.IsInRoleAsync(identityUser, "Admin"))
+                        {
+                            HttpContext.Session.SetString("_Admin", "Admin");
+                        }
+                        else if (await _userManager.IsInRoleAsync(identityUser, "Director"))
+                        {
+                            HttpContext.Session.SetString("_Director", "Director");
+                        }
+
                         return RedirectToAction("Index", "Home");
                     }
                     

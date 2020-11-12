@@ -29,14 +29,14 @@ namespace SDGE.Infrastructure.Repository
         public IEnumerable<Correcao> ObterPorSubmissao(int id)
         {
             return _dbContext.Set<Correcao>().Include(c => c.Submissao).Include(c => c.Membro)
-                .Where(c => c.SubmissaoId == id && c.Removido == state && c.Submissao.Removido == state && c.Membro.Removido == state)
+                .Where(c => c.SubmissaoId == id && c.Removido == state && c.Submissao.Removido == state && !c.Submissao.Status.Equals("Aprovado") && c.Membro.Removido == state)
                 .AsEnumerable();
         }
 
         public Correcao ObterPorCorrecao(int id)
         {
             return _dbContext.Set<Correcao>().Include(c => c.Submissao).Include(c => c.Membro)
-               .Where(c => c.CorrecaoId == id && c.Removido == state && c.Submissao.Removido == state && c.Membro.Removido == state)
+               .Where(c => c.CorrecaoId == id && c.Removido == state && c.Submissao.Removido == state  && !c.Submissao.Status.Equals("Aprovado") && c.Membro.Removido == state)
                .FirstOrDefault();
         }
         public override void Remover(Correcao entity)
@@ -57,7 +57,7 @@ namespace SDGE.Infrastructure.Repository
         {
             return _dbContext.Set<Correcao>().Include(x => x.Submissao).Include(x => x.Submissao.Participante).Include( x => x.Membro)
               .Where(x => x.Submissao.ParticipanteId == id && x.Removido == state &&
-             x.Submissao.Participante.Removido == state && x.Submissao.Removido == state && x.Membro.Removido == state)
+             x.Submissao.Participante.Removido == state && x.Submissao.Removido && !x.Submissao.Status.Equals("Aprovado") == state && x.Membro.Removido == state)
              .AsEnumerable();
         }
 
@@ -65,7 +65,7 @@ namespace SDGE.Infrastructure.Repository
         {
             return _dbContext.Set<Correcao>().Include(x => x.Submissao).Include(x => x.Submissao.Participante).Include(x => x.Membro)
               .Where(x => x.MembroId == id && x.Removido == state &&
-             x.Submissao.Participante.Removido == state && x.Submissao.Removido == state && x.Membro.Removido == state)
+             x.Submissao.Participante.Removido == state && x.Submissao.Removido == state && !x.Submissao.Status.Equals("Aprovado") && x.Membro.Removido == state)
              .AsEnumerable();
         }
     }

@@ -1,10 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+
+using EmailService;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.WebUtilities;
 using SDGE.ApplicationCore.Entity;
 using SDGE.ApplicationCore.Interfaces.Repository;
 using SDGE.UI.Web.Models;
@@ -17,21 +23,35 @@ namespace SDGE.UI.Web.Controllers
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IEmailSender _emailSender;
+        private readonly IMembroOrganizadorRepository _membroOrganizadorRepository;
 
         public MembroController(IMembroRepository membroRepository, 
             UserManager<IdentityUser> userManager,
             SignInManager<IdentityUser> signInManager,
-            IHttpContextAccessor httpContextAccessor)
+            IHttpContextAccessor httpContextAccessor,
+            IEmailSender emailSender,
+            IMembroOrganizadorRepository membroOrganizadorRepository)
         {
             _membroRepository = membroRepository;
             _userManager = userManager;
             _signInManager = signInManager;
             _httpContextAccessor = httpContextAccessor;
+            _emailSender = emailSender;
+            _membroOrganizadorRepository = membroOrganizadorRepository;
         }
         // GET: Membro
-        public ActionResult Index()
+        public async Task<ActionResult> Index(string msg = null, string type = null)
         {
-            return View(_membroRepository.ObterTodos());
+            ViewBag.Alert = msg;
+            ViewBag.Type = type;
+            var users = await _userManager.GetUsersInRoleAsync("Organizador");
+
+           // _
+            //for(var item in users)
+            var result = _membroRepository.ObterTodos();
+
+            return View(result);
         }
 
         // GET: Membro/Details/5
@@ -68,7 +88,7 @@ namespace SDGE.UI.Web.Controllers
             membro.Email = email;
             return View(membro);
         }
-
+       
         // POST: Membro/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -84,9 +104,9 @@ namespace SDGE.UI.Web.Controllers
                     if (result != null)
                     {
                         IdentityUser identityUser = await _userManager.FindByEmailAsync(collection.Email);
+
                         if (identityUser != null)
                         {
-                            
                             identityResult = await _userManager.AddToRoleAsync(identityUser, "Membro");
                             if (identityResult.Succeeded)
                             {
@@ -94,11 +114,10 @@ namespace SDGE.UI.Web.Controllers
                                 HttpContext.Session.Remove("_UserEmail");
                                 return RedirectToAction("Eventos", "Evento");
                             }
-                                
+
                         }
-                        
+
                     }
-                    
                 }
                 return View(collection);
 
@@ -106,6 +125,56 @@ namespace SDGE.UI.Web.Controllers
             catch
             {
                 return View(collection);
+            }
+        }
+
+        public ActionResult Adicionar()
+        {
+            ViewBag.MembroId = ObterMembros();
+            return View(new MembroOrganizadorViewModel());
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> Adicionar(MembroOrganizadorViewModel organizadorViewModel)
+        {
+            //return PartialView("_addMember", organizador);
+            try
+            {
+                // TODO: Add insert logic here
+                if (ModelState.IsValid)
+                {
+                    if(organizadorViewModel != null)
+                    {
+                        foreach (var selectedId in organizadorViewModel.Membros)
+                        {
+                            var result = _membroRepository.ObterPorId(selectedId);
+                            if (result != null)
+                            {
+                                IdentityUser identityUser = await _userManager.FindByEmailAsync(result.Email);
+                                if (identityUser != null)
+                                {
+                                    IdentityResult identityResult = await _userManager.AddToRoleAsync(identityUser, "Organizador");
+                                    var message = new Message(new string[] { result.Email }, "Adicionar Organizador", $"Oi {result.Nome}, agora pode criar uma comissão organizadora.", null);
+                                    Notificar(message);
+                                }
+                            }
+                        }
+                        return RedirectToAction("Index", new { msg = "Membro(s) adicionado(s)", type = "success" });
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, "Erro ao registar membro.");
+                    }
+                    
+                }
+                ViewBag.MembroId = ObterMembros();
+                return View(organizadorViewModel);
+            }
+            catch
+            {
+                ViewBag.MembroId = ObterMembros();
+                return View(organizadorViewModel);
             }
         }
 
@@ -181,6 +250,40 @@ namespace SDGE.UI.Web.Controllers
                 return int.Parse(_httpContextAccessor.HttpContext.Session.GetString("_Membro"));
 
             return -1;
+        }
+
+        private List<SelectListItem> ObterMembros()
+        {
+            List<SelectListItem> items = new List<SelectListItem>();
+            var result = _membroRepository.ObterTodos();
+            //var orgs = _userManager.Get
+            bool state = false;
+
+            if(result != null)
+            {
+                foreach (var item in result)
+                {
+                    state = true;
+                    items.Add(new SelectListItem() { Value = item.MembroId.ToString(), Text = item.Nome + "-" + item.Email });
+                }
+            }
+           
+            if (!state)
+                items.Add(new SelectListItem() { Value = "", Text = "Não existe nenhum membro" });
+
+            return items;
+
+        }
+
+        private bool Notificar(Message message)
+        {
+            if (message.To != null)
+            {
+                _emailSender.SendEmailAsync(message);
+                return true;
+            }
+
+            return false;
         }
     }
 }

@@ -22,7 +22,7 @@
                         <i class="material-icons">close</i>
                     </button>
                     <span>
-                        <b> Sucesso - </b> @ViewBag.Alert
+                       @ViewBag.Alert
                     </span>
                 </div>
             }
@@ -48,10 +48,10 @@
                                             Estado
                                         </th>
                                         <th>
-                                            @Html.DisplayNameFor(model => model.Participante)
+                                            Candidato
                                         </th>
                                         <th>
-                                            @Html.DisplayNameFor(model => model.Tipo)
+                                            Formato de Apresentação
                                         </th>
 
                                         <th></th>
@@ -128,9 +128,13 @@
                                                         <i class="material-icons">done</i>
                                                     </button>
                                                 }
-                                                <button type="button" onclick="location.href='@Url.Action("Index", "Correcao", new { id = item.SubmissaoId })'" rel="tooltip" title="Avaliações" class="btn btn-success btn-link btn-sm">
-                                                    <i class="material-icons">view_list</i>
-                                                </button>
+                                                @if (item.Status == null || !item.Status.Equals("Aprovado"))
+                                                {
+                                                    <button type="button" onclick="location.href='@Url.Action("Index", "Correcao", new { id = item.SubmissaoId })'" rel="tooltip" title="Avaliações" class="btn btn-success btn-link btn-sm">
+                                                        <i class="material-icons">view_list</i>
+                                                    </button>
+                                                }
+
                                                 @if (item.Status == null || !item.Status.Equals("Reprovado"))
                                                 {
                                                     <button type="button" onclick="location.href='@Url.Action("Reprovar", new { id = item.SubmissaoId })'" rel="tooltip" title="Reprovar" class="btn btn-danger btn-link btn-sm">

@@ -27,13 +27,13 @@ namespace SDGE.UI.Web
                 {
                     var context = services.GetRequiredService<ApplicationDbContext>();
                     var context2 = services.GetRequiredService<ParticipanteContext>();
-                    Seed.Initialize(context);
+                    //Seed.Initialize(context);
                     DBInitializer.Initialize(context2);
                 }
                 catch(Exception ex)
                 {
                     var logger = services.GetRequiredService<ILogger<Program>>();
-                    logger.LogError(ex, "Erro no metdo seeding do contexto");
+                    logger.LogError(ex, "Erro no metodo seeding do contexto");
                 }
             }
             host.Run();

@@ -57,7 +57,7 @@ namespace SDGE.Infrastructure.Repository
         public override IEnumerable<Evento> ObterTodos()
         {
             return base.ObterTodos()
-                .Where(e => e.Removido == state && (DateTime.Parse(e.DataInicio) <= dataActual && dataActual <= DateTime.Parse(e.DataFim)));
+                .Where(e => e.Removido == state && (dataActual <= DateTime.Parse(e.DataFim)));
         }
 
         public IEnumerable<Evento> ObterEventos(int membroId)
